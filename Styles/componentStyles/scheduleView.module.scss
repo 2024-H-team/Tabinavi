@@ -1,12 +1,15 @@
 .ScheduleWrap {
     font-weight: bold;
     display: flex;
+    justify-content: space-evenly;
+    width: 100%;
     .ScheduleContents {
         margin-left: 17px;
         padding-left: 8px;
         display: flex;
         align-items: center;
         width: 260px;
+        justify-content: space-between;
         .ScheduleInformation {
             margin-right: 29px;
             display: flex;

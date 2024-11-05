@@ -3,7 +3,7 @@ import ScheduleDate from '@/components/Home/ScheduleDate';
 import style from '@styles/componentStyles/ScheduleView.module.scss';
 import { BiChevronRight } from 'react-icons/bi';
 
-interface ScheduleDateProps {
+interface ScheduleData {
     month: number;
     day: number;
     Title: string;
@@ -12,20 +12,24 @@ interface ScheduleDateProps {
     TimeEnd: string;
 }
 
-export default function ScheduleView({ month, day, SubTitle, Title, TimeStart, TimeEnd }: ScheduleDateProps) {
+interface ScheduleDateProps {
+    data: ScheduleData;
+}
+
+export default function ScheduleView({ data }: ScheduleDateProps) {
     return (
         <div className={style.ScheduleWrap}>
             <div>
-                <ScheduleDate month={month} day={day} />
+                <ScheduleDate month={data.month} day={data.day} />
             </div>
 
             <div className={style.ScheduleContents}>
                 <div className={style.ScheduleInformation}>
                     <p className={style.time}>
-                        {TimeStart}~{TimeEnd}
+                        {data.TimeStart}~{data.TimeEnd}
                     </p>
-                    <h3>{Title}</h3>
-                    <h4>{SubTitle}</h4>
+                    <h3>{data.Title}</h3>
+                    <h4>{data.SubTitle}</h4>
                 </div>
                 <BiChevronRight size="30px" color="blue" />
             </div>
