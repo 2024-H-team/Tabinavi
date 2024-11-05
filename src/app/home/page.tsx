@@ -1,5 +1,6 @@
 import ScheduleView from '@/components/Home/ScheduleView';
 import style from '@styles/appStyles/home.module.scss';
+import Footer from '@/components/Home/Footer';
 
 // const ScheduleViewArray = [
 //     [
@@ -53,6 +54,7 @@ export default function Home() {
                     SubTitle="直近の予定直近の予定"
                 />
             </div>
+            <Footer />
         </>
     );
 }
