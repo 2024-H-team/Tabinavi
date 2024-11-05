@@ -7,7 +7,14 @@
 .calendar {
     width: 90%;
     margin: auto;
+    margin-top: 15px;
     border: solid 1px;
     height: 321px;
     border-radius: 6px;
+}
+
+.Setting {
+    display: flex;
+    justify-content: end;
+    margin: 56px 25px 0 0;
 }

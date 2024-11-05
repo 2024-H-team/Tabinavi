@@ -1,6 +1,7 @@
 import ScheduleView from '@/components/Home/ScheduleView';
 import style from '@styles/appStyles/home.module.scss';
 import Footer from '@/components/Home/Footer';
+import { IoSettingsOutline } from 'react-icons/io5';
 
 // const ScheduleViewArray = [
 //     [
@@ -26,6 +27,9 @@ import Footer from '@/components/Home/Footer';
 export default function Home() {
     return (
         <>
+            <div className={style.Setting}>
+                <IoSettingsOutline size="24px" />
+            </div>
             <div className={style.calendar}></div>
             <div className={style.ScheduleWrap}>
                 <h2 style={{ fontSize: '16px' }}>直近の予定</h2>
