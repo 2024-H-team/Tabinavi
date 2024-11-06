@@ -31,6 +31,8 @@ export default function ScheduleView({ data }: ScheduleDateProps) {
                     <h3>{data.Title}</h3>
                     <h4>{data.SubTitle}</h4>
                 </div>
+            </div>
+            <div className={style.BiChevronRight}>
                 <BiChevronRight size="30px" color="blue" />
             </div>
         </div>

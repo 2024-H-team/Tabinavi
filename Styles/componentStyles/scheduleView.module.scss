@@ -1,7 +1,6 @@
 .ScheduleWrap {
     font-weight: bold;
     display: flex;
-    justify-content: space-evenly;
     width: 100%;
     .ScheduleContents {
         margin-left: 17px;
@@ -28,5 +27,10 @@
                 margin: 7px 0;
             }
         }
+    }
+    .BiChevronRight {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 }
