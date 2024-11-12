@@ -6,15 +6,15 @@ import { BsClockHistory } from 'react-icons/bs';
 export default function Footer() {
     return (
         <footer className={style.FooterWrap}>
-            <div className={style.navBtn}>
+            <div className={style.NavBtn}>
                 <GoHome color="white" size="24px" />
                 <p>Home</p>
             </div>
-            <div className={style.navBtn}>
+            <div className={style.NavBtn}>
                 <PiPlusSquareBold color="white" size="24px" />
                 <p>Home</p>
             </div>
-            <div className={style.navBtn}>
+            <div className={style.NavBtn}>
                 <BsClockHistory color="white" size="24px" />
                 <p>Home</p>
             </div>
