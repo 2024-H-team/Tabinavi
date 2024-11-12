@@ -1,5 +1,5 @@
-import ScheduleView from '@/components/Home/ScheduleView';
-import style from '@styles/appStyles/Home/Home.module.scss';
+import ScheduleView from '@/components/home/ScheduleView';
+import style from '@styles/appStyles/home/Home.module.scss';
 import Footer from '@/components/Footer';
 import { IoSettingsOutline } from 'react-icons/io5';
 import ScheduleViewArray from './utils/ScheduleViewArray';

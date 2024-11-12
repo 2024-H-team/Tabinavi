@@ -1,5 +1,5 @@
 import React from 'react';
-import ScheduleDate from '@/components/Home/ScheduleDate';
+import ScheduleDate from '@/components/home/ScheduleDate';
 import style from '@styles/componentStyles/ScheduleView.module.scss';
 import { BiChevronRight } from 'react-icons/bi';
 
