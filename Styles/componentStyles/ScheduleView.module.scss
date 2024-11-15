@@ -1,0 +1,36 @@
+.ScheduleWrap {
+    font-weight: bold;
+    display: flex;
+    width: 100%;
+    .ScheduleContents {
+        margin-left: 17px;
+        padding-left: 8px;
+        display: flex;
+        align-items: center;
+        width: 260px;
+        justify-content: space-between;
+        .ScheduleInformation {
+            margin-right: 29px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            h3 {
+                font-size: 18px;
+            }
+            h4 {
+                margin: 5px 0;
+                font-size: 12px;
+                font-weight: normal;
+            }
+            .time {
+                font-size: 11px;
+                margin: 7px 0;
+            }
+        }
+    }
+    .BiChevronRight {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
