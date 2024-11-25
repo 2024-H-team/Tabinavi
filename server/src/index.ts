@@ -1,4 +1,4 @@
-import './loadEnv';
+import './config/loadEnv';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import webRoutes from './routers/web';
