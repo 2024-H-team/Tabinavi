@@ -27,14 +27,104 @@
     border-radius: 5px;
     font-size: 14px;
     line-height: 1.5;
+    code {
+        background-color: #cecece;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        color: #1b1b1b;
+    }
 
+    pre {
+        background-color: #cecece;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        color: #1b1b1b;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow: auto;
+    }
+
+    ul {
+        padding-left: 20px;
+        margin-top: 5px;
+    }
+
+    ul li {
+        margin-bottom: 5px;
+    }
+
+    ol {
+        padding-left: 20px;
+        margin-top: 5px;
+    }
+
+    ol li {
+        margin-bottom: 5px;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    strong {
+        font-weight: bold;
+    }
+
+    em,
+    i {
+        font-style: italic;
+    }
+
+    p {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    a {
+        color: #1a73e8;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    u {
+        text-decoration: underline;
+    }
+
+    s {
+        text-decoration: line-through;
+    }
+
+    blockquote {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #cecece;
+        border-left: 5px solid #ddd;
+        font-style: italic;
+    }
     &.userMessage {
-        background-color: #e0f7fa;
+        background-color: #cecece;
         align-self: flex-end;
+        p {
+            margin: 0;
+        }
     }
 
     &.assistantMessage {
-        background-color: #fce4ec;
         align-self: flex-start;
     }
 }
