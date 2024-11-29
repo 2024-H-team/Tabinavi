@@ -1,0 +1,31 @@
+.Spot {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    width: 100%;
+    height: 75px;
+    transition: all 0.3s;
+    flex-shrink: 0;
+    position: relative;
+    .closeBtn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: #f57676;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 11px;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+        line-height: 25px;
+    }
+}

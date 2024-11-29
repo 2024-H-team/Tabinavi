@@ -1,6 +1,7 @@
 import { Roboto } from 'next/font/google';
 import 'normalize.css';
 import '@styles/GlobalStyles.scss';
+import { MapProvider } from '@/components/MapProvider';
 
 const roboto = Roboto({
     subsets: ['latin'],
@@ -15,7 +16,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={roboto.className}>{children}</body>
+            <body className={roboto.className}>
+                <MapProvider>{children}</MapProvider>
+            </body>
         </html>
     );
 }

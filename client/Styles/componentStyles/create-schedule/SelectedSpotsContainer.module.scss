@@ -1,0 +1,19 @@
+.Container {
+    width: calc(50% - 50px);
+    height: 500px;
+    padding: 8px 20px;
+    overflow: auto;
+    background-color: #f5f3aa;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    button {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #afafaf;
+        color: white;
+    }
+}
