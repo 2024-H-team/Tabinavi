@@ -1,5 +1,5 @@
 import React from 'react';
-import style from '@styles/componentStyles/ScheduleDate.module.scss';
+import styles from '@styles/componentStyles/home/ScheduleDate.module.scss';
 
 interface ScheduleDateProps {
     month: number;
@@ -8,10 +8,10 @@ interface ScheduleDateProps {
 
 export default function ScheduleDate({ month, day }: ScheduleDateProps) {
     return (
-        <div className={style.DateWrap}>
-            <p className={style.Date}>
+        <div className={styles.DateWrap}>
+            <p className={styles.Date}>
                 {month}/<br />
-                <span className={style.day}>{day}</span>
+                <span className={styles.day}>{day}</span>
             </p>
         </div>
     );
