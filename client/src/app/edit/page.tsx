@@ -1,9 +1,18 @@
 'use client';
+import Content from '@/components/edit/Content';
 import EditHeader from '@/components/edit/EditHeader';
 import { useEffect, useState } from 'react';
 
+type ScheduleData = {
+    id: number;
+    Location: string;
+    Time: string;
+    PersonalEffects: { Name: string }[];
+    Memo: string;
+};
+
 export default function Edit() {
-    const [location, setLocation] = useState<string | null>(null);
+    const [scheduleData, setScheduleData] = useState<ScheduleData | undefined>(undefined);
     useEffect(() => {
         const fetchSchedule = async () => {
             try {
@@ -12,8 +21,7 @@ export default function Edit() {
                     throw new Error('データの取得に失敗しました');
                 }
                 const data = await res.json();
-                const firstLocation = data.scheduledata[0]?.Location;
-                setLocation(firstLocation);
+                setScheduleData(data.scheduledata[0]);
             } catch (error) {
                 console.error(error);
             }
@@ -22,11 +30,10 @@ export default function Edit() {
         fetchSchedule();
     }, []);
 
-    console.log(location);
     return (
         <>
-            <EditHeader location={location} />
-            <p>1</p>
+            <EditHeader location={scheduleData?.Location || '未設定'} />
+            <Content data={scheduleData} />
         </>
     );
 }
