@@ -23,6 +23,10 @@ export default function Content({ data }: ContentProps) {
                 <h2>滞在時間</h2>
                 <p>{data ? data.Time + '時間' : 'データがありません'}</p>
             </div>
+            <div className={styles.editWrap}>
+                <h2>持ち物</h2>
+                <p>{data ? data.Time + '時間' : 'データがありません'}</p>
+            </div>
         </div>
     );
 }
