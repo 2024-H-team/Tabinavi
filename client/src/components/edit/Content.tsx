@@ -1,6 +1,7 @@
 import styles from '@styles/componentStyles/edit/Content.module.scss';
 import { MdClose } from 'react-icons/md';
 import { HiOutlinePencil } from 'react-icons/hi2';
+import EditField from './EditField';
 
 type ScheduleData = {
     id: number;
@@ -15,27 +16,11 @@ type ContentProps = {
 };
 
 export default function Content({ data }: ContentProps) {
-    console.log(data?.PersonalEffects);
     return (
         <div className={styles.contentWrap}>
-            <div className={styles.editWrap}>
-                <div>
-                    <h2>旅行先</h2>
-                    <p>{data ? data.Location : 'データがありません'}</p>
-                </div>
-                <button className={styles.editBtn}>
-                    <HiOutlinePencil color="#929292" />
-                </button>
-            </div>
-            <div className={styles.editWrap}>
-                <div>
-                    <h2>滞在時間</h2>
-                    <p>{data ? data.Time + '時間' : 'データがありません'}</p>
-                </div>
-                <button className={styles.editBtn}>
-                    <HiOutlinePencil color="#929292" />
-                </button>
-            </div>
+            <EditField title="旅行先" value={data?.Location || '未設定'} />
+            <EditField title="滞在時間" value={data?.Time + '時間' || '未設定'} />
+
             <div className={styles.editWrap}>
                 <div>
                     <h2>持ち物</h2>
