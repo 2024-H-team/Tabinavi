@@ -31,9 +31,9 @@ export default function Edit() {
     }, []);
 
     return (
-        <>
+        <div>
             <EditHeader location={scheduleData?.Location || '未設定'} />
             <Content data={scheduleData} />
-        </>
+        </div>
     );
 }
