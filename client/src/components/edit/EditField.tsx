@@ -32,7 +32,7 @@ export default function EditField({ title, value }: EditFieldProps) {
     };
 
     return (
-        <div className={styles.editWrap}>
+        <div className={styles.EditWrap}>
             <div>
                 <h2>{title}</h2>
                 <input
@@ -44,7 +44,7 @@ export default function EditField({ title, value }: EditFieldProps) {
                     onChange={handleChange}
                 />
             </div>
-            <button className={styles.editBtn} onClick={handleEnableEdit}>
+            <button className={styles.EditBtn} onClick={handleEnableEdit}>
                 <HiOutlinePencil color="#929292" />
             </button>
         </div>

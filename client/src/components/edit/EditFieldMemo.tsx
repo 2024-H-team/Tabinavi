@@ -37,14 +37,14 @@ export default function EditFieldMemo({ title, value }: EditFieldMemoProps) {
     };
 
     return (
-        <div className={styles.editWrap}>
+        <div className={styles.EditWrap}>
             <div>
                 <h2>{title}</h2>
                 <textarea
                     ref={inputRef}
                     rows={5}
                     cols={45}
-                    className={styles.editMemo}
+                    className={styles.EditMemo}
                     value={inputValue}
                     placeholder="お店の情報やURLを記入するのがおすすめ"
                     readOnly={!isEditable}
@@ -52,7 +52,7 @@ export default function EditFieldMemo({ title, value }: EditFieldMemoProps) {
                     onChange={handleChange}
                 />
             </div>
-            <button className={styles.editBtn} onClick={handleEnableEdit}>
+            <button className={styles.EditBtn} onClick={handleEnableEdit}>
                 <HiOutlinePencil color="#929292" />
             </button>
         </div>

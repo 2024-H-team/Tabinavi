@@ -1,7 +1,7 @@
-.contentWrap {
+.ContentWrap {
     padding: 0 15px;
 
-    .editWrap {
+    .EditWrap {
         background-color: #fff;
         margin-top: 20px;
         margin-bottom: 16px;
@@ -32,7 +32,7 @@
             font-weight: normal;
             resize: none;
         }
-        .editBtn {
+        .EditBtn {
             background-color: #fff;
             position: absolute;
             top: 24px;
@@ -40,17 +40,17 @@
             font-size: 1.4rem;
             color: #929292;
         }
-        .noItems {
+        .NoItems {
             color: #929292;
             font-weight: normal;
         }
-        .addItemForm {
+        .AddItemForm {
             padding-left: 8px;
             button {
                 background-color: #fff;
                 font-size: 1.4rem;
             }
-            .addBtn {
+            .AddBtn {
                 margin-right: 50px;
             }
         }

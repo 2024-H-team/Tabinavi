@@ -40,7 +40,7 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
     const hasVisibleItems = visibleEffects.some((isVisible) => isVisible);
 
     return (
-        <div className={styles.editWrap}>
+        <div className={styles.EditWrap}>
             <div>
                 <h2>{title}</h2>
                 {hasVisibleItems ? (
@@ -58,25 +58,25 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
                         );
                     })
                 ) : (
-                    <p className={styles.noItems}>持ち物がありません</p>
+                    <p className={styles.NoItems}>持ち物がありません</p>
                 )}
 
                 {isAdding && (
-                    <div className={styles.addItemForm}>
+                    <div className={styles.AddItemForm}>
                         <input
                             type="text"
                             value={newItem}
                             placeholder="持ち物を入力"
                             onChange={(e) => setNewItem(e.target.value)}
-                            className={styles.addItemInput}
+                            className={styles.AddItemInput}
                         />
-                        <button onClick={handleAdd} className={styles.addButton}>
+                        <button onClick={handleAdd} className={styles.AddButton}>
                             追加
                         </button>
                     </div>
                 )}
             </div>
-            <button className={styles.editBtn} onClick={() => setIsAdding((prev) => !prev)}>
+            <button className={styles.EditBtn} onClick={() => setIsAdding((prev) => !prev)}>
                 {isAdding ? 'キャンセル' : <HiOutlinePencil color="#929292" />}
             </button>
         </div>
