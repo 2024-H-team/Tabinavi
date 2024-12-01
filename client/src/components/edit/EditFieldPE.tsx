@@ -1,3 +1,61 @@
+// import styles from '@styles/componentStyles/edit/Content.module.scss';
+// import { HiOutlinePencil } from 'react-icons/hi2';
+// import { MdClose } from 'react-icons/md';
+// import { useState, useEffect } from 'react';
+
+// type EditFieldPEProps = {
+//     title: string;
+//     data: { PersonalEffects: { Name: string }[] } | undefined;
+// };
+
+// export default function EditFieldPE({ title, data }: EditFieldPEProps) {
+//     const [visibleEffects, setVisibleEffects] = useState<boolean[]>([]);
+
+//     useEffect(() => {
+//         if (data?.PersonalEffects) {
+//             setVisibleEffects(data.PersonalEffects.map(() => true));
+//         }
+//     }, [data]);
+
+//     const handleDelete = (index: number) => {
+//         setVisibleEffects((prev) => {
+//             const newVisibility = [...prev];
+//             newVisibility[index] = false;
+//             return newVisibility;
+//         });
+//     };
+
+//     const hasVisibleItems = visibleEffects.some((isVisible) => isVisible);
+
+//     return (
+//         <div className={styles.editWrap}>
+//             <div>
+//                 <h2>{title}</h2>
+//                 {hasVisibleItems ? (
+//                     data?.PersonalEffects.map((effect, index) => {
+//                         if (!visibleEffects[index]) return null;
+//                         return (
+//                             <div key={index} className={styles.PersonalEffects}>
+//                                 <p>
+//                                     {effect.Name}
+//                                     <button onClick={() => handleDelete(index)}>
+//                                         <MdClose size="12" />
+//                                     </button>
+//                                 </p>
+//                             </div>
+//                         );
+//                     })
+//                 ) : (
+//                     <p className={styles.noItems}>持ち物がありません</p>
+//                 )}
+//             </div>
+//             <button className={styles.editBtn}>
+//                 <HiOutlinePencil color="#929292" />
+//             </button>
+//         </div>
+//     );
+// }
+
 import styles from '@styles/componentStyles/edit/Content.module.scss';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
@@ -10,9 +68,13 @@ type EditFieldPEProps = {
 
 export default function EditFieldPE({ title, data }: EditFieldPEProps) {
     const [visibleEffects, setVisibleEffects] = useState<boolean[]>([]);
+    const [personalEffects, setPersonalEffects] = useState(data?.PersonalEffects || []);
+    const [newItem, setNewItem] = useState('');
+    const [isAdding, setIsAdding] = useState(false);
 
     useEffect(() => {
         if (data?.PersonalEffects) {
+            setPersonalEffects(data.PersonalEffects);
             setVisibleEffects(data.PersonalEffects.map(() => true));
         }
     }, [data]);
@@ -25,6 +87,14 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
         });
     };
 
+    const handleAdd = () => {
+        if (newItem.trim()) {
+            setPersonalEffects((prev) => [...prev, { Name: newItem }]);
+            setVisibleEffects((prev) => [...prev, true]);
+            setNewItem('');
+        }
+    };
+
     const hasVisibleItems = visibleEffects.some((isVisible) => isVisible);
 
     return (
@@ -32,7 +102,7 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
             <div>
                 <h2>{title}</h2>
                 {hasVisibleItems ? (
-                    data?.PersonalEffects.map((effect, index) => {
+                    personalEffects.map((effect, index) => {
                         if (!visibleEffects[index]) return null;
                         return (
                             <div key={index} className={styles.PersonalEffects}>
@@ -48,9 +118,24 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
                 ) : (
                     <p className={styles.noItems}>持ち物がありません</p>
                 )}
+
+                {isAdding && (
+                    <div className={styles.addItemForm}>
+                        <input
+                            type="text"
+                            value={newItem}
+                            placeholder="持ち物を入力"
+                            onChange={(e) => setNewItem(e.target.value)}
+                            className={styles.addItemInput}
+                        />
+                        <button onClick={handleAdd} className={styles.addButton}>
+                            追加
+                        </button>
+                    </div>
+                )}
             </div>
-            <button className={styles.editBtn}>
-                <HiOutlinePencil color="#929292" />
+            <button className={styles.editBtn} onClick={() => setIsAdding((prev) => !prev)}>
+                {isAdding ? 'キャンセル' : <HiOutlinePencil color="#929292" />}
             </button>
         </div>
     );

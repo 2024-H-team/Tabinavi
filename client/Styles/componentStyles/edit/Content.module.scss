@@ -37,10 +37,23 @@
             position: absolute;
             top: 24px;
             right: 14px;
+            font-size: 1.4rem;
+            color: #929292;
         }
         .noItems {
             color: #929292;
             font-weight: normal;
+        }
+        .addItemForm {
+            padding-left: 8px;
+            button {
+                background-color: #fff;
+                font-size: 1.4rem;
+            }
+            .addBtn {
+                background-color: #fff;
+                margin-right: 50px;
+            }
         }
         .PersonalEffects {
             border-radius: 4px;
