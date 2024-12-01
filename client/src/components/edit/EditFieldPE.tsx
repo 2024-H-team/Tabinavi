@@ -25,23 +25,29 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
         });
     };
 
+    const hasVisibleItems = visibleEffects.some((isVisible) => isVisible);
+
     return (
         <div className={styles.editWrap}>
             <div>
                 <h2>{title}</h2>
-                {data?.PersonalEffects.map((effect, index) => {
-                    if (!visibleEffects[index]) return null;
-                    return (
-                        <div key={index} className={styles.PersonalEffects}>
-                            <p>
-                                {effect.Name}
-                                <button onClick={() => handleDelete(index)}>
-                                    <MdClose size="12" />
-                                </button>
-                            </p>
-                        </div>
-                    );
-                })}
+                {hasVisibleItems ? (
+                    data?.PersonalEffects.map((effect, index) => {
+                        if (!visibleEffects[index]) return null;
+                        return (
+                            <div key={index} className={styles.PersonalEffects}>
+                                <p>
+                                    {effect.Name}
+                                    <button onClick={() => handleDelete(index)}>
+                                        <MdClose size="12" />
+                                    </button>
+                                </p>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p className={styles.noItems}>持ち物がありません</p>
+                )}
             </div>
             <button className={styles.editBtn}>
                 <HiOutlinePencil color="#929292" />
