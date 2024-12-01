@@ -12,6 +12,7 @@
         border-radius: 8px;
         display: flex;
         justify-content: space-between;
+        position: relative;
         h2 {
             margin-top: 9px;
             font-size: 1.1rem;
@@ -19,6 +20,7 @@
             font-weight: normal;
         }
         input,
+        textarea,
         p {
             margin-top: 10px;
             margin-bottom: 15px;
@@ -26,11 +28,15 @@
             color: #272727;
             font-weight: bold;
         }
+        textarea {
+            font-weight: normal;
+            resize: none;
+        }
         .editBtn {
             background-color: #fff;
-            display: flex;
-            align-items: start;
-            margin-top: 24px;
+            position: absolute;
+            top: 24px;
+            right: 14px;
         }
         .PersonalEffects {
             border-radius: 4px;

@@ -1,5 +1,7 @@
 import styles from '@styles/componentStyles/edit/Content.module.scss';
-import EditField, { EditFieldPE } from './EditField';
+import EditField from './EditField';
+import EditFieldPE from './EditFieldPE';
+import EditFieldMemo from './EditFieldMemo';
 
 type ScheduleData = {
     id: number;
@@ -19,10 +21,7 @@ export default function Content({ data }: ContentProps) {
             <EditField title="旅行先" value={data?.Location || '未設定'} />
             <EditField title="滞在時間" value={data?.Time + '時間' || '未設定'} />
             <EditFieldPE title="持ち物" data={data} />
-            <div className={styles.editWrap}>
-                <h2>メモ</h2>
-                <p></p>
-            </div>
+            <EditFieldMemo title="メモ" value={data?.Memo || ''} />
         </div>
     );
 }
