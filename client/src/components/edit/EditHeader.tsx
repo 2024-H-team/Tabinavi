@@ -8,7 +8,9 @@ type Props = {
 export default function EditHeader(props: Props) {
     return (
         <header className={styles.header}>
-            <IoIosArrowBack size={18} color="white" />
+            <button>
+                <IoIosArrowBack size={18} color="white" />
+            </button>
             <h1>{props.location}</h1>
         </header>
     );
