@@ -10,7 +10,7 @@ type EditFieldProps = {
 export default function EditField({ title, value }: EditFieldProps) {
     const [isEditable, setIsEditable] = useState(false);
     const [inputValue, setInputValue] = useState(value);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         setInputValue(value);
@@ -20,6 +20,8 @@ export default function EditField({ title, value }: EditFieldProps) {
         setIsEditable(true);
         if (inputRef.current) {
             inputRef.current.focus();
+            const length = inputRef.current.value.length;
+            inputRef.current.setSelectionRange(length, length);
         }
     };
 
@@ -27,17 +29,28 @@ export default function EditField({ title, value }: EditFieldProps) {
         setIsEditable(false);
     };
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputValue(event.target.value);
     };
+
+    const handleAutoResize = () => {
+        if (inputRef.current) {
+            inputRef.current.style.height = '16px';
+            inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+        }
+    };
+
+    useEffect(() => {
+        handleAutoResize();
+    }, [inputValue]);
 
     return (
         <div className={styles.EditWrap}>
             <div>
                 <h2>{title}</h2>
-                <input
+                <textarea
+                    className={styles.EditField}
                     ref={inputRef}
-                    type="text"
                     value={inputValue}
                     readOnly={!isEditable}
                     onBlur={handleBlur}

@@ -17,11 +17,12 @@ type ContentProps = {
 };
 
 export default function Content({ data }: ContentProps) {
+    if (!data) return null;
     return (
         <div className={styles.ContentWrap}>
             <EditField title="旅行先" value={data?.Location || '未設定'} />
             <EditField title="滞在時間" value={data?.Time + '時間' || '未設定'} />
-            <EditFieldPE title="持ち物" data={data} />
+            <EditFieldPE title="持ち物" data={data?.PersonalEffects || undefined} />
             <EditFieldMemo title="メモ" value={data?.Memo || ''} />
             <DeleteSchedule />
         </div>

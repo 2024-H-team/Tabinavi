@@ -21,7 +21,7 @@ export default function Edit() {
                     throw new Error('データの取得に失敗しました');
                 }
                 const data = await res.json();
-                setScheduleData(data.scheduledata[0]);
+                setScheduleData(data.scheduleData[0]);
             } catch (error) {
                 console.error(error);
             }
@@ -33,7 +33,7 @@ export default function Edit() {
     return (
         <div>
             <EditHeader location={scheduleData?.Location || '未設定'} />
-            <Content data={scheduleData} />
+            <Content data={scheduleData || undefined} />
         </div>
     );
 }

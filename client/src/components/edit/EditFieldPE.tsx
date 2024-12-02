@@ -1,23 +1,30 @@
 import styles from '@styles/componentStyles/edit/Content.module.scss';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type EditFieldPEProps = {
     title: string;
-    data: { PersonalEffects: { Name: string }[] } | undefined;
+    data: { Name: string }[] | undefined;
 };
 
 export default function EditFieldPE({ title, data }: EditFieldPEProps) {
     const [visibleEffects, setVisibleEffects] = useState<boolean[]>([]);
-    const [personalEffects, setPersonalEffects] = useState(data?.PersonalEffects || []);
+    const [personalEffects, setPersonalEffects] = useState(data || []);
     const [newItem, setNewItem] = useState('');
     const [isAdding, setIsAdding] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (data?.PersonalEffects) {
-            setPersonalEffects(data.PersonalEffects);
-            setVisibleEffects(data.PersonalEffects.map(() => true));
+        if (isAdding && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isAdding]);
+
+    useEffect(() => {
+        if (data) {
+            setPersonalEffects(data);
+            setVisibleEffects(data.map(() => true));
         }
     }, [data]);
 
@@ -35,6 +42,10 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
             setVisibleEffects((prev) => [...prev, true]);
             setNewItem('');
         }
+    };
+
+    const handleEditClick = () => {
+        setIsAdding((prev) => !prev);
     };
 
     const hasVisibleItems = visibleEffects.some((isVisible) => isVisible);
@@ -64,6 +75,7 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
                 {isAdding && (
                     <div className={styles.AddItemForm}>
                         <input
+                            ref={inputRef}
                             type="text"
                             value={newItem}
                             placeholder="持ち物を入力"
@@ -76,7 +88,7 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
                     </div>
                 )}
             </div>
-            <button className={styles.EditBtn} onClick={() => setIsAdding((prev) => !prev)}>
+            <button className={styles.EditBtn} onClick={handleEditClick}>
                 {isAdding ? 'キャンセル' : <HiOutlinePencil color="#929292" />}
             </button>
         </div>

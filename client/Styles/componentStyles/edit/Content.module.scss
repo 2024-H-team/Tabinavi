@@ -13,6 +13,10 @@
         display: flex;
         justify-content: space-between;
         position: relative;
+        & > div {
+            flex: 1;
+            margin-right: 14px;
+        }
         h2 {
             margin-top: 9px;
             font-size: 1.1rem;
@@ -26,23 +30,27 @@
             margin-bottom: 15px;
             font-size: 1.4rem;
             color: #272727;
-            font-weight: bold;
         }
         textarea {
-            font-weight: normal;
             resize: none;
+        }
+        .EditField {
+            width: 100%;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #272727;
         }
         .EditBtn {
             background-color: #fff;
-            position: absolute;
-            top: 24px;
-            right: 14px;
             font-size: 1.4rem;
             color: #929292;
+            flex-shrink: 0;
+            display: flex;
+            align-items: start;
+            margin-top: 24px;
         }
         .NoItems {
             color: #929292;
-            font-weight: normal;
         }
         .AddItemForm {
             padding-left: 8px;

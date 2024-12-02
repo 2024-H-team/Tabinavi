@@ -43,7 +43,7 @@ export default function EditFieldMemo({ title, value }: EditFieldMemoProps) {
                 <textarea
                     ref={inputRef}
                     rows={5}
-                    cols={45}
+                    cols={40}
                     className={styles.EditMemo}
                     value={inputValue}
                     placeholder="お店の情報やURLを記入するのがおすすめ"
