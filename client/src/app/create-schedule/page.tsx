@@ -1,110 +1,46 @@
 'use client';
-import React, { useState } from 'react';
-import WheelPicker from 'react-simple-wheel-picker';
+import { useState } from 'react';
+import WheelPicker from '@/components/WheelPicker';
+import styles from '@styles/appStyles/schedule/InfoSetup.module.scss';
+import { useRouter } from 'next/navigation';
+const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
 
-const hours = Array.from({ length: 24 }, (_, i) => ({
-    id: i.toString(),
-    value: i.toString().padStart(2, '0'),
-}));
+export default function InfoSetup() {
+    const [startHour, setStartHour] = useState(hours[0]);
+    const [startMinute, setStartMinute] = useState(minutes[0]);
+    const [endHour, setEndHour] = useState(hours[0]);
+    const [endMinute, setEndMinute] = useState(minutes[0]);
 
-const minutes = Array.from({ length: 12 }, (_, i) => ({
-    id: (i * 5).toString(),
-    value: (i * 5).toString().padStart(2, '0'),
-}));
-
-export default function Page() {
-    const [selectedStartHour, setSelectedStartHour] = useState<string>(hours[0].id);
-    const [selectedStartMinute, setSelectedStartMinute] = useState<string>(minutes[0].id);
-    const [selectedEndHour, setSelectedEndHour] = useState<string>(hours[0].id);
-    const [selectedEndMinute, setSelectedEndMinute] = useState<string>(minutes[0].id);
-
-    const handleStartHourChange = (target: { id: string; value: string | number }) => {
-        setSelectedStartHour(target.id);
-    };
-
-    const handleStartMinuteChange = (target: { id: string; value: string | number }) => {
-        setSelectedStartMinute(target.id);
-    };
-
-    const handleEndHourChange = (target: { id: string; value: string | number }) => {
-        setSelectedEndHour(target.id);
-    };
-
-    const handleEndMinuteChange = (target: { id: string; value: string | number }) => {
-        setSelectedEndMinute(target.id);
-    };
+    const router = useRouter();
 
     const handleSubmit = () => {
-        const startTime = `${hours.find((h) => h.id === selectedStartHour)?.value}:${
-            minutes.find((m) => m.id === selectedStartMinute)?.value
-        }`;
-        const endTime = `${hours.find((h) => h.id === selectedEndHour)?.value}:${
-            minutes.find((m) => m.id === selectedEndMinute)?.value
-        }`;
-        alert(`開始時間: ${startTime}\n終了時間: ${endTime}`);
+        sessionStorage.setItem('startTime', `${startHour}:${startMinute}`);
+        sessionStorage.setItem('endTime', `${endHour}:${endMinute}`);
+        router.push('/create-schedule/select-spot');
     };
 
     return (
-        <div style={{ padding: '20px' }}>
+        <div className={styles.infoSetup}>
             <h2>設定情報</h2>
 
-            <div style={{ marginBottom: '20px' }}>
+            <div className={styles.timePickerGroup}>
                 <h3>開始時間</h3>
-                <div style={{ display: 'flex', gap: '20px' }}>
-                    <WheelPicker
-                        data={hours}
-                        onChange={handleStartHourChange}
-                        height={150}
-                        width={100}
-                        itemHeight={30}
-                        selectedID={selectedStartHour}
-                    />
-                    <WheelPicker
-                        data={minutes}
-                        onChange={handleStartMinuteChange}
-                        height={150}
-                        width={100}
-                        itemHeight={30}
-                        selectedID={selectedStartMinute}
-                        color="#ccc"
-                    />
+                <div className={styles.pickers}>
+                    <WheelPicker data={hours} defaultSelection={0} onChange={(value) => setStartHour(value)} />
+                    <WheelPicker data={minutes} defaultSelection={0} onChange={(value) => setStartMinute(value)} />
                 </div>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
+            <div className={styles.timePickerGroup}>
                 <h3>終了時間</h3>
-                <div style={{ display: 'flex', gap: '20px' }}>
-                    <WheelPicker
-                        data={hours}
-                        onChange={handleEndHourChange}
-                        height={150}
-                        width={100}
-                        itemHeight={30}
-                        selectedID={selectedEndHour}
-                        color="#ccc"
-                    />
-                    <WheelPicker
-                        data={minutes}
-                        onChange={handleEndMinuteChange}
-                        height={150}
-                        width={100}
-                        itemHeight={30}
-                        selectedID={selectedEndMinute}
-                        color="#ccc"
-                    />
+                <div className={styles.pickers}>
+                    <WheelPicker data={hours} defaultSelection={0} onChange={(value) => setEndHour(value)} />
+                    <WheelPicker data={minutes} defaultSelection={0} onChange={(value) => setEndMinute(value)} />
                 </div>
             </div>
 
-            <button
-                onClick={handleSubmit}
-                style={{
-                    marginTop: '20px',
-                    padding: '10px 20px',
-                    color: '#fff',
-                    border: 'none',
-                    cursor: 'pointer',
-                }}
-            >
+            <button onClick={handleSubmit} className={styles.submitButton}>
                 確認
             </button>
         </div>

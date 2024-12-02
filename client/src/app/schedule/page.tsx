@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ScheduleMap from '@/components/create-schedule/schedule/ScheduleMap';
+import ScheduleMap from '@/components/schedule/ScheduleMap';
 import Styles from '@styles/appStyles/schedule/scheduleMap.module.scss';
 import { useMapContext } from '@/components/MapProvider';
 import { PlaceDetails } from '@/types/PlaceDetails';
