@@ -1,4 +1,4 @@
-import Styles from '@styles/componentStyles/create-schedule/spotInfo.module.scss';
+import Styles from '@styles/componentStyles/create-schedule/SpotInfo.module.scss';
 import { PlaceDetails } from '@/types/PlaceDetails';
 
 interface SpotInfoProps {
