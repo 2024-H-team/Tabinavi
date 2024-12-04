@@ -11,12 +11,14 @@ export default function InfoSetup() {
     const [startMinute, setStartMinute] = useState(minutes[0]);
     const [endHour, setEndHour] = useState(hours[0]);
     const [endMinute, setEndMinute] = useState(minutes[0]);
+    const [selectedDate, setSelectedDate] = useState('');
 
     const router = useRouter();
 
     const handleSubmit = () => {
         sessionStorage.setItem('startTime', `${startHour}:${startMinute}`);
         sessionStorage.setItem('endTime', `${endHour}:${endMinute}`);
+        sessionStorage.setItem('selectedDate', selectedDate);
         router.push('/create-schedule/select-spot');
     };
 
@@ -39,7 +41,10 @@ export default function InfoSetup() {
                     <WheelPicker data={minutes} defaultSelection={0} onChange={(value) => setEndMinute(value)} />
                 </div>
             </div>
-
+            <div className={styles.timePickerGroup}>
+                <h3>日付</h3>
+                <input type="date" onChange={(e) => setSelectedDate(e.target.value)} />
+            </div>
             <button onClick={handleSubmit} className={styles.submitButton}>
                 確認
             </button>
