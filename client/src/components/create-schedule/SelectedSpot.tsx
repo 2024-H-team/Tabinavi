@@ -1,4 +1,4 @@
-import Styles from '@styles/componentStyles/create-schedule/SelectedSpot.module.scss';
+import styles from '@styles/componentStyles/create-schedule/SelectedSpot.module.scss';
 
 interface SelectedSpotProps {
     name: string;
@@ -8,10 +8,11 @@ interface SelectedSpotProps {
 
 export default function SelectedSpot({ name, address, onDelete }: SelectedSpotProps) {
     return (
-        <div className={Styles.Spot}>
+        <div className={styles.spot}>
+            <div className={styles.dragHolder}>=</div>
             <h3>{name}</h3>
             <p>住所: {address}</p>
-            <div className={Styles.closeBtn} onClick={onDelete}>
+            <div className={styles.closeBtn} onClick={onDelete}>
                 X
             </div>
         </div>

@@ -1,7 +1,8 @@
 .Container {
-    width: calc(50% - 50px);
+    width: calc(80% - 50px);
     height: 500px;
     padding: 8px 20px;
+    padding-left: 50px;
     overflow: auto;
     background-color: #f5f3aa;
     display: flex;
@@ -15,5 +16,8 @@
         border-radius: 5px;
         background-color: #afafaf;
         color: white;
+    }
+    .selectedSpot {
+        width: 100%;
     }
 }
