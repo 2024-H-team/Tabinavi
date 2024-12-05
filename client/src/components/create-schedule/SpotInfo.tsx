@@ -7,7 +7,6 @@ interface SpotInfoProps {
 }
 
 export default function SpotInfo({ places, onAddSpot }: SpotInfoProps) {
-    console.log(places);
     return (
         <div className={Styles.infoContainer}>
             {places.length > 0 ? (

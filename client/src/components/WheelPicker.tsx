@@ -11,8 +11,8 @@ interface WheelPickerProps {
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
     data,
-    height = 200,
-    itemHeight = 40,
+    height = 30,
+    itemHeight = 15,
     defaultSelection = 0,
     onChange,
 }) => {

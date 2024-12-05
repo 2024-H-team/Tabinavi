@@ -79,7 +79,7 @@ export const getPlaceDetails = (
                     'geometry',
                     'reviews',
                     'opening_hours',
-                    'utc_offset_minutes', // Thêm trường này
+                    'utc_offset_minutes',
                 ],
             },
             (place, status) => {
@@ -98,7 +98,7 @@ export const getPlaceDetails = (
                         reviews: place.reviews || undefined,
                         openingHours: {
                             weekday_text: place.opening_hours?.weekday_text,
-                            isOpen: place.opening_hours?.isOpen(currentDateTime), // Truyền thời gian hiện tại
+                            isOpen: place.opening_hours?.isOpen(currentDateTime),
                         },
                     };
                     resolve(placeDetails);
@@ -123,7 +123,6 @@ export const fetchPlaceDetailsFromLatLng = (
 
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ location: latLng }, (results, status) => {
-        console.log(results);
         if (status === google.maps.GeocoderStatus.OK && results) {
             const getTypePriority = (types: string[]): number => {
                 if (
