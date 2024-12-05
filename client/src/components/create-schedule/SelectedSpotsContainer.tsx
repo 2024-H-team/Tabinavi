@@ -9,11 +9,10 @@ import {
     useSensors,
     DragEndEvent,
 } from '@dnd-kit/core';
-import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-
+import { SortableContext, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import styles from '@styles/componentStyles/create-schedule/SelectedSpotsContainer.module.scss';
 import SelectedSpot from './SelectedSpot';
+import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import { useRouter } from 'next/navigation';
 
@@ -64,7 +63,6 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
         if (active.id !== over?.id) {
             const oldIndex = spots.findIndex((spot) => spot.name === active.id);
             const newIndex = spots.findIndex((spot) => spot.name === over?.id);
-
             setSpots((prev) => arrayMove(prev, oldIndex, newIndex));
         }
     };
@@ -85,60 +83,27 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
             <SortableContext items={spots.map((spot) => spot.name)}>
                 <div className={styles.Container}>
                     {spots.map((spot) => (
-                        <SortableSpot
+                        <SortableSpotWrapper
                             key={spot.name}
                             spot={spot}
                             onDelete={() => onDeleteSpot(spots.indexOf(spot))}
                             onStayTimeUpdate={handleStayTimeUpdate}
-                        />
+                            className={styles.selectedSpot}
+                        >
+                            {({ dragHandleProps, isDragging }) => (
+                                <SelectedSpot
+                                    spot={spot}
+                                    onDelete={() => onDeleteSpot(spots.indexOf(spot))}
+                                    onStayTimeUpdate={handleStayTimeUpdate}
+                                    dragHandleProps={dragHandleProps}
+                                    isDragging={isDragging}
+                                />
+                            )}
+                        </SortableSpotWrapper>
                     ))}
                     <button onClick={handleCreateSchedule}>スケジュール作成</button>
                 </div>
             </SortableContext>
         </DndContext>
-    );
-}
-
-function SortableSpot({
-    spot,
-    onDelete,
-    onStayTimeUpdate,
-}: {
-    spot: PlaceDetails;
-    onDelete: () => void;
-    onStayTimeUpdate: (spotName: string, stayTime: { hour: string; minute: string }) => void;
-}) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-        id: spot.name,
-    });
-    const [delayedDragging, setDelayedDragging] = useState(false);
-
-    useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
-        if (isDragging) {
-            timeoutId = setTimeout(() => {
-                setDelayedDragging(true);
-            }, 200);
-        } else {
-            setDelayedDragging(false);
-        }
-        return () => clearTimeout(timeoutId);
-    }, [isDragging]);
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    };
-
-    return (
-        <div ref={setNodeRef} style={style} className={styles.selectedSpot}>
-            <SelectedSpot
-                spot={spot}
-                onDelete={onDelete}
-                onStayTimeUpdate={onStayTimeUpdate}
-                dragHandleProps={{ ...attributes, ...listeners }}
-                isDragging={delayedDragging}
-            />
-        </div>
     );
 }

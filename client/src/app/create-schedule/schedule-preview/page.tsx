@@ -10,10 +10,10 @@ import {
     useSensors,
     DragEndEvent,
 } from '@dnd-kit/core';
-import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { SortableContext, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
 import SchedulePreviewSpotItem from '@/components/create-schedule/SchedulePreviewSpotItem';
+import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { PlaceDetails } from '@/types/PlaceDetails';
 
 interface ScheduleTime {
@@ -77,9 +77,10 @@ export default function PreviewSpotsContainer() {
     };
 
     const handleDragCancel = () => {
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
     };
+
     const handleDragEnd = (event: DragEndEvent) => {
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
@@ -118,12 +119,24 @@ export default function PreviewSpotsContainer() {
                         </p>
                     </div>
                     {spots.map((spot) => (
-                        <SortablePreviewSpot
+                        <SortableSpotWrapper
                             key={spot.name}
                             spot={spot}
-                            onStayTimeUpdate={handleStayTimeUpdate}
                             onDelete={() => handleDelete(spot.name)}
-                        />
+                            onStayTimeUpdate={handleStayTimeUpdate}
+                            className={styles.schedulePreviewSpot}
+                        >
+                            {({ dragHandleProps, isDragging }) => (
+                                <SchedulePreviewSpotItem
+                                    name={spot.name}
+                                    stayTime={spot.stayTime}
+                                    onStayTimeUpdate={handleStayTimeUpdate}
+                                    dragHandleProps={dragHandleProps}
+                                    onDelete={() => handleDelete(spot.name)}
+                                    isDragging={isDragging}
+                                />
+                            )}
+                        </SortableSpotWrapper>
                     ))}
                     <button className={styles.createScheduleButton} onClick={handleSave}>
                         保存
@@ -131,50 +144,5 @@ export default function PreviewSpotsContainer() {
                 </div>
             </SortableContext>
         </DndContext>
-    );
-}
-
-function SortablePreviewSpot({
-    spot,
-    onStayTimeUpdate,
-    onDelete,
-}: {
-    spot: PlaceDetails;
-    onStayTimeUpdate: (spotName: string, stayTime: { hour: string; minute: string }) => void;
-    onDelete: () => void;
-}) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-        id: spot.name,
-    });
-    const [delayedDragging, setDelayedDragging] = useState(false);
-
-    useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
-        if (isDragging) {
-            timeoutId = setTimeout(() => {
-                setDelayedDragging(true);
-            }, 200);
-        } else {
-            setDelayedDragging(false);
-        }
-        return () => clearTimeout(timeoutId);
-    }, [isDragging]);
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    };
-
-    return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <SchedulePreviewSpotItem
-                name={spot.name}
-                stayTime={spot.stayTime}
-                onStayTimeUpdate={onStayTimeUpdate}
-                dragHandleProps={{ ...attributes, ...listeners }}
-                onDelete={onDelete}
-                isDragging={delayedDragging}
-            />
-        </div>
     );
 }
