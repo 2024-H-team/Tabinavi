@@ -13,6 +13,7 @@ import { SortableContext, arrayMove, sortableKeyboardCoordinates } from '@dnd-ki
 import styles from '@styles/componentStyles/create-schedule/SelectedSpotsContainer.module.scss';
 import SelectedSpot from './SelectedSpot';
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
+import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import { useRouter } from 'next/navigation';
 
@@ -20,7 +21,11 @@ interface SelectedSpotsContainerProps {
     selectedSpots: PlaceDetails[];
     onDeleteSpot: (index: number) => void;
 }
-
+declare global {
+    interface Window {
+        preventScrollHandler?: (e: Event) => void;
+    }
+}
 export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: SelectedSpotsContainerProps) {
     const [spots, setSpots] = useState(selectedSpots);
     const router = useRouter();
@@ -45,21 +50,10 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
         setSpots((prevSpots) => prevSpots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot)));
     };
 
-    const handleDragStart = () => {
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-    };
-
-    const handleDragCancel = () => {
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-    };
-
     const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
+        handleDragEndUtil();
 
+        const { active, over } = event;
         if (active.id !== over?.id) {
             const oldIndex = spots.findIndex((spot) => spot.name === active.id);
             const newIndex = spots.findIndex((spot) => spot.name === over?.id);
@@ -78,7 +72,6 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
             onDragStart={handleDragStart}
-            onDragCancel={handleDragCancel}
         >
             <SortableContext items={spots.map((spot) => spot.name)}>
                 <div className={styles.Container}>

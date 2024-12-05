@@ -14,6 +14,7 @@ import { SortableContext, arrayMove, sortableKeyboardCoordinates } from '@dnd-ki
 import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
 import SchedulePreviewSpotItem from '@/components/create-schedule/SchedulePreviewSpotItem';
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
+import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
 import { PlaceDetails } from '@/types/PlaceDetails';
 
 interface ScheduleTime {
@@ -21,7 +22,11 @@ interface ScheduleTime {
     endTime: string;
     selectedDate: string;
 }
-
+declare global {
+    interface Window {
+        preventScrollHandler?: (e: Event) => void;
+    }
+}
 export default function PreviewSpotsContainer() {
     const [spots, setSpots] = useState<PlaceDetails[]>([]);
     const [scheduleTime, setScheduleTime] = useState<ScheduleTime>({
@@ -71,28 +76,16 @@ export default function PreviewSpotsContainer() {
         setSpots((prevSpots) => prevSpots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot)));
     };
 
-    const handleDragStart = () => {
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-    };
-
-    const handleDragCancel = () => {
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-    };
-
     const handleDragEnd = (event: DragEndEvent) => {
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-        const { active, over } = event;
+        handleDragEndUtil();
 
+        const { active, over } = event;
         if (active.id !== over?.id) {
             const oldIndex = spots.findIndex((spot) => spot.name === active.id);
             const newIndex = spots.findIndex((spot) => spot.name === over?.id);
             setSpots((prev) => arrayMove(prev, oldIndex, newIndex));
         }
     };
-
     const handleDelete = (spotName: string) => {
         setSpots(spots.filter((spot) => spot.name !== spotName));
     };
@@ -107,7 +100,6 @@ export default function PreviewSpotsContainer() {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
             onDragStart={handleDragStart}
-            onDragCancel={handleDragCancel}
         >
             <SortableContext items={spots.map((spot) => spot.name)}>
                 <div className={styles.schedulePreview}>
