@@ -41,13 +41,21 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
             coordinateGetter: sortableKeyboardCoordinates,
         }),
     );
+
     const handleStayTimeUpdate = (spotName: string, stayTime: { hour: string; minute: string }) => {
         setSpots((prevSpots) => prevSpots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot)));
     };
+
     const handleDragStart = () => {
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
     };
+
+    const handleDragCancel = () => {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+    };
+
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         document.body.style.overflow = '';
@@ -70,8 +78,9 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
         <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
+            onDragCancel={handleDragCancel}
         >
             <SortableContext items={spots.map((spot) => spot.name)}>
                 <div className={styles.Container}>
@@ -99,9 +108,22 @@ function SortableSpot({
     onDelete: () => void;
     onStayTimeUpdate: (spotName: string, stayTime: { hour: string; minute: string }) => void;
 }) {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: spot.name,
     });
+    const [delayedDragging, setDelayedDragging] = useState(false);
+
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+        if (isDragging) {
+            timeoutId = setTimeout(() => {
+                setDelayedDragging(true);
+            }, 200);
+        } else {
+            setDelayedDragging(false);
+        }
+        return () => clearTimeout(timeoutId);
+    }, [isDragging]);
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -114,7 +136,8 @@ function SortableSpot({
                 spot={spot}
                 onDelete={onDelete}
                 onStayTimeUpdate={onStayTimeUpdate}
-                dragHandleProps={{ ...attributes, ...listeners }} // Truyền props xuống
+                dragHandleProps={{ ...attributes, ...listeners }}
+                isDragging={delayedDragging}
             />
         </div>
     );

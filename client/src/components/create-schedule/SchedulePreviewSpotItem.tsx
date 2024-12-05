@@ -11,11 +11,21 @@ interface SchedulePreviewSpotItemProps {
     name: string;
     stayTime?: { hour: string; minute: string };
     onStayTimeUpdate: (name: string, stayTime: { hour: string; minute: string }) => void;
+    dragHandleProps?: React.HTMLAttributes<HTMLDivElement>;
+    onDelete: () => void;
+    isDragging?: boolean;
 }
 
-export default function SchedulePreviewSpotItem({ name, stayTime, onStayTimeUpdate }: SchedulePreviewSpotItemProps) {
+export default function SchedulePreviewSpotItem({
+    name,
+    stayTime,
+    onStayTimeUpdate,
+    dragHandleProps,
+    onDelete,
+    isDragging,
+}: SchedulePreviewSpotItemProps) {
     const [showPicker, setShowPicker] = useState(false);
-    const hour = stayTime?.hour || hours[1];
+    const hour = stayTime?.hour || hours[0];
     const minute = stayTime?.minute || minutes[0];
 
     const handleChange = (type: 'hour' | 'minute', value: string) => {
@@ -27,8 +37,19 @@ export default function SchedulePreviewSpotItem({ name, stayTime, onStayTimeUpda
     };
 
     return (
-        <div className={styles.PreviewSpotItem}>
+        <div
+            className={styles.PreviewSpotItem}
+            style={{
+                border: isDragging ? '2px solid green' : '1px solid #ccc',
+            }}
+        >
             <h2>{name}</h2>
+            <div className={styles.dragHolder} {...dragHandleProps}>
+                =
+            </div>
+            <div className={styles.closeBtn} onClick={onDelete}>
+                X
+            </div>
             <div className={styles.stayTime}>
                 <p>滞在時間:</p>
                 {!showPicker ? (

@@ -6,6 +6,7 @@
     padding: 1.4rem;
     background-color: #e7e7e7;
 }
+
 .PreviewSpotItem {
     width: 100%;
     display: flex;
@@ -16,11 +17,35 @@
     gap: 20px;
     background-color: #a3a3a3;
     padding: 20px;
+    padding-left: 50px;
+    position: relative;
+
+    .dragHolder {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 30px;
+        cursor: pointer;
+        padding: 10px;
+    }
+    .closeBtn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: #f57676;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 11px;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+        line-height: 25px;
+    }
     .stayTime {
         display: flex;
         gap: 20px;
-        p {
-            line-height: 30px;
-        }
     }
 }

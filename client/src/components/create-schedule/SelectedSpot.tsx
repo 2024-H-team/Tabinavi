@@ -14,9 +14,16 @@ interface SelectedSpotProps {
     spot: PlaceDetails;
     onStayTimeUpdate: (spotName: string, stayTime: { hour: string; minute: string }) => void;
     dragHandleProps?: React.HTMLAttributes<HTMLDivElement>;
+    isDragging?: boolean;
 }
 
-export default function SelectedSpot({ spot, onDelete, onStayTimeUpdate, dragHandleProps }: SelectedSpotProps) {
+export default function SelectedSpot({
+    spot,
+    onDelete,
+    onStayTimeUpdate,
+    dragHandleProps,
+    isDragging,
+}: SelectedSpotProps) {
     const [hour, setHour] = useState(hours[1]);
     const [minute, setMinute] = useState(minutes[0]);
 
@@ -27,7 +34,12 @@ export default function SelectedSpot({ spot, onDelete, onStayTimeUpdate, dragHan
     };
 
     return (
-        <div className={styles.spot}>
+        <div
+            className={styles.spot}
+            style={{
+                border: isDragging ? '2px solid green' : '',
+            }}
+        >
             <div className={styles.spotInfo}>
                 <div className={styles.dragHolder} {...dragHandleProps}>
                     =
