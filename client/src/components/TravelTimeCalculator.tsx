@@ -21,50 +21,56 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
     useEffect(() => {
         if (!window.google) return;
 
-        const calculateWalkingToNearestStation = async () => {
+        const findNearestStation = async (
+            location: google.maps.LatLngLiteral,
+            types: string[],
+        ): Promise<google.maps.places.PlaceResult | null> => {
             const placesService = new window.google.maps.places.PlacesService(document.createElement('div'));
-            const directionsService = new window.google.maps.DirectionsService();
 
-            try {
-                // Tìm ga gần nhất từ điểm xuất phát (origin)
-                const nearestOriginStation = await new Promise<google.maps.places.PlaceResult>((resolve, reject) => {
-                    placesService.nearbySearch(
-                        {
-                            location: origin,
-                            radius: 1000,
-                            type: 'transit_station',
-                        },
-                        (results, status) => {
-                            if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-                                resolve(results[0]);
-                            } else {
-                                reject('No origin transit station found');
-                            }
-                        },
-                    );
-                });
-
-                // Tìm ga gần nhất từ điểm đích (destination)
-                const nearestDestinationStation = await new Promise<google.maps.places.PlaceResult>(
-                    (resolve, reject) => {
+            for (const type of types) {
+                try {
+                    const result = await new Promise<google.maps.places.PlaceResult | null>((resolve, reject) => {
                         placesService.nearbySearch(
                             {
-                                location: destination,
+                                location,
                                 radius: 1000,
-                                type: 'transit_station',
+                                type: type as string,
                             },
                             (results, status) => {
                                 if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-                                    resolve(results[0]);
+                                    resolve(results[0]); // Return the first result
                                 } else {
-                                    reject('No destination transit station found');
+                                    reject(null); // No results for this type
                                 }
                             },
                         );
-                    },
-                );
+                    });
+                    if (result) return result;
+                } catch (error) {
+                    console.warn(`No results found for type: ${type}, ${error}`);
+                }
+            }
 
-                // Tính thời gian đi bộ từ origin tới ga gần nhất
+            console.error('No stations found within range for all types.');
+            return null;
+        };
+
+        const calculateWalkingToNearestStation = async () => {
+            const directionsService = new window.google.maps.DirectionsService();
+            const stationTypes = ['transit_station', 'subway_station', 'train_station'];
+
+            try {
+                // Tìm ga gần nhất từ điểm xuất phát
+                const nearestOriginStation = await findNearestStation(origin, stationTypes);
+
+                // Tìm ga gần nhất từ điểm đích
+                const nearestDestinationStation = await findNearestStation(destination, stationTypes);
+
+                if (!nearestOriginStation || !nearestDestinationStation) {
+                    throw new Error('No stations found near origin or destination.');
+                }
+
+                // Tính thời gian đi bộ từ điểm xuất phát tới ga gần nhất
                 const walkingToOriginStation = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
                     directionsService.route(
                         {
@@ -80,7 +86,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                                 if (response) {
                                     resolve(response);
                                 } else {
-                                    reject('No directions found');
+                                    reject('No response received');
                                 }
                             } else {
                                 reject(status);
@@ -108,7 +114,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                                     if (response) {
                                         resolve(response);
                                     } else {
-                                        reject('No directions found');
+                                        reject('No response received');
                                     }
                                 } else {
                                     reject(status);
