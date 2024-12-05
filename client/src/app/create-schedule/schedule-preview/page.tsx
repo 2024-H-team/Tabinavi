@@ -1,4 +1,3 @@
-// page.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
 import {
@@ -16,6 +15,7 @@ import SchedulePreviewSpotItem from '@/components/create-schedule/SchedulePrevie
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
 import { PlaceDetails } from '@/types/PlaceDetails';
+import { TravelTimeCalculator } from '@/components/TravelTimeCalculator';
 
 interface ScheduleTime {
     startTime: string;
@@ -82,6 +82,7 @@ export default function PreviewSpotsContainer() {
             setSpots((prev) => arrayMove(prev, oldIndex, newIndex));
         }
     };
+
     const handleDelete = (spotName: string) => {
         setSpots(spots.filter((spot) => spot.name !== spotName));
     };
@@ -91,46 +92,55 @@ export default function PreviewSpotsContainer() {
     };
 
     return (
-        <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-        >
-            <SortableContext items={spots.map((spot) => spot.name)}>
-                <div className={styles.schedulePreview}>
-                    <div className={styles.scheduleTime}>
-                        <h2>スケジュール</h2>
-                        <p>予定日：{scheduleTime.selectedDate ? formatDate(scheduleTime.selectedDate) : ''}</p>
-                        <p>
-                            予定時間：{scheduleTime.startTime} - {scheduleTime.endTime}
-                        </p>
-                    </div>
-                    {spots.map((spot) => (
-                        <SortableSpotWrapper
-                            key={spot.name}
-                            spot={spot}
-                            onDelete={() => handleDelete(spot.name)}
-                            onStayTimeUpdate={handleStayTimeUpdate}
-                            className={styles.schedulePreviewSpot}
-                        >
-                            {({ dragHandleProps, isDragging }) => (
-                                <SchedulePreviewSpotItem
-                                    name={spot.name}
-                                    stayTime={spot.stayTime}
-                                    onStayTimeUpdate={handleStayTimeUpdate}
-                                    dragHandleProps={dragHandleProps}
+        <div>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+                onDragStart={handleDragStart}
+            >
+                <SortableContext items={spots.map((spot) => spot.name)}>
+                    <div className={styles.schedulePreview}>
+                        <div className={styles.scheduleTime}>
+                            <h2>スケジュール</h2>
+                            <p>予定日：{scheduleTime.selectedDate ? formatDate(scheduleTime.selectedDate) : ''}</p>
+                            <p>
+                                予定時間：{scheduleTime.startTime} - {scheduleTime.endTime}
+                            </p>
+                        </div>
+                        {spots.map((spot, index) => (
+                            <React.Fragment key={spot.name}>
+                                <SortableSpotWrapper
+                                    spot={spot}
                                     onDelete={() => handleDelete(spot.name)}
-                                    isDragging={isDragging}
-                                />
-                            )}
-                        </SortableSpotWrapper>
-                    ))}
-                    <button className={styles.createScheduleButton} onClick={handleSave}>
-                        保存
-                    </button>
-                </div>
-            </SortableContext>
-        </DndContext>
+                                    onStayTimeUpdate={handleStayTimeUpdate}
+                                    className={styles.schedulePreviewSpot}
+                                >
+                                    {({ dragHandleProps, isDragging }) => (
+                                        <SchedulePreviewSpotItem
+                                            name={spot.name}
+                                            stayTime={spot.stayTime}
+                                            onStayTimeUpdate={handleStayTimeUpdate}
+                                            dragHandleProps={dragHandleProps}
+                                            onDelete={() => handleDelete(spot.name)}
+                                            isDragging={isDragging}
+                                        />
+                                    )}
+                                </SortableSpotWrapper>
+                                {index < spots.length - 1 && (
+                                    <TravelTimeCalculator
+                                        origin={spot.location}
+                                        destination={spots[index + 1].location}
+                                    />
+                                )}
+                            </React.Fragment>
+                        ))}
+                        <button className={styles.createScheduleButton} onClick={handleSave}>
+                            保存
+                        </button>
+                    </div>
+                </SortableContext>
+            </DndContext>
+        </div>
     );
 }

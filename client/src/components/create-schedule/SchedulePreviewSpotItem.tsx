@@ -1,4 +1,3 @@
-// SchedulePreviewSpotItem.tsx
 'use client';
 import { useState } from 'react';
 import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
