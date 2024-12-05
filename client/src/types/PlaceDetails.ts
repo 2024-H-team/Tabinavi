@@ -4,5 +4,13 @@ export interface PlaceDetails {
     phoneNumber?: string;
     website?: string;
     rating?: number;
-    location: { lat: number; lng: number };
+    location: {
+        lat: number;
+        lng: number;
+    };
+    reviews?: google.maps.places.PlaceReview[];
+    openingHours?: {
+        weekday_text?: string[];
+        isOpen?: boolean;
+    };
 }

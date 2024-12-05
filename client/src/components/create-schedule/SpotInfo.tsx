@@ -7,6 +7,7 @@ interface SpotInfoProps {
 }
 
 export default function SpotInfo({ places, onAddSpot }: SpotInfoProps) {
+    console.log(places);
     return (
         <div className={Styles.infoContainer}>
             {places.length > 0 ? (
@@ -24,6 +25,25 @@ export default function SpotInfo({ places, onAddSpot }: SpotInfoProps) {
                             </p>
                         )}
                         {place.rating && <p>評価 : {place.rating}★</p>}
+
+                        {place.openingHours?.isOpen !== undefined && (
+                            <p className={place.openingHours.isOpen ? Styles.open : Styles.closed}>
+                                営業状況: {place.openingHours.isOpen ? '営業中' : '営業時間外'}
+                            </p>
+                        )}
+
+                        {/* Add opening hours */}
+                        {place.openingHours?.weekday_text && (
+                            <div className={Styles.openingHours}>
+                                <h3>営業時間</h3>
+                                <ul>
+                                    {place.openingHours.weekday_text.map((hours, idx) => (
+                                        <li key={idx}>{hours}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
                         <button onClick={() => onAddSpot(place)}>この場所を選ぶ</button>
                     </div>
                 ))
