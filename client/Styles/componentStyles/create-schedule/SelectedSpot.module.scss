@@ -15,12 +15,12 @@
     position: relative;
     .dragHolder {
         position: absolute;
-        left: -35px;
+        left: -45px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 20px;
+        font-size: 30px;
         cursor: pointer;
-        padding: 5px 5px;
+        padding: 10px;
     }
     .closeBtn {
         position: absolute;
