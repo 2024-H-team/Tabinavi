@@ -21,11 +21,7 @@ interface SelectedSpotsContainerProps {
     selectedSpots: PlaceDetails[];
     onDeleteSpot: (index: number) => void;
 }
-declare global {
-    interface Window {
-        preventScrollHandler?: (e: Event) => void;
-    }
-}
+
 export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: SelectedSpotsContainerProps) {
     const [spots, setSpots] = useState(selectedSpots);
     const router = useRouter();

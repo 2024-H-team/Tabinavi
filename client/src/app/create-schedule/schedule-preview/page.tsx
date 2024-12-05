@@ -22,11 +22,7 @@ interface ScheduleTime {
     endTime: string;
     selectedDate: string;
 }
-declare global {
-    interface Window {
-        preventScrollHandler?: (e: Event) => void;
-    }
-}
+
 export default function PreviewSpotsContainer() {
     const [spots, setSpots] = useState<PlaceDetails[]>([]);
     const [scheduleTime, setScheduleTime] = useState<ScheduleTime>({
