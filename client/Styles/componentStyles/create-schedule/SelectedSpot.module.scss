@@ -36,4 +36,14 @@
         text-align: center;
         line-height: 25px;
     }
+    .timePickerGroup {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+        .pickers {
+            display: flex;
+            gap: 20px;
+        }
+    }
 }

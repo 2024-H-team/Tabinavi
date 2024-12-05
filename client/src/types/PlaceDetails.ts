@@ -13,4 +13,8 @@ export interface PlaceDetails {
         weekday_text?: string[];
         isOpen?: boolean;
     };
+    stayTime?: {
+        hour: string;
+        minute: string;
+    };
 }

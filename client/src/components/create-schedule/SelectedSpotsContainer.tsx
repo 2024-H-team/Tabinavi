@@ -36,7 +36,9 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
             coordinateGetter: sortableKeyboardCoordinates,
         }),
     );
-
+    const handleStayTimeUpdate = (spotName: string, stayTime: { hour: string; minute: string }) => {
+        setSpots((prevSpots) => prevSpots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot)));
+    };
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
@@ -58,7 +60,12 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
             <SortableContext items={spots.map((spot) => spot.name)}>
                 <div className={styles.Container}>
                     {spots.map((spot) => (
-                        <SortableSpot key={spot.name} spot={spot} onDelete={() => onDeleteSpot(spots.indexOf(spot))} />
+                        <SortableSpot
+                            key={spot.name}
+                            spot={spot}
+                            onDelete={() => onDeleteSpot(spots.indexOf(spot))}
+                            onStayTimeUpdate={handleStayTimeUpdate}
+                        />
                     ))}
                     <button onClick={handleCreateSchedule}>スケジュール作成</button>
                 </div>
@@ -67,7 +74,15 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
     );
 }
 
-function SortableSpot({ spot, onDelete }: { spot: PlaceDetails; onDelete: () => void }) {
+function SortableSpot({
+    spot,
+    onDelete,
+    onStayTimeUpdate,
+}: {
+    spot: PlaceDetails;
+    onDelete: () => void;
+    onStayTimeUpdate: (spotName: string, stayTime: { hour: string; minute: string }) => void;
+}) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
         id: spot.name,
     });
@@ -79,7 +94,7 @@ function SortableSpot({ spot, onDelete }: { spot: PlaceDetails; onDelete: () => 
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners} className={styles.selectedSpot}>
-            <SelectedSpot name={spot.name} address={spot.address} onDelete={onDelete} />
+            <SelectedSpot spot={spot} onDelete={onDelete} onStayTimeUpdate={onStayTimeUpdate} />
         </div>
     );
 }
