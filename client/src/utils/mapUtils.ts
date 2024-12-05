@@ -46,22 +46,6 @@ export const createMarker = async (
     });
 };
 
-const getCurrentDateTime = (utcOffsetMinutes?: number): Date => {
-    const now = new Date();
-
-    if (typeof utcOffsetMinutes === 'number') {
-        const utcTime = now.getTime();
-
-        const localOffset = now.getTimezoneOffset();
-
-        const targetTime = utcTime + (localOffset + utcOffsetMinutes) * 60000;
-
-        return new Date(targetTime);
-    }
-
-    return now;
-};
-
 export const getPlaceDetails = (
     service: google.maps.places.PlacesService,
     placeId: string,
@@ -84,7 +68,6 @@ export const getPlaceDetails = (
             },
             (place, status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-                    const currentDateTime = getCurrentDateTime(place.utc_offset_minutes);
                     const placeDetails: PlaceDetails = {
                         name: place.name || '',
                         address: place.formatted_address || '',
@@ -98,7 +81,6 @@ export const getPlaceDetails = (
                         reviews: place.reviews || undefined,
                         openingHours: {
                             weekday_text: place.opening_hours?.weekday_text,
-                            isOpen: place.opening_hours?.isOpen(currentDateTime),
                         },
                     };
                     resolve(placeDetails);

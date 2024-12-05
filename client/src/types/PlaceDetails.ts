@@ -11,7 +11,6 @@ export interface PlaceDetails {
     reviews?: google.maps.places.PlaceReview[];
     openingHours?: {
         weekday_text?: string[];
-        isOpen?: boolean;
     };
     stayTime?: {
         hour: string;

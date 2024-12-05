@@ -25,12 +25,6 @@ export default function SpotInfo({ places, onAddSpot }: SpotInfoProps) {
                         )}
                         {place.rating && <p>評価 : {place.rating}★</p>}
 
-                        {place.openingHours?.isOpen !== undefined && (
-                            <p className={place.openingHours.isOpen ? Styles.open : Styles.closed}>
-                                営業状況: {place.openingHours.isOpen ? '営業中' : '営業時間外'}
-                            </p>
-                        )}
-
                         {/* Add opening hours */}
                         {place.openingHours?.weekday_text && (
                             <div className={Styles.openingHours}>

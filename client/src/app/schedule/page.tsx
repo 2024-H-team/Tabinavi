@@ -20,8 +20,6 @@ export default function Schedule() {
             setPlaces(parsedPlaces);
             const initialTravelModes = Array(parsedPlaces.length).fill(google.maps.TravelMode.WALKING);
             setTravelModes(initialTravelModes);
-
-            sessionStorage.removeItem('ScheduleSpot');
         }
     }, [isLoaded]);
 
