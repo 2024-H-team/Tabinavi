@@ -31,7 +31,12 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
     }, [selectedSpots]);
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                delay: 100,
+                tolerance: 5,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         }),
@@ -39,8 +44,14 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
     const handleStayTimeUpdate = (spotName: string, stayTime: { hour: string; minute: string }) => {
         setSpots((prevSpots) => prevSpots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot)));
     };
+    const handleDragStart = () => {
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+    };
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
 
         if (active.id !== over?.id) {
             const oldIndex = spots.findIndex((spot) => spot.name === active.id);
@@ -56,7 +67,12 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
     };
 
     return (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+        >
             <SortableContext items={spots.map((spot) => spot.name)}>
                 <div className={styles.Container}>
                     {spots.map((spot) => (
@@ -93,8 +109,13 @@ function SortableSpot({
     };
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className={styles.selectedSpot}>
-            <SelectedSpot spot={spot} onDelete={onDelete} onStayTimeUpdate={onStayTimeUpdate} />
+        <div ref={setNodeRef} style={style} className={styles.selectedSpot}>
+            <SelectedSpot
+                spot={spot}
+                onDelete={onDelete}
+                onStayTimeUpdate={onStayTimeUpdate}
+                dragHandleProps={{ ...attributes, ...listeners }} // Truyền props xuống
+            />
         </div>
     );
 }
