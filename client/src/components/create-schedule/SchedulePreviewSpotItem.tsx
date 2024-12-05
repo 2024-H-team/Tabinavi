@@ -57,7 +57,7 @@ export default function SchedulePreviewSpotItem({
                         {`${hour}時間${minute}分`}
                     </p>
                 ) : (
-                    <div>
+                    <div className={styles.timePicker}>
                         <WheelPicker
                             data={hours}
                             defaultSelection={hours.indexOf(hour)}

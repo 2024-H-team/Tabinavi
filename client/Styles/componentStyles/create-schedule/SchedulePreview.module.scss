@@ -19,7 +19,6 @@
     padding: 20px;
     padding-left: 50px;
     position: relative;
-
     .dragHolder {
         position: absolute;
         left: 0;
@@ -45,6 +44,10 @@
         line-height: 25px;
     }
     .stayTime {
+        display: flex;
+        gap: 20px;
+    }
+    .timePicker {
         display: flex;
         gap: 20px;
     }
