@@ -52,7 +52,7 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
 
     const handleCreateSchedule = () => {
         sessionStorage.setItem('ScheduleSpot', JSON.stringify(spots));
-        router.push('/schedule');
+        router.push('/create-schedule/schedule-preview');
     };
 
     return (
