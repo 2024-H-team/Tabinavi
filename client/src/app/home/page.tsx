@@ -3,7 +3,7 @@ import styles from '@styles/appStyles/home/Home.module.scss';
 import Footer from '@/components/Footer';
 import { IoSettingsOutline } from 'react-icons/io5';
 import ScheduleViewArray from '@/utils/ScheduleViewArray';
-import Calender from '@/components/home/Calender';
+import Calender from '@/components/Calender';
 
 export default function Home() {
     return (
