@@ -1,17 +1,27 @@
 import React from 'react';
 import styles from '@styles/componentStyles/home/ScheduleDate.module.scss';
 
-interface ScheduleDateProps {
+interface ScheduleData {
     month: number;
-    day: number;
+    startday: number;
+    endday: number;
+    Title: string;
+    SubTitle: string;
+    TimeStart: string;
+    TimeEnd: string;
 }
 
-export default function ScheduleDate({ month, day }: ScheduleDateProps) {
+interface ScheduleDateProps {
+    data: ScheduleData;
+}
+export default function ScheduleDate({ data }: ScheduleDateProps) {
     return (
         <div className={styles.DateWrap}>
             <p className={styles.Date}>
-                {month}/<br />
-                <span className={styles.day}>{day}</span>
+                {data.month}/<br />
+                <span className={styles.day}>
+                    {data.endday === data.startday ? data.startday : `${data.startday}-${data.endday}`}
+                </span>
             </p>
         </div>
     );
