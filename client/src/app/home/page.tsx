@@ -8,17 +8,17 @@ import Calender from '@/components/home/Calender';
 export default function Home() {
     return (
         <>
-            <div className={styles.Setting}>
-                <IoSettingsOutline size="24px" />
-            </div>
-            <div className={styles.Calendar}>
+            <div className={styles.ContentWrap}>
+                <div className={styles.Setting}>
+                    <IoSettingsOutline size="24px" />
+                </div>
                 <Calender />
-            </div>
-            <div className={styles.ScheduleWrap}>
-                <h2 style={{ fontSize: '16px' }}>直近の予定</h2>
-                {ScheduleViewArray.map((schedule, index) => (
-                    <ScheduleView key={index} data={schedule} />
-                ))}
+                <div className={styles.ScheduleWrap}>
+                    <h2 style={{ fontSize: '16px' }}>直近の予定</h2>
+                    {ScheduleViewArray.map((schedule, index) => (
+                        <ScheduleView key={index} data={schedule} />
+                    ))}
+                </div>
             </div>
             <Footer />
         </>
