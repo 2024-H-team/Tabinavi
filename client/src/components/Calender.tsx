@@ -13,10 +13,11 @@ export default function Calender() {
                 readOnly
                 onChange={() => {}}
                 sx={{
+                    backgroundColor: '#FFF',
                     marginTop: '12px',
                     width: '100%',
                     boxShadow: '0 0 4px 1px rgba(150,150,150,0.11)',
-                    border: '1px solid #000',
+                    // border: '1px solid #000',
                     borderRadius: '16px',
                     padding: '24px',
                     svg: {
