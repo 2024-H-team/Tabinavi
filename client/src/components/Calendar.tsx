@@ -17,6 +17,7 @@ const CustomDay = (props: PickersDayProps<Dayjs>) => {
         dayjs('2024-12-25'),
         dayjs('2025-01-01'),
         dayjs('2025-02-14'),
+        dayjs('2025-03-31'),
     ];
 
     const isSpecialDate = specialDates.some((specialDate) => day.isSame(specialDate, 'day'));
@@ -59,6 +60,8 @@ export default function Calendar() {
                         backgroundColor: '#FFF',
                         marginTop: '12px',
                         width: '100%',
+                        maxHeight: '352px',
+                        height: '352px',
                         boxShadow: '0 0 4px 1px rgba(150,150,150,0.11)',
                         borderRadius: '16px 0 16px 16px',
                         padding: '24px 48px 24px 24px',
@@ -68,6 +71,9 @@ export default function Calendar() {
                         },
                         '.MuiPickersCalendarHeader-label': {
                             fontSize: '1.4rem',
+                        },
+                        '.MuiDayCalendar-monthContainer': {
+                            height: '230px',
                         },
                         '.MuiDayCalendar-header': {
                             padding: '0',
