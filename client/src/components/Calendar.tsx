@@ -1,6 +1,6 @@
 'use client';
 
-import styles from '@styles/componentStyles/Calender.module.scss';
+import styles from '@styles/componentStyles/Calendar.module.scss';
 import { FaCalendarAlt } from 'react-icons/fa';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
@@ -14,7 +14,7 @@ const CustomDay = (props: PickersDayProps<Dayjs>) => {
     const specialDates = [
         dayjs('2024-12-25'),
         dayjs('2024-12-2'),
-        dayjs('2024-12-4'),
+        dayjs('2024-12-25'),
         dayjs('2025-01-01'),
         dayjs('2025-02-14'),
     ];
@@ -41,10 +41,10 @@ const CustomDay = (props: PickersDayProps<Dayjs>) => {
     );
 };
 
-export default function Calender() {
+export default function Calendar() {
     return (
         <div>
-            <button className={styles.CalenderButton}>
+            <button className={styles.CalendarButton}>
                 <FaCalendarAlt color="#FFD643" size="24px" />
             </button>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
