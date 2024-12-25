@@ -2,10 +2,44 @@
 
 import styles from '@styles/componentStyles/Calender.module.scss';
 import { FaCalendarAlt } from 'react-icons/fa';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import ja from 'date-fns/locale/ja';
+import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+
+const CustomDay = (props: PickersDayProps<Dayjs>) => {
+    const { day, selected, ...other } = props;
+
+    const specialDates = [
+        dayjs('2024-12-25'),
+        dayjs('2024-12-2'),
+        dayjs('2024-12-4'),
+        dayjs('2025-01-01'),
+        dayjs('2025-02-14'),
+    ];
+
+    const isSpecialDate = specialDates.some((specialDate) => day.isSame(specialDate, 'day'));
+
+    return (
+        <PickersDay
+            {...other}
+            day={day}
+            selected={selected}
+            sx={{
+                position: 'relative',
+                '&::after': {
+                    content: isSpecialDate ? '"・"' : '""',
+                    color: '#7BC3FF',
+                    fontSize: '30px',
+                    position: 'absolute',
+                    top: 0,
+                    left: -3,
+                },
+            }}
+        />
+    );
+};
 
 export default function Calender() {
     return (
@@ -13,11 +47,14 @@ export default function Calender() {
             <button className={styles.CalenderButton}>
                 <FaCalendarAlt color="#FFD643" size="24px" />
             </button>
-            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateCalendar
                     views={['day']}
                     readOnly
                     onChange={() => {}}
+                    slots={{
+                        day: CustomDay, // カスタムコンポーネントを指定
+                    }}
                     sx={{
                         backgroundColor: '#FFF',
                         marginTop: '12px',
@@ -25,7 +62,6 @@ export default function Calender() {
                         boxShadow: '0 0 4px 1px rgba(150,150,150,0.11)',
                         borderRadius: '16px 0 16px 16px',
                         padding: '24px 48px 24px 24px',
-                        height: 'fitContent',
                         svg: {
                             width: '16px',
                             height: '16px',
