@@ -1,4 +1,5 @@
 import ScheduleView from '@/components/home/ScheduleView';
+import Bookmark from '@/components/Bookmark';
 import styles from '@styles/appStyles/home/Home.module.scss';
 import Footer from '@/components/Footer';
 import { IoSettingsOutline } from 'react-icons/io5';
@@ -17,6 +18,7 @@ export default function Home() {
                     <ScheduleView key={index} data={schedule} />
                 ))}
             </div>
+            <Bookmark />
             <Footer />
         </>
     );
