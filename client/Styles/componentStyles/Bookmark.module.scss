@@ -1,0 +1,35 @@
+.title {
+    font-size: 1.6rem;
+}
+.BookmarkWrap {
+    width: 100%;
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    .Bookmark {
+        flex-shrink: 0;
+        margin: 8px 16px 8px 0;
+        width: 130px;
+        height: 210px;
+        border-radius: 6px;
+        text-align: left;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+        .BookmarkImg {
+            border-radius: 6px 6px 0 0;
+            border: solid 1px #000;
+            height: 160px;
+        }
+        .BookmarkInfo {
+            padding: 8px;
+
+            p {
+                font-size: 1.1rem;
+                color: #bdbdbd;
+                margin-bottom: 4px;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+        }
+    }
+}

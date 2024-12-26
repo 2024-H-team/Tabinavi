@@ -31,14 +31,17 @@ export default function Bookmark() {
 
     return (
         <>
-            <h1>ブックマークした場所</h1>
+            <h1 className={styles.title}>ブックマークした場所</h1>
             <div className={styles.BookmarkWrap}>
                 {bookmarks.length > 0 ? (
                     bookmarks.map((bookmark) => (
-                        <div key={bookmark.id} className={styles.BookmarkInfo}>
-                            <h2>{bookmark.title}</h2>
-                            <p>{bookmark.address}</p>
-                        </div>
+                        <button key={bookmark.id} className={styles.Bookmark}>
+                            <p className={styles.BookmarkImg}></p>
+                            <div className={styles.BookmarkInfo}>
+                                <p>{bookmark.address}</p>
+                                <h2>{bookmark.title}</h2>
+                            </div>
+                        </button>
                     ))
                 ) : (
                     <p>ブックマークがありません。</p>
