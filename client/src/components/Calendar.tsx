@@ -16,12 +16,21 @@ type CalendarData = {
     id: number;
     startDate: string;
     endDate: string;
+    period: string;
 };
 
-const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: Dayjs[] }) => {
+type SpecialDate = {
+    date: Dayjs;
+    period: string;
+};
+
+const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: SpecialDate[] }) => {
     const { day, selected, specialDates, ...other } = props;
 
-    const isSpecialDate = specialDates.some((specialDate) => day.isSame(specialDate, 'day'));
+    const specialDate = specialDates.find((special) => day.isSame(special.date, 'day'));
+    const isSpecialDate = !!specialDate;
+
+    const isMultiple = isSpecialDate && specialDate?.period === 'multiple';
 
     return (
         <PickersDay
@@ -30,8 +39,9 @@ const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: Dayjs[] }) =>
             selected={selected}
             sx={{
                 position: 'relative',
+
                 '&::after': {
-                    content: isSpecialDate ? '"・"' : '""',
+                    content: isSpecialDate && !isMultiple ? '"・"' : '""',
                     color: '#7BC3FF',
                     fontSize: '30px',
                     position: 'absolute',
@@ -44,7 +54,7 @@ const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: Dayjs[] }) =>
 };
 
 export default function Calendar() {
-    const [specialDates, setSpecialDates] = useState<Dayjs[]>([]);
+    const [specialDates, setSpecialDates] = useState<SpecialDate[]>([]);
 
     useEffect(() => {
         const fetchSpecialDates = async () => {
@@ -55,11 +65,11 @@ export default function Calendar() {
                 const start = dayjs(entry.startDate);
                 const end = dayjs(entry.endDate);
 
-                const days = [];
+                const days: SpecialDate[] = [];
                 let current = start;
 
                 while (current.isSameOrBefore(end, 'day')) {
-                    days.push(current);
+                    days.push({ date: current, period: entry.period });
                     current = current.add(1, 'day');
                 }
                 return days;
