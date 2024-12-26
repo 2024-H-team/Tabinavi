@@ -7,18 +7,19 @@ import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
+import { useEffect, useState } from 'react';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
-const CustomDay = (props: PickersDayProps<Dayjs>) => {
-    const { day, selected, ...other } = props;
+dayjs.extend(isSameOrBefore);
 
-    const specialDates = [
-        dayjs('2024-12-25'),
-        dayjs('2024-12-2'),
-        dayjs('2024-12-25'),
-        dayjs('2025-01-01'),
-        dayjs('2025-02-14'),
-        dayjs('2025-03-31'),
-    ];
+type CalendarData = {
+    id: number;
+    startDate: string;
+    endDate: string;
+};
+
+const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: Dayjs[] }) => {
+    const { day, selected, specialDates, ...other } = props;
 
     const isSpecialDate = specialDates.some((specialDate) => day.isSame(specialDate, 'day'));
 
@@ -43,6 +44,33 @@ const CustomDay = (props: PickersDayProps<Dayjs>) => {
 };
 
 export default function Calendar() {
+    const [specialDates, setSpecialDates] = useState<Dayjs[]>([]);
+
+    useEffect(() => {
+        const fetchSpecialDates = async () => {
+            const response = await fetch('/CalendarData.json');
+            const data: CalendarData[] = await response.json();
+
+            const dates = data.flatMap((entry) => {
+                const start = dayjs(entry.startDate);
+                const end = dayjs(entry.endDate);
+
+                const days = [];
+                let current = start;
+
+                while (current.isSameOrBefore(end, 'day')) {
+                    days.push(current);
+                    current = current.add(1, 'day');
+                }
+                return days;
+            });
+
+            setSpecialDates(dates);
+        };
+
+        fetchSpecialDates();
+    }, []);
+
     return (
         <div>
             <button className={styles.CalendarButton}>
@@ -54,7 +82,7 @@ export default function Calendar() {
                     readOnly
                     onChange={() => {}}
                     slots={{
-                        day: CustomDay, // カスタムコンポーネントを指定
+                        day: (props) => <CustomDay {...props} specialDates={specialDates} />,
                     }}
                     sx={{
                         backgroundColor: '#FFF',
