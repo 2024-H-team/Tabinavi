@@ -151,6 +151,7 @@ export default function Calendar() {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateCalendar
                     views={['day']}
+                    readOnly
                     onChange={() => {}}
                     slots={{
                         day: (props) => <CustomDay {...props} specialDates={specialDates} />,
@@ -167,11 +168,6 @@ export default function Calendar() {
                         svg: {
                             width: '16px',
                             height: '16px',
-                        },
-                        '.Mui-selected': {
-                            backgroundColor: '#FFF !important',
-                            color: '#436EEE !important',
-                            border: '1px solid #436EEE !important',
                         },
                         '.MuiPickersCalendarHeader-label': {
                             fontSize: '1.4rem',
