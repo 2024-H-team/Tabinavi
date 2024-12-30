@@ -17,7 +17,7 @@ export default function Home() {
                 {ScheduleViewArray.map((schedule, index) => (
                     <ScheduleView key={index} data={schedule} />
                 ))}
-                <Bookmark />
+                <Bookmark title="ブックマークした場所" />
             </div>
             <Footer />
         </>

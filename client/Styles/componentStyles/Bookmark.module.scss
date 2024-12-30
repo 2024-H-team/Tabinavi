@@ -1,5 +1,17 @@
-.title {
-    font-size: 1.6rem;
+.BookmarkHeader {
+    display: flex;
+    justify-content: space-between;
+    h1 {
+        font-size: 1.6rem;
+        display: flex;
+        align-items: center;
+    }
+    p {
+        display: flex;
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
 }
 .BookmarkWrap {
     width: 100%;

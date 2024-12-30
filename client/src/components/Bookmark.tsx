@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import styles from '@styles/componentStyles/Bookmark.module.scss';
+import { IoIosArrowForward } from 'react-icons/io';
 
 type Bookmark = {
     id: number;
@@ -9,7 +10,11 @@ type Bookmark = {
     address: string;
 };
 
-export default function Bookmark() {
+type BookmarkProps = {
+    title: string;
+};
+
+export default function Bookmark({ title }: BookmarkProps) {
     const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
 
     useEffect(() => {
@@ -31,7 +36,13 @@ export default function Bookmark() {
 
     return (
         <>
-            <h1 className={styles.title}>ブックマークした場所</h1>
+            <div className={styles.BookmarkHeader}>
+                <h1>{title}</h1>
+                <p>
+                    一覧を見る
+                    <IoIosArrowForward color="#436EEE" size="18px" />
+                </p>
+            </div>
             <div className={styles.BookmarkWrap}>
                 {bookmarks.length > 0 ? (
                     bookmarks.map((bookmark) => (
