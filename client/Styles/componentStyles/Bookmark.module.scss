@@ -1,5 +1,6 @@
 .BookmarkHeader {
     display: flex;
+    margin-top: 30px;
     justify-content: space-between;
     h1 {
         font-size: 1.6rem;
@@ -7,10 +8,13 @@
         align-items: center;
     }
     p {
-        display: flex;
-        align-items: center;
         font-size: 1.2rem;
         font-weight: bold;
+        margin-top: 1px;
+    }
+    .BookmarkLink {
+        display: flex;
+        align-items: center;
     }
 }
 .BookmarkWrap {

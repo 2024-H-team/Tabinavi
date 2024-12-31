@@ -38,10 +38,10 @@ export default function Bookmark({ title }: BookmarkProps) {
         <>
             <div className={styles.BookmarkHeader}>
                 <h1>{title}</h1>
-                <p>
-                    一覧を見る
+                <button className={styles.BookmarkLink}>
+                    <p>一覧を見る</p>
                     <IoIosArrowForward color="#436EEE" size="18px" />
-                </p>
+                </button>
             </div>
             <div className={styles.BookmarkWrap}>
                 {bookmarks.length > 0 ? (
