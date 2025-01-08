@@ -21,7 +21,7 @@ export async function getResponseFromOpenAI(userMessage: string, history: Messag
             { role: 'user', content: userMessage },
         ];
         const completion = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o-mini',
             messages,
             temperature: 0.7,
         });
