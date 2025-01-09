@@ -18,10 +18,18 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
 }) => {
     const router = useRouter();
     const [selectedMode, setSelectedMode] = useState<TravelMode>('WALKING');
-    const [duration, setDuration] = useState<string>('...');
+    const [duration, setDuration] = useState<string>('計算中');
     const [transferData, setTransferData] = useState<BestRoute | null>(null);
+    const [isGoogleMapsReady, setGoogleMapsReady] = useState(false);
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
-        if (!window.google) return;
+        const interval = setInterval(() => {
+            if (window.google && window.google.maps && typeof window.google.maps.DirectionsService === 'function') {
+                setGoogleMapsReady(true);
+                clearInterval(interval);
+            }
+        });
+        if (!isGoogleMapsReady) return;
 
         const findNearestStation = async (
             location: google.maps.LatLngLiteral,
@@ -71,6 +79,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
         };
 
         const calculateWalkingToNearestStation = async () => {
+            setLoading(true);
             const directionsService = new window.google.maps.DirectionsService();
             const stationTypes = ['transit_station', 'subway_station', 'train_station'];
 
@@ -167,6 +176,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                     )}分, 合計: ${totalDuration}`,
                 );
                 onDurationCalculated?.(totalDuration);
+                setLoading(false);
             } catch (error) {
                 console.error('Failed to calculate durations:', error);
                 setDuration('経路が見つかりません');
@@ -175,6 +185,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
         };
 
         const calculateRegularDuration = async () => {
+            setLoading(true);
             const directionsService = new window.google.maps.DirectionsService();
 
             try {
@@ -198,6 +209,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                 const durationText = result.routes[0].legs[0].duration?.text || 'N/A';
                 setDuration(durationText);
                 onDurationCalculated?.(durationText);
+                setLoading(false);
             } catch (error) {
                 console.error('Failed to calculate duration:', error);
                 setDuration('N/A');
@@ -210,7 +222,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
         } else {
             calculateRegularDuration();
         }
-    }, [origin, destination, selectedMode, onDurationCalculated]);
+    }, [origin, destination, selectedMode, onDurationCalculated, isGoogleMapsReady]);
 
     const handleDurationClick = () => {
         if (transferData) {
@@ -232,22 +244,26 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                 <option value="DRIVING">車</option>
                 <option value="TRANSIT">電車</option>
             </select>
-            <p className={styles.duration}>
-                移動時間: {duration}
-                {selectedMode === 'TRANSIT' && (
-                    <span
-                        onClick={handleDurationClick}
-                        style={{
-                            cursor: 'pointer',
-                            marginLeft: '8px',
-                            color: 'blue', // Màu sắc để nhấn mạnh
-                            fontWeight: 'bold',
-                        }}
-                    >
-                        &gt;
-                    </span>
-                )}
-            </p>
+            {loading ? (
+                <p className={styles.duration}>計算中...</p>
+            ) : (
+                <p className={styles.duration}>
+                    移動時間: {duration}
+                    {selectedMode === 'TRANSIT' && transferData && (
+                        <span
+                            onClick={handleDurationClick}
+                            style={{
+                                cursor: 'pointer',
+                                marginLeft: '8px',
+                                color: 'blue',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            &gt;
+                        </span>
+                    )}
+                </p>
+            )}
         </div>
     );
 };
