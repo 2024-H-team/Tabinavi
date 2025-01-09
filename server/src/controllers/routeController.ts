@@ -4,7 +4,6 @@ import { findShortestRoute } from '../models/routeModel';
 export const getRoute = async (req: Request, res: Response): Promise<Response> => {
     const { startStation, endStation } = req.body;
 
-    // Kiểm tra dữ liệu đầu vào
     if (!startStation || !endStation) {
         return res.status(400).json({
             error: 'Please enter both start and end station names',
@@ -12,7 +11,6 @@ export const getRoute = async (req: Request, res: Response): Promise<Response> =
     }
 
     try {
-        // Tìm tuyến đường ngắn nhất
         const result = await findShortestRoute(startStation, endStation);
         return res.status(200).json(result);
     } catch (error: unknown) {
