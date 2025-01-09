@@ -48,7 +48,6 @@ export default function Page() {
                     </div>,
                 );
             } else {
-                // Show new line name when it changes
                 if (segment.line !== currentLine) {
                     // Find transfer information
                     const transfer = transfers.find((t) => t.from_line === currentLine && t.to_line === segment.line);
