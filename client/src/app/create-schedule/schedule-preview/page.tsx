@@ -10,7 +10,6 @@ import {
     DragEndEvent,
 } from '@dnd-kit/core';
 import { SortableContext, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
 import SchedulePreviewSpotItem from '@/components/create-schedule/SchedulePreviewSpotItem';
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
@@ -100,8 +99,8 @@ export default function PreviewSpotsContainer() {
                 onDragStart={handleDragStart}
             >
                 <SortableContext items={spots.map((spot) => spot.name)}>
-                    <div className={styles.schedulePreview}>
-                        <div className={styles.scheduleTime}>
+                    <div>
+                        <div>
                             <h2>スケジュール</h2>
                             <p>予定日：{scheduleTime.selectedDate ? formatDate(scheduleTime.selectedDate) : ''}</p>
                             <p>
@@ -114,7 +113,6 @@ export default function PreviewSpotsContainer() {
                                     spot={spot}
                                     onDelete={() => handleDelete(spot.name)}
                                     onStayTimeUpdate={handleStayTimeUpdate}
-                                    className={styles.schedulePreviewSpot}
                                 >
                                     {({ dragHandleProps, isDragging }) => (
                                         <SchedulePreviewSpotItem
@@ -135,9 +133,7 @@ export default function PreviewSpotsContainer() {
                                 )}
                             </React.Fragment>
                         ))}
-                        <button className={styles.createScheduleButton} onClick={handleSave}>
-                            保存
-                        </button>
+                        <button onClick={handleSave}>保存</button>
                     </div>
                 </SortableContext>
             </DndContext>
