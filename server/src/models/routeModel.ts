@@ -1,10 +1,18 @@
 import pool from '../config/database';
+import { RowDataPacket } from 'mysql2';
 import { dijkstra } from '../utils/dijkstra';
 import { getGraph } from '../utils/graphManager';
 import { BuildGraphResult, Station, Connection } from '../utils/buildGraph';
 
+interface StationRow extends Station, RowDataPacket {}
+interface ConnectionRow extends Connection, RowDataPacket {}
+interface LineRow extends RowDataPacket {
+    line_cd: number;
+    line_name: string;
+}
+
 interface GroupedStations {
-    [key: number]: Station[];
+    [key: number]: StationRow[];
 }
 
 interface RouteStep {
@@ -30,7 +38,7 @@ interface BestRoute {
 }
 
 export async function findStationsByName(name: string): Promise<GroupedStations> {
-    const [stations] = await pool.query<Station[]>(
+    const [stations] = await pool.query<StationRow[]>(
         `SELECT station_cd, station_g_cd, station_name, lat, lon 
          FROM railway_stations 
          WHERE station_name = ?`,
@@ -73,15 +81,15 @@ export async function findShortestRoute(startName: string, endName: string): Pro
     const startGcds = Object.keys(startGroups).map(Number);
     const endGcds = Object.keys(endGroups).map(Number);
 
-    const [stations] = await pool.query<Station[]>(
+    const [stations] = await pool.query<StationRow[]>(
         'SELECT station_cd, station_g_cd, station_name, lat, lon FROM railway_stations',
     );
-    const [connections] = await pool.query<Connection[]>(
+
+    const [connections] = await pool.query<ConnectionRow[]>(
         'SELECT station_cd1, station_cd2, line_cd FROM railway_line_connections',
     );
-    const [lines] = await pool.query<{ line_cd: number; line_name: string }[]>(
-        'SELECT line_cd, line_name FROM railway_lines',
-    );
+
+    const [lines] = await pool.query<LineRow[]>('SELECT line_cd, line_name FROM railway_lines');
 
     const graphData: BuildGraphResult = getGraph();
 
