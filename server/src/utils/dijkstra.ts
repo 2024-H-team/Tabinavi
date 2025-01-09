@@ -25,8 +25,8 @@ interface DijkstraResult {
 
 export function dijkstra(graph: Graph, startGcd: number, targetGcd: number): DijkstraResult {
     // Define costs
-    const STATION_HOP_COST = 4; // 4 minutes between stations
-    const TRANSFER_COST = 8; // 8 minutes per line transfer
+    const STATION_HOP_COST = 3; //  minutes between stations
+    const TRANSFER_COST = 6; // 8 minutes per line transfer
 
     const distances: Record<number, Distance> = {};
     const previous: Record<number, PreviousNode | null> = {};
