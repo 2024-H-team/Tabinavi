@@ -28,8 +28,6 @@ const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: SpecialDate[]
     const { day, selected, specialDates, ...other } = props;
 
     const specialDate = specialDates.find((special) => day.isSame(special.date, 'day'));
-    const isStartDate = specialDates.some((special) => special.date.isSame(day, 'day') && special.period === 'start');
-    const isEndDate = specialDates.some((special) => special.date.isSame(day, 'day') && special.period === 'end');
     const isSingleDate = specialDates.some((special) => special.date.isSame(day, 'day') && special.period === 'single');
 
     const isSpecialDate = !!specialDate;
@@ -56,47 +54,12 @@ const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: SpecialDate[]
                 ...(isSpecialDate &&
                     isMultiple && {
                         '&::after': {
-                            content: '""',
-                            borderTop: '1.5px solid #436EEE',
-                            borderBottom: '1.5px solid #436EEE',
-                            width: '42.3px',
-                            height: '25px',
+                            content: '"・"',
+                            color: '#436EEE',
+                            fontSize: '30px',
                             position: 'absolute',
                             top: 0,
                             left: -3,
-                        },
-                    }),
-                ...(isSpecialDate &&
-                    !isSingleDate &&
-                    isStartDate && {
-                        '&::after': {
-                            content: '""',
-                            borderTop: '1.5px solid #436EEE',
-                            borderBottom: '1.5px solid #436EEE',
-                            borderLeft: '1.5px solid #436EEE',
-                            position: 'absolute',
-                            textAlign: 'center',
-                            width: '42.3px',
-                            height: '25px',
-                            top: 0,
-                            left: -1,
-                            borderRadius: '8px 0 0 8px',
-                        },
-                    }),
-                ...(isSpecialDate &&
-                    !isSingleDate &&
-                    isEndDate && {
-                        '&::after': {
-                            content: '""',
-                            borderTop: '1.5px solid #436EEE',
-                            borderBottom: '1.5px solid #436EEE',
-                            borderRight: '1.5px solid #436EEE',
-                            position: 'absolute',
-                            width: '28px',
-                            height: '25px',
-                            top: 0,
-                            left: -3,
-                            borderRadius: '0 8px 8px 0',
                         },
                     }),
             }}
@@ -124,11 +87,7 @@ export default function Calendar() {
                     let current = start;
 
                     while (current.isSameOrBefore(end, 'day')) {
-                        const period = current.isSame(start, 'day')
-                            ? 'start'
-                            : current.isSame(end, 'day')
-                            ? 'end'
-                            : 'multiple';
+                        const period = 'multiple';
 
                         days.push({ date: current, period });
                         current = current.add(1, 'day');
