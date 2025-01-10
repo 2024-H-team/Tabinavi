@@ -1,20 +1,23 @@
-.ScheduleWrap {
+.ContentWrap {
     padding: 24px;
     margin: auto;
-    margin-top: 35px;
-}
+    .ScheduleWrap {
+        margin: auto;
+        margin-top: 35px;
+    }
 
-.Calendar {
-    width: 90%;
-    margin: auto;
-    margin-top: 15px;
-    border: solid 1px;
-    height: 321px;
-    border-radius: 6px;
-}
+    .Calendar {
+        width: 90%;
+        margin: auto;
+        margin-top: 15px;
+        border: solid 1px;
+        height: 321px;
+        border-radius: 6px;
+    }
 
-.Setting {
-    display: flex;
-    justify-content: end;
-    margin: 56px 25px 0 0;
+    .Setting {
+        display: flex;
+        justify-content: flex-start;
+        margin: 56px 0 0 24px;
+    }
 }

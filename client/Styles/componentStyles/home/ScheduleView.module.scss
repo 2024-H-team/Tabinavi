@@ -2,35 +2,38 @@
     font-weight: bold;
     display: flex;
     width: 100%;
-    .ScheduleContents {
-        margin-left: 17px;
-        padding-left: 8px;
+    .ContentsWrap {
         display: flex;
-        align-items: center;
-        width: 260px;
-        justify-content: space-between;
-        .ScheduleInformation {
-            margin-right: 29px;
+        box-shadow: 0 1px 2px 0 rgb(0, 0, 0, 0.25);
+        margin: 8px;
+        border-radius: 6px;
+        background: #fff;
+        .ScheduleContents {
+            height: 78px;
+            margin-left: 17px;
             display: flex;
             flex-direction: column;
+            align-items: left;
+            width: 260px;
             justify-content: space-evenly;
             h3 {
-                font-size: 18px;
+                font-size: 1.8rem;
             }
             h4 {
-                margin: 5px 0;
-                font-size: 12px;
+                font-size: 1rem;
                 font-weight: normal;
+                color: #bdbdbd;
             }
             .time {
                 font-size: 11px;
-                margin: 7px 0;
             }
         }
-    }
-    .BiChevronRight {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+
+        .BiChevronRight {
+            margin-right: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
     }
 }
