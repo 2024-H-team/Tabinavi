@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import ScheduleDate from '@/components/home/ScheduleDate';
 import styles from '@styles/componentStyles/home/ScheduleView.module.scss';
 import { BiChevronRight } from 'react-icons/bi';
-import ScheduleViewArray from '@/utils/ScheduleViewArray';
 
 interface Schedule {
     id: number;
@@ -12,6 +11,8 @@ interface Schedule {
     endDate: string;
     startTime: string;
     endTime: string;
+    Title: string;
+    SubTitle: string;
 }
 
 export default function ScheduleView() {
@@ -34,7 +35,7 @@ export default function ScheduleView() {
     return (
         <>
             <h2 style={{ fontSize: '16px' }}>直近の予定</h2>
-            {ScheduleViewArray.map((schedule, index) => (
+            {schedule.map((schedule, index) => (
                 <div key={index} className={styles.ScheduleWrap}>
                     <div>
                         <ScheduleDate data={schedule} />
@@ -43,7 +44,7 @@ export default function ScheduleView() {
                     <div className={styles.ContentsWrap}>
                         <div className={styles.ScheduleContents}>
                             <p className={styles.time}>
-                                {schedule.TimeStart}~{schedule.TimeEnd}
+                                {schedule.startTime}~{schedule.endTime}
                             </p>
                             <h3>{schedule.Title}</h3>
                             <h4>{schedule.SubTitle}</h4>
