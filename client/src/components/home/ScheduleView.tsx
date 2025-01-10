@@ -10,8 +10,8 @@ interface Schedule {
     id: number;
     startDate: string;
     endDate: string;
-    StartTime: string;
-    EndTime: string;
+    startTime: string;
+    endTime: string;
 }
 
 export default function ScheduleView() {
