@@ -72,7 +72,7 @@ export default function Calendar() {
 
     useEffect(() => {
         const fetchSpecialDates = async () => {
-            const response = await fetch('/CalendarData.json');
+            const response = await fetch('/ScheduleData.json');
             const data: CalendarData[] = await response.json();
 
             const dates = data.flatMap((entry) => {
