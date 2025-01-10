@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect } from 'react';
 import ScheduleDate from '@/components/home/ScheduleDate';
 import styles from '@styles/componentStyles/home/ScheduleView.module.scss';
@@ -10,8 +12,6 @@ interface Schedule {
     endDate: string;
     StartTime: string;
     EndTime: string;
-    Title: string;
-    SubTitle: string;
 }
 
 export default function ScheduleView() {
@@ -37,20 +37,20 @@ export default function ScheduleView() {
             {ScheduleViewArray.map((schedule, index) => (
                 <div key={index} className={styles.ScheduleWrap}>
                     <div>
-                        <ScheduleDate month={schedule.month} day={schedule.day} />
+                        <ScheduleDate data={schedule} />
                     </div>
 
-                    <div className={styles.ScheduleContents}>
-                        <div className={styles.ScheduleInformation}>
+                    <div className={styles.ContentsWrap}>
+                        <div className={styles.ScheduleContents}>
                             <p className={styles.time}>
                                 {schedule.TimeStart}~{schedule.TimeEnd}
                             </p>
                             <h3>{schedule.Title}</h3>
                             <h4>{schedule.SubTitle}</h4>
                         </div>
-                    </div>
-                    <div className={styles.BiChevronRight}>
-                        <BiChevronRight size="30px" color="blue" />
+                        <div className={styles.BiChevronRight}>
+                            <BiChevronRight size="30px" color="blue" />
+                        </div>
                     </div>
                 </div>
             ))}
