@@ -19,7 +19,7 @@ export default function ScheduleView() {
 
     useEffect(() => {
         const fetchSchedule = async () => {
-            const response = await fetch('/ScheduleDate.json');
+            const response = await fetch('/ScheduleData.json');
             if (!response.ok) {
                 throw new Error(`Failed to fetch schedule: ${response.status}`);
             }
