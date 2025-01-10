@@ -14,7 +14,7 @@ import SchedulePreviewSpotItem from '@/components/create-schedule/SchedulePrevie
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
 import { PlaceDetails } from '@/types/PlaceDetails';
-import { TravelTimeCalculator } from '@/components/TravelTimeCalculator';
+import { TravelTimeCalculator } from '@/components/create-schedule/TravelTimeCalculator';
 
 interface ScheduleTime {
     startTime: string;
