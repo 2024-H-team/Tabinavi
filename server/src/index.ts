@@ -1,23 +1,49 @@
-import './config/loadEnv';
 import express, { Request, Response } from 'express';
+import bodyParser from 'body-parser';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
+
+import { initGraph } from './utils/graphManager';
 import webRoutes from './routers/web';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 
-const port: number = parseInt(process.env.PORT as string, 10) || 3000;
-const host: string = process.env.HOST_NAME || 'localhost';
-
+// Middleware
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
-app.use(express.json());
+// Serve static files from 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
+// Routes
 app.use('/api', webRoutes);
 
+// Default route serves index.html
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World!');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(port, host, () => {
-    console.log(`Server is running at http://${host}:${port}`);
-});
+// Initialize graph and start server
+(async () => {
+    try {
+        await initGraph();
+        console.log('Graph is ready for use.');
+
+        const PORT = parseInt(process.env.PORT || '3000', 10);
+        const HOST = process.env.HOST_NAME || 'localhost';
+
+        app.listen(PORT, HOST, () => {
+            console.log(`Server is running on http://${HOST}:${PORT}`);
+        });
+    } catch (error) {
+        console.error('Failed to initialize graph:', error);
+        process.exit(1);
+    }
+})();

@@ -1,0 +1,47 @@
+.container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+}
+
+.title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.result {
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.routeItem {
+    font-size: 18px;
+    padding: 5px 0;
+    color: #333;
+}
+
+.routeLine {
+    font-size: 16px;
+    color: #555;
+    margin-left: 10px;
+}
+
+.routeArrow {
+    text-align: center;
+    font-size: 20px;
+    color: #888;
+    margin: 5px 0;
+}
+
+.routeItemTransfer {
+    font-size: 16px;
+    color: #d9534f;
+    margin: 10px 0;
+    font-weight: bold;
+}
