@@ -77,4 +77,30 @@ export class UserModel {
         if (!passwordMatch) return null;
         return user;
     }
+
+    async checkAndUpdateFirstLogin(userID: number): Promise<boolean> {
+        const queryCheck = `
+        SELECT firstLogin
+        FROM users
+        WHERE userID = ?
+    `;
+        const [rows] = await this.pool.execute<mysql.RowDataPacket[]>(queryCheck, [userID]);
+
+        if (rows.length === 0) {
+            throw new Error('User not found');
+        }
+
+        const firstLogin = rows[0].firstLogin;
+
+        if (firstLogin) {
+            const queryUpdate = `
+            UPDATE users
+            SET firstLogin = false
+            WHERE userID = ?
+        `;
+            await this.pool.execute(queryUpdate, [userID]);
+        }
+
+        return firstLogin;
+    }
 }

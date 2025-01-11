@@ -34,7 +34,13 @@ export default function LoginPage() {
             if (response.data.success) {
                 setLoading(false);
                 setError('');
-                router.push('/home');
+                const { firstLogin } = response.data.data;
+
+                if (firstLogin) {
+                    router.push('/survey');
+                } else {
+                    router.push('/home');
+                }
             }
         } catch (err) {
             if (err instanceof AxiosError) {

@@ -92,6 +92,9 @@ export class UserController {
                 });
             }
 
+            // Check and update firstLogin
+            const firstLogin = await this.userModel.checkAndUpdateFirstLogin(user.userID!);
+
             // Generate JWT token
             const token = jwt.sign(
                 { userId: user.userID, userName: user.userName },
@@ -115,7 +118,10 @@ export class UserController {
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',
-                data: userWithoutPassword,
+                data: {
+                    ...userWithoutPassword,
+                    firstLogin,
+                },
             });
         } catch (error) {
             console.error('Login error:', error);
