@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import apiClient from '@/lib/axios';
 import styles from '@styles/appStyles/auth/auth.module.scss';
 import { AxiosError } from 'axios';
+import Link from 'next/link';
 
 interface RegisterFormData {
     userName: string;
@@ -55,7 +56,13 @@ export default function RegisterPage() {
                 </div>
 
                 {success ? (
-                    <div className={styles.successMessage}>Registration successful! You can now login.</div>
+                    <div className={styles.successMessage}>
+                        Registration successful! You can now{' '}
+                        <Link href="/" style={{ color: '#059669', textDecoration: 'underline' }}>
+                            login
+                        </Link>
+                        .
+                    </div>
                 ) : (
                     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
                         <div className={styles.formGroup}>

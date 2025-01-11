@@ -61,4 +61,20 @@ export class UserModel {
             throw error;
         }
     }
+
+    async loginUser(userName: string, password: string): Promise<User | null> {
+        const query = `
+            SELECT * FROM users 
+            WHERE userName = ?
+        `;
+
+        const [rows] = await this.pool.execute<mysql.RowDataPacket[]>(query, [userName]);
+        if (rows.length === 0) return null;
+
+        const user = rows[0] as User;
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (!passwordMatch) return null;
+        return user;
+    }
 }
