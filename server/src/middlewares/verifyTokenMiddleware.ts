@@ -5,10 +5,10 @@ interface AuthRequest extends Request {
     user?: {
         userId: number;
         userName: string;
-        email: string;
+        iat?: number;
+        exp?: number;
     };
 }
-
 export const verifyTokenMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const token = req.cookies.token;
@@ -23,9 +23,7 @@ export const verifyTokenMiddleware = async (req: AuthRequest, res: Response, nex
         const decoded = jwt.verify(token, process.env.LOGIN_TOKEN_KEY as string) as {
             userId: number;
             userName: string;
-            email: string;
         };
-
         // Attach user info to request object
         req.user = decoded;
         next();
