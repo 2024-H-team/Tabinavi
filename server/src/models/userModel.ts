@@ -21,7 +21,7 @@ export class UserModel {
     async checkUserExists(userName: string, email: string): Promise<boolean> {
         const query = `
             SELECT COUNT(*) AS count
-            FROM user
+            FROM users
             WHERE userName = ? OR email = ?
         `;
 
@@ -33,7 +33,7 @@ export class UserModel {
         const hashedPassword = await bcrypt.hash(user.password, 10);
 
         const query = `
-            INSERT INTO user (userName, password, email, fullName)
+            INSERT INTO users (userName, password, email, fullName)
             VALUES (?, ?, ?, ?)
         `;
 

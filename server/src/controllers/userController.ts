@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { UserModel } from '../models/registerModel';
+import { UserModel } from '../models/userModel';
 
 export const registerValidation = [
     body('userName').trim().isLength({ min: 3, max: 30 }).withMessage('Username must be between 3 and 30 characters'),

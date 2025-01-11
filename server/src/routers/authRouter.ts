@@ -3,7 +3,7 @@
 import express from 'express';
 import { UserController, registerValidation } from '../controllers/userController';
 import { asyncHandler } from '../middlewares/asyncHandler';
-import { UserModel } from '../models/registerModel';
+import { UserModel } from '../models/userModel';
 import pool from '../config/database';
 
 const router = express.Router();
