@@ -15,6 +15,7 @@
     "author": "huynhnguyen1906",
     "license": "ISC",
     "dependencies": {
+        "@googlemaps/google-maps-services-js": "^3.4.0",
         "bcrypt": "^5.1.1",
         "body-parser": "^1.20.3",
         "cookie-parser": "^1.4.7",
@@ -34,6 +35,7 @@
         "@types/cookie-parser": "^1.4.8",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.0",
+        "@types/googlemaps": "^3.43.3",
         "@types/jsonwebtoken": "^9.0.7",
         "@types/morgan": "^1.9.9",
         "@types/node": "^22.9.1",

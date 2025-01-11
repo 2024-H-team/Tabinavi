@@ -46,46 +46,77 @@ export const createMarker = async (
     });
 };
 
-export const getPlaceDetails = (
-    service: google.maps.places.PlacesService,
-    placeId: string,
-): Promise<PlaceDetails | null> => {
-    return new Promise((resolve) => {
+// mapUtils.ts - Update getPlaceDetails to ensure all fields are captured
+export const getPlaceDetails = (service: google.maps.places.PlacesService, placeId: string): Promise<PlaceDetails> => {
+    return new Promise((resolve, reject) => {
         service.getDetails(
             {
                 placeId,
                 fields: [
+                    'place_id',
                     'name',
                     'formatted_address',
                     'formatted_phone_number',
+                    'international_phone_number',
                     'website',
                     'rating',
                     'geometry',
                     'reviews',
                     'opening_hours',
-                    'utc_offset_minutes',
+                    'price_level',
+                    'photos',
+                    'types',
+                    'vicinity',
+                    'business_status',
+                    'icon',
+                    'icon_background_color',
+                    'icon_mask_base_uri',
                 ],
             },
-            (place, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-                    const placeDetails: PlaceDetails = {
-                        name: place.name || '',
-                        address: place.formatted_address || '',
-                        phoneNumber: place.formatted_phone_number || undefined,
-                        website: place.website || undefined,
-                        rating: place.rating || undefined,
+            (result, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && result) {
+                    const photoUrls =
+                        result.photos?.map((photo) =>
+                            photo.getUrl({
+                                maxWidth: 800,
+                                maxHeight: 600,
+                            }),
+                        ) || [];
+                    resolve({
+                        placeId: result.place_id || '',
+                        name: result.name || '',
+                        address: result.formatted_address || '',
+                        phoneNumber: result.formatted_phone_number,
+                        website: result.website,
+                        rating: result.rating,
                         location: {
-                            lat: place.geometry?.location?.lat() || 0,
-                            lng: place.geometry?.location?.lng() || 0,
+                            lat: result.geometry?.location?.lat() || 0,
+                            lng: result.geometry?.location?.lng() || 0,
                         },
-                        reviews: place.reviews || undefined,
-                        openingHours: {
-                            weekday_text: place.opening_hours?.weekday_text,
-                        },
-                    };
-                    resolve(placeDetails);
+                        reviews: result.reviews,
+                        openingHours: result.opening_hours
+                            ? {
+                                  weekday_text: result.opening_hours.weekday_text,
+                              }
+                            : undefined,
+                        stayTime: undefined,
+                        formattedPhoneNumber: result.formatted_phone_number,
+                        internationalPhoneNumber: result.international_phone_number,
+                        priceLevel: result.price_level,
+                        photos: result.photos,
+                        types: result.types,
+                        vicinity: result.vicinity,
+                        businessStatus: result.business_status,
+                        formattedAddress: result.formatted_address,
+                        icon: result.icon,
+                        iconBackgroundColor: result.icon_background_color,
+                        iconMaskBaseUri: result.icon_mask_base_uri,
+                        primaryType: result.types?.[0],
+                        userRatingsTotal: result.user_ratings_total,
+                        photoUrls,
+                    });
                 } else {
-                    resolve(null);
+                    reject(new Error(`Place details failed: ${status}`));
                 }
             },
         );
