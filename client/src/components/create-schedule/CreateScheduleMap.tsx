@@ -6,20 +6,55 @@ import { GoogleMap, Autocomplete } from '@react-google-maps/api';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import { useMapContext } from '@/components/MapProvider';
 import { smoothPanTo, createMarker, fetchPlaceDetailsFromLatLng, getPlaceDetails } from '@/utils/mapUtils';
-
 interface CreateScheduleMapProps {
     onPlaceSelect: (places: PlaceDetails[]) => void;
+    recommendedSpots?: PlaceDetails[];
 }
 
-const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({ onPlaceSelect }) => {
+const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({ onPlaceSelect, recommendedSpots }) => {
     const { isLoaded, loadError } = useMapContext();
     const mapRef = useRef<google.maps.Map | null>(null);
     const autoCompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
     const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
     const [selectedPlaces, setSelectedPlaces] = useState<PlaceDetails[]>([]);
     const [clickedLocation, setClickedLocation] = useState<google.maps.LatLng | null>(null);
+    const [recommendMarkers, setRecommendMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
 
     const center = useMemo(() => ({ lat: 34.6937, lng: 135.5023 }), []);
+
+    useEffect(() => {
+        if (!mapRef.current || !recommendedSpots?.length) {
+            // Remove markers by setting map to null
+            recommendMarkers.forEach((marker) => {
+                marker.map = null; // Use this instead of setMap
+            });
+            setRecommendMarkers([]);
+            return;
+        }
+
+        const createRecommendMarkers = async () => {
+            // Clear old markers
+            recommendMarkers.forEach((marker) => {
+                marker.map = null;
+            });
+
+            // Create new markers using mapUtils createMarker
+            const newMarkers = await Promise.all(
+                recommendedSpots.map(async (spot) => {
+                    return createMarker(
+                        mapRef.current!,
+                        new google.maps.LatLng(spot.location.lat, spot.location.lng),
+                        'blue', // Different color for recommended spots
+                    );
+                }),
+            );
+
+            setRecommendMarkers(newMarkers);
+        };
+
+        createRecommendMarkers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [recommendedSpots]);
 
     useEffect(() => {
         if (!clickedLocation || !mapRef.current) return;

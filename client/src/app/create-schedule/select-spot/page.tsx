@@ -16,6 +16,7 @@ export default function CreateSchedule() {
     const [selectedPlaces, setSelectedPlaces] = useState<PlaceDetails[]>([]);
     const [selectedSpots, setSelectedSpots] = useState<PlaceDetails[]>([]);
     const [recommendedSpots, setRecommendedSpots] = useState<PlaceDetails[]>([]);
+    const [visibleRecommendedSpots, setVisibleRecommendedSpots] = useState<PlaceDetails[]>([]);
 
     const handleAddSpot = useCallback((spot: PlaceDetails) => {
         setSelectedSpots((prevSpots) => [...prevSpots, spot]);
@@ -24,6 +25,10 @@ export default function CreateSchedule() {
     const handleDeleteSpot = useCallback((index: number) => {
         setSelectedSpots((prevSpots) => prevSpots.filter((_, i) => i !== index));
     }, []);
+
+    const handleLoadMore = (visibleSpots: PlaceDetails[]) => {
+        setVisibleRecommendedSpots(visibleSpots);
+    };
 
     const handleRecommendClick = async () => {
         if (selectedSpots.length === 0) {
@@ -51,6 +56,7 @@ export default function CreateSchedule() {
             if (response.data.success) {
                 const nearbyPlaces = await searchNearbyPlaces(selectedSpots, response.data.data);
                 setRecommendedSpots(nearbyPlaces || []);
+                setVisibleRecommendedSpots(nearbyPlaces?.slice(0, 5) || []);
             }
         } catch (error) {
             console.error('Error getting recommendations:', error);
@@ -61,10 +67,10 @@ export default function CreateSchedule() {
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
                 <h1>スケジュール作成</h1>
-                <CreateScheduleMap onPlaceSelect={setSelectedPlaces} />
+                <CreateScheduleMap onPlaceSelect={setSelectedPlaces} recommendedSpots={visibleRecommendedSpots} />
             </div>
             <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} />
-            <RecommendSpotsContainer recommendedSpots={recommendedSpots} />
+            <RecommendSpotsContainer recommendedSpots={recommendedSpots} onLoadMore={handleLoadMore} />
             <SelectedSpotsContainer selectedSpots={selectedSpots} onDeleteSpot={handleDeleteSpot} />
             <button
                 onClick={handleRecommendClick}

@@ -5,15 +5,18 @@ import Styles from '@styles/componentStyles/create-schedule/RecommendSpotsContai
 
 interface RecommendSpotsContainerProps {
     recommendedSpots: PlaceDetails[];
+    onLoadMore: (visibleSpots: PlaceDetails[]) => void;
 }
 
-export default function RecommendSpotsContainer({ recommendedSpots }: RecommendSpotsContainerProps) {
+export default function RecommendSpotsContainer({ recommendedSpots, onLoadMore }: RecommendSpotsContainerProps) {
     const [visibleItems, setVisibleItems] = useState(5);
 
     if (!recommendedSpots.length) return null;
 
     const handleLoadMore = () => {
-        setVisibleItems((prev) => prev + 5);
+        const newVisibleItems = visibleItems + 5;
+        setVisibleItems(newVisibleItems);
+        onLoadMore(recommendedSpots.slice(0, newVisibleItems));
     };
 
     const visibleSpots = recommendedSpots.slice(0, visibleItems);

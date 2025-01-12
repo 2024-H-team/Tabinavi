@@ -29,11 +29,12 @@ export const smoothPanTo = (map: google.maps.Map | null, targetLatLng: google.ma
 export const createMarker = async (
     map: google.maps.Map,
     position: google.maps.LatLng,
+    color: string = 'red', // Default color is red
 ): Promise<google.maps.marker.AdvancedMarkerElement> => {
     const { AdvancedMarkerElement } = (await google.maps.importLibrary('marker')) as typeof google.maps.marker;
 
     const markerContent = document.createElement('div');
-    markerContent.style.backgroundColor = 'red';
+    markerContent.style.backgroundColor = color;
     markerContent.style.width = '32px';
     markerContent.style.height = '32px';
     markerContent.style.borderRadius = '50%';
