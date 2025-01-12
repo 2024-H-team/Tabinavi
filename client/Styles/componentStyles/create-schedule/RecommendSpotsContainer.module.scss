@@ -1,0 +1,56 @@
+.container {
+    max-width: 100%;
+    padding: 20px;
+    overflow: hidden;
+
+    h2 {
+        margin-bottom: 20px;
+    }
+}
+
+.spotsGrid {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+
+    // Hide scrollbar completely
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+
+    &::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+    }
+}
+
+.spotCard {
+    flex: 0 0 auto; // Prevent cards from shrinking
+    width: 200px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.imageWrapper {
+    width: 200px;
+    height: 200px;
+}
+
+.spotInfo {
+    padding: 12px;
+
+    h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+    }
+
+    p {
+        margin: 4px 0;
+        font-size: 14px;
+        color: #666;
+    }
+}

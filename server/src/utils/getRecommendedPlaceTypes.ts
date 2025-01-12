@@ -45,6 +45,7 @@ Rules:
 
 - Avoid suggesting similar types in sequence
 - Consider time of day and typical visit duration
+- Pay attention to the types the user has already selected and estimate the time spent at each location to inform the recommendation of subsequent types
 - Maximum 3-4 different types
 - Format response as JSON array
 

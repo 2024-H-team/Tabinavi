@@ -2,30 +2,32 @@
 
 import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-
-const CreateScheduleMap = dynamic(() => import('@/components/create-schedule/CreateScheduleMap'), { ssr: false });
-
+import { searchNearbyPlaces } from '@/utils/mapCalculations';
 import Styles from '@styles/appStyles/schedule/createSchedule.module.scss';
 import SpotInfo from '@/components/create-schedule/SpotInfo';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import SelectedSpotsContainer from '@/components/create-schedule/SelectedSpotsContainer';
 import apiClient from '@/lib/axios';
+import RecommendSpotsContainer from '@/components/create-schedule/RecommendSpotsContainer';
+
+const CreateScheduleMap = dynamic(() => import('@/components/create-schedule/CreateScheduleMap'), { ssr: false });
 
 export default function CreateSchedule() {
     const [selectedPlaces, setSelectedPlaces] = useState<PlaceDetails[]>([]);
     const [selectedSpots, setSelectedSpots] = useState<PlaceDetails[]>([]);
+    const [recommendedSpots, setRecommendedSpots] = useState<PlaceDetails[]>([]);
 
     const handleAddSpot = useCallback((spot: PlaceDetails) => {
         setSelectedSpots((prevSpots) => [...prevSpots, spot]);
     }, []);
+
     const handleDeleteSpot = useCallback((index: number) => {
         setSelectedSpots((prevSpots) => prevSpots.filter((_, i) => i !== index));
     }, []);
 
     const handleRecommendClick = async () => {
-        // Validate selectedSpots
         if (selectedSpots.length === 0) {
-            alert('少なくとも1つの場所を選択してください'); // "Please select at least one place" in Japanese
+            alert('少なくとも1つの場所を選択してください');
             return;
         }
 
@@ -33,7 +35,6 @@ export default function CreateSchedule() {
             const processedSpots = selectedSpots.reduce((acc: { type: string; count: number }[], spot) => {
                 const type = spot.primaryType;
                 if (!type) return acc;
-
                 const existing = acc.find((item) => item.type === type);
                 if (existing) {
                     existing.count++;
@@ -47,11 +48,15 @@ export default function CreateSchedule() {
                 selectedPlaces: processedSpots,
             });
 
-            console.log('Recommended places response:', response.data);
+            if (response.data.success) {
+                const nearbyPlaces = await searchNearbyPlaces(selectedSpots, response.data.data);
+                setRecommendedSpots(nearbyPlaces || []);
+            }
         } catch (error) {
             console.error('Error getting recommendations:', error);
         }
     };
+
     return (
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
@@ -59,6 +64,7 @@ export default function CreateSchedule() {
                 <CreateScheduleMap onPlaceSelect={setSelectedPlaces} />
             </div>
             <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} />
+            <RecommendSpotsContainer recommendedSpots={recommendedSpots} />
             <SelectedSpotsContainer selectedSpots={selectedSpots} onDeleteSpot={handleDeleteSpot} />
             <button
                 onClick={handleRecommendClick}
