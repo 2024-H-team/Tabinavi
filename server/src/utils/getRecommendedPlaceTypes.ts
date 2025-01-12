@@ -118,7 +118,6 @@ export async function getRecommendedPlaceTypes(request: PlaceTypesRequest): Prom
         if (!responseMessage) {
             throw new Error('No response from OpenAI');
         }
-        console.log('AI response:', responseMessage);
         const types = parseAIResponse(responseMessage);
 
         return {
