@@ -26,27 +26,62 @@ export const smoothPanTo = (map: google.maps.Map | null, targetLatLng: google.ma
     }, 10);
 };
 
+// utils/mapUtils.ts
+
 export const createMarker = async (
     map: google.maps.Map,
     position: google.maps.LatLng,
-    color: string = 'red', // Default color is red
+    color: string = 'red',
 ): Promise<google.maps.marker.AdvancedMarkerElement> => {
     const { AdvancedMarkerElement } = (await google.maps.importLibrary('marker')) as typeof google.maps.marker;
 
     const markerContent = document.createElement('div');
-    markerContent.style.backgroundColor = color;
-    markerContent.style.width = '20px';
-    markerContent.style.height = '20px';
-    markerContent.style.borderRadius = '50%';
+    markerContent.style.width = '30px';
+    markerContent.style.height = '30px';
+    markerContent.style.display = 'flex';
+    markerContent.style.alignItems = 'center';
+    markerContent.style.justifyContent = 'center';
+    markerContent.style.cursor = 'pointer';
 
-    return new AdvancedMarkerElement({
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', '30');
+    svg.setAttribute('height', '30');
+    svg.setAttribute('viewBox', '0 0 30 30');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    const path = document.createElementNS(svgNS, 'path');
+    // Scaled up path coordinates
+    path.setAttribute(
+        'd',
+        'M15 2.5C10.16 2.5 6.25 6.41 6.25 11.25C6.25 17.81 15 27.5 15 27.5C15 27.5 23.75 17.81 23.75 11.25C23.75 6.41 19.84 2.5 15 2.5Z',
+    );
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', color);
+    svg.appendChild(path);
+
+    const circle = document.createElementNS(svgNS, 'circle');
+    // Scaled up circle coordinates
+    circle.setAttribute('cx', '15');
+    circle.setAttribute('cy', '11.25');
+    circle.setAttribute('r', '5');
+    circle.setAttribute('fill', 'white');
+    circle.setAttribute('stroke', color);
+    circle.setAttribute('stroke-width', '2');
+    svg.appendChild(circle);
+
+    markerContent.appendChild(svg);
+
+    const marker = new AdvancedMarkerElement({
         position,
         map,
-        title: 'Selected Place',
         content: markerContent,
     });
-};
 
+    return marker;
+};
 // mapUtils.ts - Update getPlaceDetails to ensure all fields are captured
 export const getPlaceDetails = (service: google.maps.places.PlacesService, placeId: string): Promise<PlaceDetails> => {
     return new Promise((resolve, reject) => {

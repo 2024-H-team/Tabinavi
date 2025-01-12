@@ -7,8 +7,8 @@ import Styles from '@styles/appStyles/schedule/createSchedule.module.scss';
 import SpotInfo from '@/components/create-schedule/SpotInfo';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import SelectedSpotsContainer from '@/components/create-schedule/SelectedSpotsContainer';
-import apiClient from '@/lib/axios';
 import RecommendSpotsContainer from '@/components/create-schedule/RecommendSpotsContainer';
+import apiClient from '@/lib/axios';
 
 const CreateScheduleMap = dynamic(() => import('@/components/create-schedule/CreateScheduleMap'), { ssr: false });
 
@@ -17,7 +17,7 @@ export default function CreateSchedule() {
     const [selectedSpots, setSelectedSpots] = useState<PlaceDetails[]>([]);
     const [recommendedSpots, setRecommendedSpots] = useState<PlaceDetails[]>([]);
     const [visibleRecommendedSpots, setVisibleRecommendedSpots] = useState<PlaceDetails[]>([]);
-    const [focusedSpot, setFocusedSpot] = useState<PlaceDetails | null>(null);
+    const [focusedSpot, setFocusedSpot] = useState<PlaceDetails | null>(null); // State để lưu spot được focus
 
     const handleAddSpot = useCallback((spot: PlaceDetails) => {
         setSelectedSpots((prevSpots) => [...prevSpots, spot]);
@@ -77,6 +77,7 @@ export default function CreateSchedule() {
                     onPlaceSelect={setSelectedPlaces}
                     recommendedSpots={visibleRecommendedSpots}
                     focusedSpot={focusedSpot}
+                    selectedSpots={selectedSpots}
                 />
             </div>
             <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} />
