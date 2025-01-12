@@ -33,6 +33,19 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
 
     const [recommendMarkers, setRecommendMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
 
+    const fitBoundsToMarkers = (map: google.maps.Map, markers: google.maps.marker.AdvancedMarkerElement[]) => {
+        if (!markers.length) return;
+
+        const bounds = new google.maps.LatLngBounds();
+        markers.forEach((marker) => {
+            if (marker.position) {
+                bounds.extend(marker.position);
+            }
+        });
+
+        map.fitBounds(bounds, 75);
+    };
+
     useEffect(() => {
         if (!mapRef.current || !recommendedSpots?.length) {
             recommendMarkers.forEach((marker) => {
@@ -58,6 +71,7 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
             );
 
             setRecommendMarkers(newMarkers);
+            fitBoundsToMarkers(mapRef.current!, newMarkers);
         };
 
         createRecommendMarkers();
