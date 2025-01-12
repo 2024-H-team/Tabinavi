@@ -1,5 +1,6 @@
 import { PlaceDetails } from '@/types/PlaceDetails';
 import Image from 'next/image';
+import { useState } from 'react';
 import Styles from '@styles/componentStyles/create-schedule/RecommendSpotsContainer.module.scss';
 
 interface RecommendSpotsContainerProps {
@@ -7,13 +8,22 @@ interface RecommendSpotsContainerProps {
 }
 
 export default function RecommendSpotsContainer({ recommendedSpots }: RecommendSpotsContainerProps) {
+    const [visibleItems, setVisibleItems] = useState(5);
+
     if (!recommendedSpots.length) return null;
+
+    const handleLoadMore = () => {
+        setVisibleItems((prev) => prev + 5);
+    };
+
+    const visibleSpots = recommendedSpots.slice(0, visibleItems);
+    const hasMore = visibleItems < recommendedSpots.length;
 
     return (
         <div className={Styles.container}>
             <h2>おすすめスポット</h2>
             <div className={Styles.spotsGrid}>
-                {recommendedSpots.map((spot, index) => (
+                {visibleSpots.map((spot, index) => (
                     <div key={`${spot.placeId}-${index}`} className={Styles.spotCard}>
                         {spot.photos?.[0] && (
                             <div className={Styles.imageWrapper}>
@@ -35,6 +45,11 @@ export default function RecommendSpotsContainer({ recommendedSpots }: RecommendS
                         </div>
                     </div>
                 ))}
+                {hasMore && (
+                    <button onClick={handleLoadMore} className={Styles.loadMoreButton}>
+                        もっと見る
+                    </button>
+                )}
             </div>
         </div>
     );

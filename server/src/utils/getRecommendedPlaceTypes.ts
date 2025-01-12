@@ -44,12 +44,23 @@ Rules:
   store, synagogue, tourist_attraction
 
 - Avoid suggesting similar types in sequence
-- Consider time of day and typical visit duration
+- Consider time of day and typical visit duration:
+  - Morning activities might include cafes or parks.
+  - Afternoon activities could include museums or shopping malls.
+  - Evening activities might include restaurants or night clubs.
 - Pay attention to the types the user has already selected and estimate the time spent at each location to inform the recommendation of subsequent types
-- Maximum 3-4 different types
+- Suggest 3-4 different types each time
+- For every 3 types that are suitable based on user preferences, insert 1 type that might not be directly suitable to encourage exploration of new and potentially interesting places
 - Format response as JSON array
 
-Example response: ["museum", "park", "restaurant"]`;
+Example response: ["museum", "park", "restaurant", "cafe"]
+
+Example scenario:
+User has selected:
+- "museum" (2 hours in the morning)
+- "restaurant" (1.5 hours for lunch)
+
+Suggested response: ["art_gallery", "park", "cafe", "library"]`;
 
 // getRecommendedPlaceTypes.ts
 function parseAIResponse(response: string): string[] {

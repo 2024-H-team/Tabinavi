@@ -54,3 +54,17 @@
         color: #666;
     }
 }
+.loadMoreButton {
+    flex: 0 0 auto;
+    min-width: 100px;
+    height: 200px;
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+}
