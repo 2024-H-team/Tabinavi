@@ -21,13 +21,20 @@ interface SelectedSpotsContainerProps {
     selectedSpots: PlaceDetails[];
     onDeleteSpot: (index: number) => void;
 }
+interface SpotWithInstanceId extends PlaceDetails {
+    instanceId: string;
+}
 
 export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: SelectedSpotsContainerProps) {
-    const [spots, setSpots] = useState(selectedSpots);
+    const [spots, setSpots] = useState<SpotWithInstanceId[]>([]);
     const router = useRouter();
 
     useEffect(() => {
-        setSpots(selectedSpots);
+        const spotsWithIds = selectedSpots.map((spot, index) => ({
+            ...spot,
+            instanceId: `${spot.placeId}-${Date.now()}-${index}`,
+        }));
+        setSpots(spotsWithIds);
     }, [selectedSpots]);
 
     const sensors = useSensors(
@@ -51,8 +58,8 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
 
         const { active, over } = event;
         if (active.id !== over?.id) {
-            const oldIndex = spots.findIndex((spot) => spot.name === active.id);
-            const newIndex = spots.findIndex((spot) => spot.name === over?.id);
+            const oldIndex = spots.findIndex((spot) => spot.placeId === active.id);
+            const newIndex = spots.findIndex((spot) => spot.placeId === over?.id);
             setSpots((prev) => arrayMove(prev, oldIndex, newIndex));
         }
     };
@@ -69,11 +76,11 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
             onDragEnd={handleDragEnd}
             onDragStart={handleDragStart}
         >
-            <SortableContext items={spots.map((spot) => spot.name)}>
+            <SortableContext items={spots.map((spot) => spot.instanceId)}>
                 <div className={styles.Container}>
                     {spots.map((spot) => (
                         <SortableSpotWrapper
-                            key={spot.name}
+                            key={spot.instanceId}
                             spot={spot}
                             onDelete={() => onDeleteSpot(spots.indexOf(spot))}
                             onStayTimeUpdate={handleStayTimeUpdate}

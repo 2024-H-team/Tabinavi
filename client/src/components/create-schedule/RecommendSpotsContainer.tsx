@@ -36,9 +36,10 @@ export default function RecommendSpotsContainer({
         <div className={Styles.container}>
             <h2>おすすめスポット</h2>
             <div className={Styles.spotsGrid}>
-                {visibleSpots.map((spot, index) => (
+                {visibleSpots.map((spot) => (
                     <div
-                        key={`${spot.placeId}-${index}`}
+                        // Use placeId as the primary key
+                        key={spot.placeId}
                         className={Styles.spotCard}
                         onClick={() => handleClickSpot(spot)}
                     >
