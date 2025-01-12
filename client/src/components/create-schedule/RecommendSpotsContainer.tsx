@@ -6,9 +6,14 @@ import Styles from '@styles/componentStyles/create-schedule/RecommendSpotsContai
 interface RecommendSpotsContainerProps {
     recommendedSpots: PlaceDetails[];
     onLoadMore: (visibleSpots: PlaceDetails[]) => void;
+    onFocusSpot?: (spot: PlaceDetails) => void;
 }
 
-export default function RecommendSpotsContainer({ recommendedSpots, onLoadMore }: RecommendSpotsContainerProps) {
+export default function RecommendSpotsContainer({
+    recommendedSpots,
+    onLoadMore,
+    onFocusSpot,
+}: RecommendSpotsContainerProps) {
     const [visibleItems, setVisibleItems] = useState(5);
 
     if (!recommendedSpots.length) return null;
@@ -19,6 +24,11 @@ export default function RecommendSpotsContainer({ recommendedSpots, onLoadMore }
         onLoadMore(recommendedSpots.slice(0, newVisibleItems));
     };
 
+    const handleClickSpot = (spot: PlaceDetails) => {
+        if (onFocusSpot) {
+            onFocusSpot(spot);
+        }
+    };
     const visibleSpots = recommendedSpots.slice(0, visibleItems);
     const hasMore = visibleItems < recommendedSpots.length;
 
@@ -27,7 +37,11 @@ export default function RecommendSpotsContainer({ recommendedSpots, onLoadMore }
             <h2>おすすめスポット</h2>
             <div className={Styles.spotsGrid}>
                 {visibleSpots.map((spot, index) => (
-                    <div key={`${spot.placeId}-${index}`} className={Styles.spotCard}>
+                    <div
+                        key={`${spot.placeId}-${index}`}
+                        className={Styles.spotCard}
+                        onClick={() => handleClickSpot(spot)}
+                    >
                         {spot.photos?.[0] && (
                             <div className={Styles.imageWrapper}>
                                 <Image

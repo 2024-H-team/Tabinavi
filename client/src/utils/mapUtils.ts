@@ -35,8 +35,8 @@ export const createMarker = async (
 
     const markerContent = document.createElement('div');
     markerContent.style.backgroundColor = color;
-    markerContent.style.width = '32px';
-    markerContent.style.height = '32px';
+    markerContent.style.width = '20px';
+    markerContent.style.height = '20px';
     markerContent.style.borderRadius = '50%';
 
     return new AdvancedMarkerElement({

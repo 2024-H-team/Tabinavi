@@ -17,6 +17,7 @@ export default function CreateSchedule() {
     const [selectedSpots, setSelectedSpots] = useState<PlaceDetails[]>([]);
     const [recommendedSpots, setRecommendedSpots] = useState<PlaceDetails[]>([]);
     const [visibleRecommendedSpots, setVisibleRecommendedSpots] = useState<PlaceDetails[]>([]);
+    const [focusedSpot, setFocusedSpot] = useState<PlaceDetails | null>(null);
 
     const handleAddSpot = useCallback((spot: PlaceDetails) => {
         setSelectedSpots((prevSpots) => [...prevSpots, spot]);
@@ -29,6 +30,11 @@ export default function CreateSchedule() {
     const handleLoadMore = (visibleSpots: PlaceDetails[]) => {
         setVisibleRecommendedSpots(visibleSpots);
     };
+
+    const handleFocusSpot = useCallback((spot: PlaceDetails) => {
+        setFocusedSpot(spot);
+        setSelectedPlaces([spot]);
+    }, []);
 
     const handleRecommendClick = async () => {
         if (selectedSpots.length === 0) {
@@ -67,10 +73,18 @@ export default function CreateSchedule() {
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
                 <h1>スケジュール作成</h1>
-                <CreateScheduleMap onPlaceSelect={setSelectedPlaces} recommendedSpots={visibleRecommendedSpots} />
+                <CreateScheduleMap
+                    onPlaceSelect={setSelectedPlaces}
+                    recommendedSpots={visibleRecommendedSpots}
+                    focusedSpot={focusedSpot}
+                />
             </div>
             <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} />
-            <RecommendSpotsContainer recommendedSpots={recommendedSpots} onLoadMore={handleLoadMore} />
+            <RecommendSpotsContainer
+                recommendedSpots={recommendedSpots}
+                onLoadMore={handleLoadMore}
+                onFocusSpot={handleFocusSpot}
+            />
             <SelectedSpotsContainer selectedSpots={selectedSpots} onDeleteSpot={handleDeleteSpot} />
             <button
                 onClick={handleRecommendClick}
