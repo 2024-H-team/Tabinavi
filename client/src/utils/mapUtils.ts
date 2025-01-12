@@ -26,66 +26,133 @@ export const smoothPanTo = (map: google.maps.Map | null, targetLatLng: google.ma
     }, 10);
 };
 
+// utils/mapUtils.ts
+
 export const createMarker = async (
     map: google.maps.Map,
     position: google.maps.LatLng,
+    color: string = 'red',
 ): Promise<google.maps.marker.AdvancedMarkerElement> => {
     const { AdvancedMarkerElement } = (await google.maps.importLibrary('marker')) as typeof google.maps.marker;
 
     const markerContent = document.createElement('div');
-    markerContent.style.backgroundColor = 'red';
-    markerContent.style.width = '32px';
-    markerContent.style.height = '32px';
-    markerContent.style.borderRadius = '50%';
+    markerContent.style.width = '30px';
+    markerContent.style.height = '30px';
+    markerContent.style.display = 'flex';
+    markerContent.style.alignItems = 'center';
+    markerContent.style.justifyContent = 'center';
+    markerContent.style.cursor = 'pointer';
 
-    return new AdvancedMarkerElement({
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', '30');
+    svg.setAttribute('height', '30');
+    svg.setAttribute('viewBox', '0 0 30 30');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    const path = document.createElementNS(svgNS, 'path');
+    // Scaled up path coordinates
+    path.setAttribute(
+        'd',
+        'M15 2.5C10.16 2.5 6.25 6.41 6.25 11.25C6.25 17.81 15 27.5 15 27.5C15 27.5 23.75 17.81 23.75 11.25C23.75 6.41 19.84 2.5 15 2.5Z',
+    );
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', color);
+    svg.appendChild(path);
+
+    const circle = document.createElementNS(svgNS, 'circle');
+    // Scaled up circle coordinates
+    circle.setAttribute('cx', '15');
+    circle.setAttribute('cy', '11.25');
+    circle.setAttribute('r', '5');
+    circle.setAttribute('fill', 'white');
+    circle.setAttribute('stroke', color);
+    circle.setAttribute('stroke-width', '2');
+    svg.appendChild(circle);
+
+    markerContent.appendChild(svg);
+
+    const marker = new AdvancedMarkerElement({
         position,
         map,
-        title: 'Selected Place',
         content: markerContent,
     });
-};
 
-export const getPlaceDetails = (
-    service: google.maps.places.PlacesService,
-    placeId: string,
-): Promise<PlaceDetails | null> => {
-    return new Promise((resolve) => {
+    return marker;
+};
+// mapUtils.ts - Update getPlaceDetails to ensure all fields are captured
+export const getPlaceDetails = (service: google.maps.places.PlacesService, placeId: string): Promise<PlaceDetails> => {
+    return new Promise((resolve, reject) => {
         service.getDetails(
             {
                 placeId,
                 fields: [
+                    'place_id',
                     'name',
                     'formatted_address',
                     'formatted_phone_number',
+                    'international_phone_number',
                     'website',
                     'rating',
                     'geometry',
                     'reviews',
                     'opening_hours',
-                    'utc_offset_minutes',
+                    'price_level',
+                    'photos',
+                    'types',
+                    'vicinity',
+                    'business_status',
+                    'icon',
+                    'icon_background_color',
+                    'icon_mask_base_uri',
                 ],
             },
-            (place, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-                    const placeDetails: PlaceDetails = {
-                        name: place.name || '',
-                        address: place.formatted_address || '',
-                        phoneNumber: place.formatted_phone_number || undefined,
-                        website: place.website || undefined,
-                        rating: place.rating || undefined,
+            (result, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && result) {
+                    const photoUrls =
+                        result.photos?.map((photo) =>
+                            photo.getUrl({
+                                maxWidth: 800,
+                                maxHeight: 600,
+                            }),
+                        ) || [];
+                    resolve({
+                        placeId: result.place_id || '',
+                        name: result.name || '',
+                        address: result.formatted_address || '',
+                        phoneNumber: result.formatted_phone_number,
+                        website: result.website,
+                        rating: result.rating,
                         location: {
-                            lat: place.geometry?.location?.lat() || 0,
-                            lng: place.geometry?.location?.lng() || 0,
+                            lat: result.geometry?.location?.lat() || 0,
+                            lng: result.geometry?.location?.lng() || 0,
                         },
-                        reviews: place.reviews || undefined,
-                        openingHours: {
-                            weekday_text: place.opening_hours?.weekday_text,
-                        },
-                    };
-                    resolve(placeDetails);
+                        reviews: result.reviews,
+                        openingHours: result.opening_hours
+                            ? {
+                                  weekday_text: result.opening_hours.weekday_text,
+                              }
+                            : undefined,
+                        stayTime: undefined,
+                        formattedPhoneNumber: result.formatted_phone_number,
+                        internationalPhoneNumber: result.international_phone_number,
+                        priceLevel: result.price_level,
+                        photos: result.photos,
+                        types: result.types,
+                        vicinity: result.vicinity,
+                        businessStatus: result.business_status,
+                        formattedAddress: result.formatted_address,
+                        icon: result.icon,
+                        iconBackgroundColor: result.icon_background_color,
+                        iconMaskBaseUri: result.icon_mask_base_uri,
+                        primaryType: result.types?.[0],
+                        userRatingsTotal: result.user_ratings_total,
+                        photoUrls,
+                    });
                 } else {
-                    resolve(null);
+                    reject(new Error(`Place details failed: ${status}`));
                 }
             },
         );

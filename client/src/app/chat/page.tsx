@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, MouseEvent, KeyboardEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from '@styles/appStyles/chat/Chat.module.scss';
-
+import apiClient from '@/lib/axios';
 interface Message {
     role: 'user' | 'assistant';
     message: string;
@@ -45,19 +45,12 @@ const ChatBox: React.FC = () => {
 
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5050/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: input,
-                    history: messages.map((msg) => ({ role: msg.role, content: msg.message })),
-                }),
+            const response = await apiClient.post('/chat', {
+                message: input,
+                history: messages.map((msg) => ({ role: msg.role, content: msg.message })),
             });
 
-            const data = await response.json();
-            const botMessage = data.message;
+            const botMessage = response.data.message;
 
             setMessages((prevMessages) => {
                 const updatedMessages: Message[] = [...prevMessages, { role: 'assistant', message: botMessage }];

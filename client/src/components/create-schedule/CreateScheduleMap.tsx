@@ -9,30 +9,107 @@ import { smoothPanTo, createMarker, fetchPlaceDetailsFromLatLng, getPlaceDetails
 
 interface CreateScheduleMapProps {
     onPlaceSelect: (places: PlaceDetails[]) => void;
+    recommendedSpots?: PlaceDetails[];
+    focusedSpot?: PlaceDetails | null;
+    selectedSpots: PlaceDetails[];
 }
 
-const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({ onPlaceSelect }) => {
+const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
+    onPlaceSelect,
+    recommendedSpots,
+    focusedSpot,
+    selectedSpots,
+}) => {
     const { isLoaded, loadError } = useMapContext();
     const mapRef = useRef<google.maps.Map | null>(null);
     const autoCompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-    const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
     const [selectedPlaces, setSelectedPlaces] = useState<PlaceDetails[]>([]);
     const [clickedLocation, setClickedLocation] = useState<google.maps.LatLng | null>(null);
 
+    const selectedMarkersRef = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
+    const highlightMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+
     const center = useMemo(() => ({ lat: 34.6937, lng: 135.5023 }), []);
+
+    const [recommendMarkers, setRecommendMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
+
+    const fitBoundsToMarkers = (map: google.maps.Map, markers: google.maps.marker.AdvancedMarkerElement[]) => {
+        if (!markers.length) return;
+
+        const bounds = new google.maps.LatLngBounds();
+        markers.forEach((marker) => {
+            if (marker.position) {
+                bounds.extend(marker.position);
+            }
+        });
+
+        map.fitBounds(bounds, 75);
+    };
+
+    useEffect(() => {
+        if (!mapRef.current || !recommendedSpots?.length) {
+            recommendMarkers.forEach((marker) => {
+                marker.map = null;
+            });
+            setRecommendMarkers([]);
+            return;
+        }
+
+        const createRecommendMarkers = async () => {
+            recommendMarkers.forEach((marker) => {
+                marker.map = null;
+            });
+
+            const newMarkers = await Promise.all(
+                recommendedSpots.map(async (spot) => {
+                    return createMarker(
+                        mapRef.current!,
+                        new google.maps.LatLng(spot.location.lat, spot.location.lng),
+                        'blue',
+                    );
+                }),
+            );
+
+            setRecommendMarkers(newMarkers);
+            fitBoundsToMarkers(mapRef.current!, newMarkers);
+        };
+
+        createRecommendMarkers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [recommendedSpots]);
+
+    useEffect(() => {
+        if (!mapRef.current || !focusedSpot) return;
+
+        const createHighlightMarker = async () => {
+            const position = new google.maps.LatLng(focusedSpot.location.lat, focusedSpot.location.lng);
+
+            smoothPanTo(mapRef.current, position);
+
+            if (highlightMarkerRef.current) {
+                highlightMarkerRef.current.map = null;
+                highlightMarkerRef.current = null;
+            }
+
+            const newHighlightMarker = await createMarker(mapRef.current!, position);
+
+            highlightMarkerRef.current = newHighlightMarker;
+        };
+
+        createHighlightMarker();
+    }, [focusedSpot]);
 
     useEffect(() => {
         if (!clickedLocation || !mapRef.current) return;
 
         const initializeMarker = async () => {
             try {
-                if (markerRef.current) {
-                    markerRef.current.position = clickedLocation;
-                } else {
-                    if (mapRef.current) {
-                        markerRef.current = await createMarker(mapRef.current, clickedLocation);
-                    }
+                if (highlightMarkerRef.current) {
+                    highlightMarkerRef.current.map = null;
+                    highlightMarkerRef.current = null;
                 }
+                const newHighlightMarker = await createMarker(mapRef.current!, clickedLocation, 'red');
+                highlightMarkerRef.current = newHighlightMarker;
             } catch (error) {
                 console.error('Error initializing AdvancedMarkerElement: ', error);
             }
@@ -40,6 +117,34 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({ onPlaceSelect }) 
 
         initializeMarker();
     }, [clickedLocation]);
+
+    useEffect(() => {
+        if (!mapRef.current) return;
+
+        const manageSelectedMarkers = async () => {
+            const currentMarkers = selectedMarkersRef.current;
+            const newSelectedSpotsIds = new Set(selectedSpots.map((spot) => spot.placeId));
+
+            currentMarkers.forEach((marker, placeId) => {
+                if (!newSelectedSpotsIds.has(placeId)) {
+                    marker.map = null;
+                    currentMarkers.delete(placeId);
+                }
+            });
+
+            await Promise.all(
+                selectedSpots.map(async (spot) => {
+                    if (!currentMarkers.has(spot.placeId)) {
+                        const position = new google.maps.LatLng(spot.location.lat, spot.location.lng);
+                        const newMarker = await createMarker(mapRef.current!, position);
+                        currentMarkers.set(spot.placeId, newMarker);
+                    }
+                }),
+            );
+        };
+
+        manageSelectedMarkers();
+    }, [selectedSpots]);
 
     const handlePlaceSelect = () => {
         if (autoCompleteRef.current) {

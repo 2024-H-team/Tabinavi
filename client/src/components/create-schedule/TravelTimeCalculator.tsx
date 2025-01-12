@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
 import { BestRoute } from '@/types/TransferData';
 import { useRouter } from 'next/navigation';
+import apiClient from '@/lib/axios';
 interface TravelTimeCalculatorProps {
     origin: google.maps.LatLngLiteral;
     destination: google.maps.LatLngLiteral;
@@ -142,28 +143,16 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                 const startName = cleanStationName(nearestOriginStation.name || '');
                 const endName = cleanStationName(nearestDestinationStation.name || '');
 
-                const response = await fetch('http://localhost:5050/api/route', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        startStation: startName,
-                        endStation: endName,
-                    }),
+                const response = await apiClient.post('/route', {
+                    startStation: startName,
+                    endStation: endName,
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch route data from API.');
-                }
-
-                const data: BestRoute = await response.json();
+                const data: BestRoute = response.data;
                 setTransferData(data);
                 const trainCostMinutes = data.totalCost;
-
                 const totalTimeSeconds =
                     walkingDurationToOriginStation + walkingDurationFromDestinationStation + trainCostMinutes * 60;
-
                 const totalHours = Math.floor(totalTimeSeconds / 3600);
                 const totalMinutes = Math.floor((totalTimeSeconds % 3600) / 60);
                 const totalDuration = totalHours > 0 ? `${totalHours}時間${totalMinutes}分` : `${totalMinutes}分`;

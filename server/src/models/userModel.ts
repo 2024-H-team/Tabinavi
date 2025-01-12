@@ -21,7 +21,7 @@ export class UserModel {
     async checkUserExists(userName: string, email: string): Promise<boolean> {
         const query = `
             SELECT COUNT(*) AS count
-            FROM user
+            FROM users
             WHERE userName = ? OR email = ?
         `;
 
@@ -33,7 +33,7 @@ export class UserModel {
         const hashedPassword = await bcrypt.hash(user.password, 10);
 
         const query = `
-            INSERT INTO user (userName, password, email, fullName)
+            INSERT INTO users (userName, password, email, fullName)
             VALUES (?, ?, ?, ?)
         `;
 
@@ -60,5 +60,47 @@ export class UserModel {
             }
             throw error;
         }
+    }
+
+    async loginUser(userName: string, password: string): Promise<User | null> {
+        const query = `
+            SELECT * FROM users 
+            WHERE userName = ?
+        `;
+
+        const [rows] = await this.pool.execute<mysql.RowDataPacket[]>(query, [userName]);
+        if (rows.length === 0) return null;
+
+        const user = rows[0] as User;
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (!passwordMatch) return null;
+        return user;
+    }
+
+    async checkAndUpdateFirstLogin(userID: number): Promise<boolean> {
+        const queryCheck = `
+        SELECT firstLogin
+        FROM users
+        WHERE userID = ?
+    `;
+        const [rows] = await this.pool.execute<mysql.RowDataPacket[]>(queryCheck, [userID]);
+
+        if (rows.length === 0) {
+            throw new Error('User not found');
+        }
+
+        const firstLogin = rows[0].firstLogin;
+
+        if (firstLogin) {
+            const queryUpdate = `
+            UPDATE users
+            SET firstLogin = false
+            WHERE userID = ?
+        `;
+            await this.pool.execute(queryUpdate, [userID]);
+        }
+
+        return firstLogin;
     }
 }

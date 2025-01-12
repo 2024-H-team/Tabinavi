@@ -153,7 +153,7 @@ export default function Calendar() {
                             display: 'flex',
                             justifyContent: 'space-around',
                             alignItems: 'center',
-                            '&:first-child': {
+                            '&:first-of-type': {
                                 marginTop: '0',
                             },
                             '&:last-child': {
