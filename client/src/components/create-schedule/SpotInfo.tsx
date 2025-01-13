@@ -13,7 +13,7 @@ export default function SpotInfo({ places, onAddSpot }: SpotInfoProps) {
     const [currentTop, setCurrentTop] = useState('60');
     const [startY, setStartY] = useState(0);
     const [dragging, setDragging] = useState(false);
-    const dragThreshold = 5;
+    const dragThreshold = 10;
     const containerRef = useRef<HTMLDivElement>(null);
 
     if (!places.length) {
