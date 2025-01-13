@@ -21,6 +21,7 @@ interface SelectedSpotsContainerProps {
     activeDateIndex: number;
     onDateChange: (index: number) => void;
     onDeleteSpot: (index: number) => void;
+    onReorderSpots: (oldIndex: number, newIndex: number) => void; // Add this
     isOpen: boolean;
     onClose: () => void;
 }
@@ -30,6 +31,7 @@ export default function SelectedSpotsContainer({
     activeDateIndex,
     onDateChange,
     onDeleteSpot,
+    onReorderSpots,
     isOpen,
     onClose,
 }: SelectedSpotsContainerProps) {
@@ -74,6 +76,8 @@ export default function SelectedSpotsContainer({
         if (active.id !== over?.id) {
             const oldIndex = spots.findIndex((spot) => spot.name === active.id);
             const newIndex = spots.findIndex((spot) => spot.name === over?.id);
+
+            onReorderSpots(oldIndex, newIndex);
             setSpots((prev) => arrayMove(prev, oldIndex, newIndex));
         }
     };

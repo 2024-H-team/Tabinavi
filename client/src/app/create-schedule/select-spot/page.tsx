@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MdMenuOpen } from 'react-icons/md';
 import { DaySchedule } from '@/app/create-schedule/page';
+import { arrayMove } from '@dnd-kit/sortable';
 
 const CreateScheduleMap = dynamic(() => import('@/components/create-schedule/CreateScheduleMap'), { ssr: false });
 
@@ -53,6 +54,19 @@ export default function CreateSchedule() {
                 const newSchedules = [...prev];
                 const currentDay = { ...newSchedules[activeDateIndex] };
                 currentDay.spots = currentDay.spots.filter((_, i) => i !== index);
+                newSchedules[activeDateIndex] = currentDay;
+                return newSchedules;
+            });
+        },
+        [activeDateIndex],
+    );
+
+    const handleReorderSpots = useCallback(
+        (oldIndex: number, newIndex: number) => {
+            setSchedules((prev) => {
+                const newSchedules = [...prev];
+                const currentDay = { ...newSchedules[activeDateIndex] };
+                currentDay.spots = arrayMove(currentDay.spots, oldIndex, newIndex);
                 newSchedules[activeDateIndex] = currentDay;
                 return newSchedules;
             });
@@ -144,6 +158,7 @@ export default function CreateSchedule() {
                 activeDateIndex={activeDateIndex}
                 onDateChange={setActiveDateIndex}
                 onDeleteSpot={handleDeleteSpot}
+                onReorderSpots={handleReorderSpots}
                 isOpen={isContainerOpen}
                 onClose={() => setIsContainerOpen(false)}
             />
