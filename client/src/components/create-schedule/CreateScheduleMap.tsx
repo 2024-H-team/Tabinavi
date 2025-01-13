@@ -91,9 +91,11 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                 highlightMarkerRef.current = null;
             }
 
-            const newHighlightMarker = await createMarker(mapRef.current!, position);
+            const newHighlightMarker = await createMarker(mapRef.current!, position, 'red');
 
             highlightMarkerRef.current = newHighlightMarker;
+
+            mapRef.current!.setZoom(13);
         };
 
         createHighlightMarker();
@@ -110,6 +112,9 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                 }
                 const newHighlightMarker = await createMarker(mapRef.current!, clickedLocation, 'red');
                 highlightMarkerRef.current = newHighlightMarker;
+
+                mapRef.current!.setZoom(13);
+                mapRef.current!.panTo(clickedLocation);
             } catch (error) {
                 console.error('Error initializing AdvancedMarkerElement: ', error);
             }
@@ -141,6 +146,14 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                     }
                 }),
             );
+
+            if (selectedSpots.length > 0 && mapRef.current) {
+                const bounds = new google.maps.LatLngBounds();
+                selectedSpots.forEach((spot) => {
+                    bounds.extend(new google.maps.LatLng(spot.location.lat, spot.location.lng));
+                });
+                mapRef.current.fitBounds(bounds, 75);
+            }
         };
 
         manageSelectedMarkers();
