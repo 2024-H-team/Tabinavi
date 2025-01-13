@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import styles from '@styles/appStyles/schedule/InfoSetup.module.scss';
+import styles from '@styles/componentStyles/create-schedule/WheelPicker.module.scss';
 
 interface WheelPickerProps {
     data: string[];

@@ -1,3 +1,4 @@
+// InfoSetup.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -25,7 +26,6 @@ export default function InfoSetup() {
 
     const router = useRouter();
 
-    // Function to generate dates between start and end date inclusive
     const getDateRange = (start: string, end: string): string[] => {
         const startDt = new Date(start);
         const endDt = new Date(end);
@@ -41,7 +41,6 @@ export default function InfoSetup() {
         return dateArray;
     };
 
-    // Update schedules when dates change
     useEffect(() => {
         if (isOneDay) {
             setSchedules([
@@ -62,7 +61,6 @@ export default function InfoSetup() {
         }
     }, [isOneDay, startDate, endDate]);
 
-    // Handle time changes for a specific day
     const handleTimeChange = (index: number, type: 'start' | 'end', value: string) => {
         setSchedules((prev) =>
             prev.map((schedule, i) =>
@@ -83,76 +81,106 @@ export default function InfoSetup() {
     return (
         <>
             <div className={styles.infoSetup}>
-                <h2>設定情報</h2>
+                <h2>新しい予定</h2>
 
                 <div className={styles.toggleGroup}>
-                    <label>
+                    <span className={styles.toggleLabel}>日帰り</span>
+                    <label className={styles.switch}>
                         <input type="checkbox" checked={isOneDay} onChange={(e) => setIsOneDay(e.target.checked)} />
-                        日帰り
+                        <span className={styles.slider}></span>
                     </label>
                 </div>
 
-                <div className={styles.datePickerGroup}>
-                    <h3>開始日</h3>
-                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                <div className={styles.datePickerContainer}>
+                    <div className={styles.datePickerGroup}>
+                        <p className={styles.dateText} data-checked={isOneDay}></p>
+                        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                    </div>
+
+                    {!isOneDay && (
+                        <div className={styles.datePickerGroup}>
+                            <p>終了日</p>
+                            <input
+                                type="date"
+                                value={endDate}
+                                min={startDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                            />
+                        </div>
+                    )}
                 </div>
 
-                {!isOneDay && (
-                    <div className={styles.datePickerGroup}>
-                        <h3>終了日</h3>
-                        <input
-                            type="date"
-                            value={endDate}
-                            min={startDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                        />
-                    </div>
-                )}
-
-                {schedules.map((schedule, index) => (
-                    <div key={index} className={styles.daySchedule}>
-                        <h3>{schedule.date}</h3>
-                        <div className={styles.timePickerGroup}>
-                            <div className={styles.pickers}>
-                                <WheelPicker
-                                    data={hours}
-                                    defaultSelection={hours.indexOf(schedule.startTime.split(':')[0])}
-                                    onChange={(value) =>
-                                        handleTimeChange(index, 'start', `${value}:${schedule.startTime.split(':')[1]}`)
-                                    }
-                                />
-                                <WheelPicker
-                                    data={minutes}
-                                    defaultSelection={minutes.indexOf(schedule.startTime.split(':')[1])}
-                                    onChange={(value) =>
-                                        handleTimeChange(index, 'start', `${schedule.startTime.split(':')[0]}:${value}`)
-                                    }
-                                />
-                            </div>
-                            <span>~</span>
-                            <div className={styles.pickers}>
-                                <WheelPicker
-                                    data={hours}
-                                    defaultSelection={hours.indexOf(schedule.endTime.split(':')[0])}
-                                    onChange={(value) =>
-                                        handleTimeChange(index, 'end', `${value}:${schedule.endTime.split(':')[1]}`)
-                                    }
-                                />
-                                <WheelPicker
-                                    data={minutes}
-                                    defaultSelection={minutes.indexOf(schedule.endTime.split(':')[1])}
-                                    onChange={(value) =>
-                                        handleTimeChange(index, 'end', `${schedule.endTime.split(':')[0]}:${value}`)
-                                    }
-                                />
+                {((isOneDay && startDate) || (!isOneDay && startDate && endDate)) &&
+                    schedules.map((schedule, index) => (
+                        <div key={index} className={styles.daySchedule}>
+                            <p className={styles.date}>{schedule.date}</p>
+                            <div className={styles.timePickerGroup}>
+                                <div className={styles.pickers}>
+                                    開始時間
+                                    <div className={styles.pickersBlock}>
+                                        <WheelPicker
+                                            data={hours}
+                                            defaultSelection={hours.indexOf(schedule.startTime.split(':')[0])}
+                                            onChange={(value) =>
+                                                handleTimeChange(
+                                                    index,
+                                                    'start',
+                                                    `${value}:${schedule.startTime.split(':')[1]}`,
+                                                )
+                                            }
+                                        />
+                                        <p>-</p>
+                                        <WheelPicker
+                                            data={minutes}
+                                            defaultSelection={minutes.indexOf(schedule.startTime.split(':')[1])}
+                                            onChange={(value) =>
+                                                handleTimeChange(
+                                                    index,
+                                                    'start',
+                                                    `${schedule.startTime.split(':')[0]}:${value}`,
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                                <span>~</span>
+                                <div className={styles.pickers}>
+                                    終了時間
+                                    <div className={styles.pickersBlock}>
+                                        <WheelPicker
+                                            data={hours}
+                                            defaultSelection={hours.indexOf(schedule.endTime.split(':')[0])}
+                                            onChange={(value) =>
+                                                handleTimeChange(
+                                                    index,
+                                                    'end',
+                                                    `${value}:${schedule.endTime.split(':')[1]}`,
+                                                )
+                                            }
+                                        />
+                                        <p>-</p>
+                                        <WheelPicker
+                                            data={minutes}
+                                            defaultSelection={minutes.indexOf(schedule.endTime.split(':')[1])}
+                                            onChange={(value) =>
+                                                handleTimeChange(
+                                                    index,
+                                                    'end',
+                                                    `${schedule.endTime.split(':')[0]}:${value}`,
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
 
-                <button onClick={handleSubmit} className={styles.submitButton}>
-                    確認
-                </button>
+                <div className={styles.btnBox}>
+                    <button onClick={handleSubmit} className={styles.submitButton}>
+                        次に進む
+                    </button>
+                </div>
             </div>
             <Footer />
         </>
