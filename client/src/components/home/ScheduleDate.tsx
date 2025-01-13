@@ -17,6 +17,7 @@ interface ScheduleDateProps {
 
 export default function ScheduleDate({ data }: ScheduleDateProps) {
     const getMonthAndDay = (date: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [year, month, day] = date.split('-');
         return { month, day };
     };
