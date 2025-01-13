@@ -11,6 +11,7 @@ const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')
 const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
 
 interface DaySchedule {
+    title?: string;
     date: string;
     startTime: string;
     endTime: string;
@@ -23,6 +24,7 @@ export default function InfoSetup() {
     const [schedules, setSchedules] = useState<DaySchedule[]>([
         { date: '', startTime: `${hours[0]}:${minutes[0]}`, endTime: `${hours[0]}:${minutes[0]}` },
     ]);
+    const [title, setTitle] = useState('');
 
     const router = useRouter();
 
@@ -44,22 +46,42 @@ export default function InfoSetup() {
     useEffect(() => {
         if (isOneDay) {
             setSchedules([
-                { date: startDate, startTime: `${hours[0]}:${minutes[0]}`, endTime: `${hours[0]}:${minutes[0]}` },
+                {
+                    title: title,
+                    date: startDate,
+                    startTime: `${hours[0]}:${minutes[0]}`,
+                    endTime: `${hours[0]}:${minutes[0]}`,
+                },
             ]);
         } else if (startDate && endDate) {
             const dates = getDateRange(startDate, endDate);
             const newSchedules: DaySchedule[] = dates.map((date, index) => {
                 if (index === 0) {
-                    return { date, startTime: `${hours[0]}:${minutes[0]}`, endTime: `${hours[23]}:${minutes[55]}` };
+                    return {
+                        title: title,
+                        date,
+                        startTime: `${hours[0]}:${minutes[0]}`,
+                        endTime: `${hours[23]}:${minutes[55]}`,
+                    };
                 } else if (index === dates.length - 1) {
-                    return { date, startTime: `${hours[0]}:${minutes[0]}`, endTime: `${hours[0]}:${minutes[0]}` };
+                    return {
+                        title: title,
+                        date,
+                        startTime: `${hours[0]}:${minutes[0]}`,
+                        endTime: `${hours[0]}:${minutes[0]}`,
+                    };
                 } else {
-                    return { date, startTime: `${hours[0]}:${minutes[0]}`, endTime: `${hours[23]}:${minutes[55]}` };
+                    return {
+                        title: title,
+                        date,
+                        startTime: `${hours[0]}:${minutes[0]}`,
+                        endTime: `${hours[23]}:${minutes[55]}`,
+                    };
                 }
             });
             setSchedules(newSchedules);
         }
-    }, [isOneDay, startDate, endDate]);
+    }, [isOneDay, startDate, endDate, title]);
 
     const handleTimeChange = (index: number, type: 'start' | 'end', value: string) => {
         setSchedules((prev) =>
@@ -82,7 +104,10 @@ export default function InfoSetup() {
         <>
             <div className={styles.infoSetup}>
                 <h2>新しい予定</h2>
-
+                <div className={styles.titleBox}>
+                    <p>タイトル：</p>
+                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+                </div>
                 <div className={styles.toggleGroup}>
                     <span className={styles.toggleLabel}>日帰り</span>
                     <label className={styles.switch}>
@@ -143,7 +168,7 @@ export default function InfoSetup() {
                                         />
                                     </div>
                                 </div>
-                                <span>~</span>
+                                <span>～</span>
                                 <div className={styles.pickers}>
                                     終了時間
                                     <div className={styles.pickersBlock}>

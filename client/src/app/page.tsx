@@ -34,7 +34,10 @@ export default function LoginPage() {
             if (response.data.success) {
                 localStorage.setItem('token', response.data.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.data.user));
-                document.cookie = `token=${response.data.data.token}; path=/`;
+
+                const expirationDate = new Date();
+                expirationDate.setDate(expirationDate.getDate() + 7);
+                document.cookie = `token=${response.data.data.token}; path=/; expires=${expirationDate.toUTCString()}`;
 
                 setLoading(false);
                 setError('');
