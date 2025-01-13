@@ -6,15 +6,17 @@ import WheelPicker from '@/components/WheelPicker';
 import styles from '@styles/appStyles/schedule/InfoSetup.module.scss';
 import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
+import { PlaceDetails } from '@/types/PlaceDetails';
 
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
 
-interface DaySchedule {
+export interface DaySchedule {
     title?: string;
     date: string;
     startTime: string;
     endTime: string;
+    spots: PlaceDetails[];
 }
 
 export default function InfoSetup() {
@@ -22,7 +24,7 @@ export default function InfoSetup() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [schedules, setSchedules] = useState<DaySchedule[]>([
-        { date: '', startTime: `${hours[0]}:${minutes[0]}`, endTime: `${hours[0]}:${minutes[0]}` },
+        { date: '', startTime: `${hours[0]}:${minutes[0]}`, endTime: `${hours[0]}:${minutes[0]}`, spots: [] },
     ]);
     const [title, setTitle] = useState('');
 
@@ -51,6 +53,7 @@ export default function InfoSetup() {
                     date: startDate,
                     startTime: `${hours[0]}:${minutes[0]}`,
                     endTime: `${hours[0]}:${minutes[0]}`,
+                    spots: [],
                 },
             ]);
         } else if (startDate && endDate) {
@@ -62,6 +65,7 @@ export default function InfoSetup() {
                         date,
                         startTime: `${hours[0]}:${minutes[0]}`,
                         endTime: `${hours[23]}:${minutes[55]}`,
+                        spots: [],
                     };
                 } else if (index === dates.length - 1) {
                     return {
@@ -69,6 +73,7 @@ export default function InfoSetup() {
                         date,
                         startTime: `${hours[0]}:${minutes[0]}`,
                         endTime: `${hours[0]}:${minutes[0]}`,
+                        spots: [],
                     };
                 } else {
                     return {
@@ -76,6 +81,7 @@ export default function InfoSetup() {
                         date,
                         startTime: `${hours[0]}:${minutes[0]}`,
                         endTime: `${hours[23]}:${minutes[55]}`,
+                        spots: [],
                     };
                 }
             });

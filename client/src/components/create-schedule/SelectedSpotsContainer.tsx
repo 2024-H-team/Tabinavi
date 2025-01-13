@@ -15,15 +15,20 @@ import SelectedSpot from './SelectedSpot';
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
 import { PlaceDetails } from '@/types/PlaceDetails';
-
+import { DaySchedule } from '@/app/create-schedule/page';
 interface SelectedSpotsContainerProps {
-    selectedSpots: PlaceDetails[];
+    schedules: DaySchedule[];
+    activeDateIndex: number;
+    onDateChange: (index: number) => void;
     onDeleteSpot: (index: number) => void;
     isOpen: boolean;
     onClose: () => void;
 }
+
 export default function SelectedSpotsContainer({
-    selectedSpots,
+    schedules,
+    activeDateIndex,
+    onDateChange,
     onDeleteSpot,
     isOpen,
     onClose,
@@ -31,8 +36,20 @@ export default function SelectedSpotsContainer({
     const [spots, setSpots] = useState<PlaceDetails[]>([]);
 
     useEffect(() => {
-        setSpots(selectedSpots);
-    }, [selectedSpots]);
+        setSpots(schedules[activeDateIndex]?.spots || []);
+    }, [schedules, activeDateIndex]);
+
+    const handlePrevDate = () => {
+        if (activeDateIndex > 0) {
+            onDateChange(activeDateIndex - 1);
+        }
+    };
+
+    const handleNextDate = () => {
+        if (activeDateIndex < schedules.length - 1) {
+            onDateChange(activeDateIndex + 1);
+        }
+    };
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -75,15 +92,17 @@ export default function SelectedSpotsContainer({
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className={styles.header}>
-                            start date-end date
+                            {schedules[activeDateIndex]?.date || 'No date'}
                             <span className={styles.closeBtn} onClick={onClose}>
                                 ✕
                             </span>
                         </div>
                         <div className={styles.datePageSelect}>
-                            <span>≪</span>
-                            <p className={styles.date}>2022年 1月14日</p>
-                            <span>≫</span>
+                            <span onClick={handlePrevDate}>≪</span>
+                            <p className={styles.date}>
+                                {new Date(schedules[activeDateIndex]?.date).toLocaleDateString('ja-JP')}
+                            </p>
+                            <span onClick={handleNextDate}>≫</span>
                         </div>
                         <div className={styles.content}>
                             {spots.map((spot, index) => (

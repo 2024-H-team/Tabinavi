@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { searchNearbyPlaces } from '@/utils/mapCalculations';
 import Styles from '@styles/appStyles/schedule/CreateSchedule.module.scss';
@@ -12,25 +12,53 @@ import apiClient from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MdMenuOpen } from 'react-icons/md';
+import { DaySchedule } from '@/app/create-schedule/page';
 
 const CreateScheduleMap = dynamic(() => import('@/components/create-schedule/CreateScheduleMap'), { ssr: false });
 
 export default function CreateSchedule() {
     const router = useRouter();
     const [selectedPlaces, setSelectedPlaces] = useState<PlaceDetails[]>([]);
-    const [selectedSpots, setSelectedSpots] = useState<PlaceDetails[]>([]);
     const [recommendedSpots, setRecommendedSpots] = useState<PlaceDetails[]>([]);
     const [visibleRecommendedSpots, setVisibleRecommendedSpots] = useState<PlaceDetails[]>([]);
     const [focusedSpot, setFocusedSpot] = useState<PlaceDetails | null>(null);
     const [isContainerOpen, setIsContainerOpen] = useState(false);
 
-    const handleAddSpot = useCallback((spot: PlaceDetails) => {
-        setSelectedSpots((prevSpots) => [...prevSpots, spot]);
+    const [schedules, setSchedules] = useState<DaySchedule[]>([]);
+    const [activeDateIndex, setActiveDateIndex] = useState<number>(0);
+
+    useEffect(() => {
+        const saved = sessionStorage.getItem('schedules');
+        if (saved) {
+            setSchedules(JSON.parse(saved));
+        }
     }, []);
 
-    const handleDeleteSpot = useCallback((index: number) => {
-        setSelectedSpots((prevSpots) => prevSpots.filter((_, i) => i !== index));
-    }, []);
+    const handleAddSpot = useCallback(
+        (spot: PlaceDetails) => {
+            setSchedules((prev) => {
+                const newSchedules = [...prev];
+                const currentDay = { ...newSchedules[activeDateIndex] };
+                currentDay.spots = [...currentDay.spots, spot];
+                newSchedules[activeDateIndex] = currentDay;
+                return newSchedules;
+            });
+        },
+        [activeDateIndex],
+    );
+
+    const handleDeleteSpot = useCallback(
+        (index: number) => {
+            setSchedules((prev) => {
+                const newSchedules = [...prev];
+                const currentDay = { ...newSchedules[activeDateIndex] };
+                currentDay.spots = currentDay.spots.filter((_, i) => i !== index);
+                newSchedules[activeDateIndex] = currentDay;
+                return newSchedules;
+            });
+        },
+        [activeDateIndex],
+    );
 
     const handleLoadMore = (visibleSpots: PlaceDetails[]) => {
         setVisibleRecommendedSpots(visibleSpots);
@@ -42,30 +70,33 @@ export default function CreateSchedule() {
     }, []);
 
     const handleRecommendClick = async () => {
-        if (selectedSpots.length === 0) {
+        if (schedules[activeDateIndex]?.spots.length === 0) {
             alert('少なくとも1つの場所を選択してください');
             return;
         }
 
         try {
-            const processedSpots = selectedSpots.reduce((acc: { type: string; count: number }[], spot) => {
-                const type = spot.primaryType;
-                if (!type) return acc;
-                const existing = acc.find((item) => item.type === type);
-                if (existing) {
-                    existing.count++;
-                } else {
-                    acc.push({ type, count: 1 });
-                }
-                return acc;
-            }, []);
+            const processedSpots = schedules[activeDateIndex].spots.reduce(
+                (acc: { type: string; count: number }[], spot) => {
+                    const type = spot.primaryType;
+                    if (!type) return acc;
+                    const existing = acc.find((item) => item.type === type);
+                    if (existing) {
+                        existing.count++;
+                    } else {
+                        acc.push({ type, count: 1 });
+                    }
+                    return acc;
+                },
+                [],
+            );
 
             const response = await apiClient.post('/recommended-place-types', {
                 selectedPlaces: processedSpots,
             });
 
             if (response.data.success) {
-                const nearbyPlaces = await searchNearbyPlaces(selectedSpots, response.data.data);
+                const nearbyPlaces = await searchNearbyPlaces(schedules[activeDateIndex].spots, response.data.data);
                 setRecommendedSpots(nearbyPlaces || []);
                 setVisibleRecommendedSpots(nearbyPlaces?.slice(0, 5) || []);
             }
@@ -73,8 +104,9 @@ export default function CreateSchedule() {
             console.error('Error getting recommendations:', error);
         }
     };
+
     const handleCreateSchedule = () => {
-        sessionStorage.setItem('ScheduleSpot', JSON.stringify(selectedSpots));
+        sessionStorage.setItem('schedules', JSON.stringify(schedules));
         router.push('/create-schedule/schedule-preview');
     };
 
@@ -85,6 +117,7 @@ export default function CreateSchedule() {
     const toggleContainer = () => {
         setIsContainerOpen(!isContainerOpen);
     };
+
     return (
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
@@ -92,7 +125,7 @@ export default function CreateSchedule() {
                     onPlaceSelect={setSelectedPlaces}
                     recommendedSpots={visibleRecommendedSpots}
                     focusedSpot={focusedSpot}
-                    selectedSpots={selectedSpots}
+                    selectedSpots={schedules[activeDateIndex]?.spots || []}
                 />
             </div>
             {selectedPlaces.length > 0 && (
@@ -107,7 +140,9 @@ export default function CreateSchedule() {
                 <MdMenuOpen color="white" size={30} />
             </div>
             <SelectedSpotsContainer
-                selectedSpots={selectedSpots}
+                schedules={schedules}
+                activeDateIndex={activeDateIndex}
+                onDateChange={setActiveDateIndex}
                 onDeleteSpot={handleDeleteSpot}
                 isOpen={isContainerOpen}
                 onClose={() => setIsContainerOpen(false)}
