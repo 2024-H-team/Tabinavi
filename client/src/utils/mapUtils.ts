@@ -133,6 +133,20 @@ export const getPlaceDetails = (service: google.maps.places.PlacesService, place
                         openingHours: result.opening_hours
                             ? {
                                   weekday_text: result.opening_hours.weekday_text,
+                                  periods: result.opening_hours.periods?.map((period) => ({
+                                      open: {
+                                          day: period.open.day,
+                                          hours: period.open.hours,
+                                          minutes: period.open.minutes,
+                                      },
+                                      close: period.close
+                                          ? {
+                                                day: period.close.day,
+                                                hours: period.close.hours,
+                                                minutes: period.close.minutes,
+                                            }
+                                          : period.open,
+                                  })),
                               }
                             : undefined,
                         stayTime: undefined,

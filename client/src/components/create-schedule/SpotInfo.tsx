@@ -67,6 +67,50 @@ export default function SpotInfo({ places, onAddSpot, onClose }: SpotInfoProps) 
         }
     };
 
+    const isOpenNow = (openingHours?: PlaceDetails['openingHours']): boolean => {
+        if (!openingHours?.periods) return false;
+
+        const now = new Date();
+        const currentDay = now.getDay();
+        const currentHours = now.getHours();
+        const currentMinutes = now.getMinutes();
+        const currentTotalMinutes = currentHours * 60 + currentMinutes;
+
+        return openingHours.periods.some((period) => {
+            // Case 1: 24-hour operation
+            if (
+                !period.close ||
+                (period.open.hours === 0 &&
+                    period.open.minutes === 0 &&
+                    (!period.close || (period.close.hours === 0 && period.close.minutes === 0)))
+            ) {
+                return true;
+            }
+
+            const openDay = period.open.day;
+            const closeDay = period.close?.day || openDay;
+            const openTotalMinutes = period.open.hours * 60 + period.open.minutes;
+            const closeTotalMinutes = period.close ? period.close.hours * 60 + period.close.minutes : openTotalMinutes;
+
+            // Case 2: Same day operation
+            if (openDay === closeDay && currentDay === openDay) {
+                return currentTotalMinutes >= openTotalMinutes && currentTotalMinutes < closeTotalMinutes;
+            }
+
+            // Case 3: Overnight operation
+            if (closeDay !== openDay) {
+                if (currentDay === openDay) {
+                    return currentTotalMinutes >= openTotalMinutes;
+                }
+                if (currentDay === closeDay) {
+                    return currentTotalMinutes < closeTotalMinutes;
+                }
+            }
+
+            return false;
+        });
+    };
+
     return (
         <div
             ref={containerRef}
@@ -99,13 +143,13 @@ export default function SpotInfo({ places, onAddSpot, onClose }: SpotInfoProps) 
                         </div>
                     )}
                     {place.address && <p className={styles.address}>{place.address}</p>}
-                    {place.businessStatus && (
-                        <p className={place.businessStatus === 'OPERATIONAL' ? styles.openStatus : styles.closedStatus}>
-                            {place.businessStatus === 'OPERATIONAL' ? '営業中' : '休業中'}
+                    {place.openingHours && (
+                        <p className={isOpenNow(place.openingHours) ? styles.openStatus : styles.closedStatus}>
+                            {isOpenNow(place.openingHours) ? '営業中' : '営業時間外'}
                         </p>
                     )}
                 </div>
-                {hasPhotos && (
+                {hasPhotos ? (
                     <div className={styles.photoRow}>
                         {(place.photos?.slice(0, 3) || place.photoUrls?.slice(0, 3) || []).map(
                             (photo: google.maps.places.PlacePhoto | string, idx: number) => {
@@ -122,6 +166,10 @@ export default function SpotInfo({ places, onAddSpot, onClose }: SpotInfoProps) 
                                 );
                             },
                         )}
+                    </div>
+                ) : (
+                    <div className={styles.photoRow}>
+                        <p>画像がございません</p>
                     </div>
                 )}
                 <div className={styles.detailCard}>

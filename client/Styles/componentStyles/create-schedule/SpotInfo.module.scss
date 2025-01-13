@@ -89,7 +89,7 @@
 
         .closedStatus {
             color: #d33;
-            font-size: 0.85rem;
+            font-size: 1.4rem;
             margin-top: -2px;
         }
 
@@ -97,7 +97,11 @@
             display: flex;
             gap: 6px;
             overflow-x: auto;
-
+            p {
+                font-size: 1.4rem;
+                color: #000;
+                margin: 0;
+            }
             .photoItem {
                 flex: 0 0 auto;
                 width: 120px;
