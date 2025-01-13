@@ -23,7 +23,6 @@ export default function SortableSpotWrapper({ spot, children, className }: Sorta
         transition,
         opacity: isDragging ? 0.5 : 1,
     };
-    console.log('style', style);
     return (
         <div ref={setNodeRef} style={style} className={className}>
             {children({
