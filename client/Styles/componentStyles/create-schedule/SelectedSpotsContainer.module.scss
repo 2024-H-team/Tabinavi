@@ -72,6 +72,38 @@
             line-height: 25px;
         }
     }
+    .datePageSelect {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 15px;
+        color: #436eee;
+        .date {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .select {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            .selectBtn {
+                font-size: 14px;
+                font-weight: 700;
+                color: #302f34;
+                cursor: pointer;
+                border: 1px solid #302f34;
+                padding: 4px 8px;
+                border-radius: 5px;
+                transition: background-color 0.3s ease-in-out;
+                &:hover {
+                    background-color: #302f34;
+                    color: #fdfdfd;
+                }
+            }
+        }
+    }
     .selectedSpot {
         width: 100%;
         color: #302f34;

@@ -80,6 +80,11 @@ export default function SelectedSpotsContainer({
                                 ✕
                             </span>
                         </div>
+                        <div className={styles.datePageSelect}>
+                            <span>≪</span>
+                            <p className={styles.date}>2022年 1月14日</p>
+                            <span>≫</span>
+                        </div>
                         <div className={styles.content}>
                             {spots.map((spot, index) => (
                                 <SortableSpotWrapper
