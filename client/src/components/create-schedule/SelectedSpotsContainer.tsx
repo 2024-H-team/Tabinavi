@@ -19,9 +19,15 @@ import { PlaceDetails } from '@/types/PlaceDetails';
 interface SelectedSpotsContainerProps {
     selectedSpots: PlaceDetails[];
     onDeleteSpot: (index: number) => void;
+    isOpen: boolean;
+    onClose: () => void;
 }
-
-export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: SelectedSpotsContainerProps) {
+export default function SelectedSpotsContainer({
+    selectedSpots,
+    onDeleteSpot,
+    isOpen,
+    onClose,
+}: SelectedSpotsContainerProps) {
     const [spots, setSpots] = useState<PlaceDetails[]>([]);
 
     useEffect(() => {
@@ -63,28 +69,38 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
             onDragStart={handleDragStart}
         >
             <SortableContext items={spots.map((spot) => spot.name)}>
-                <div className={styles.Container}>
-                    <div className={styles.header}>start date-end date</div>
-                    <div className={styles.content}>
-                        {spots.map((spot, index) => (
-                            <SortableSpotWrapper
-                                key={spot.name}
-                                spot={spot}
-                                onDelete={() => onDeleteSpot(index)}
-                                onStayTimeUpdate={handleStayTimeUpdate}
-                                className={styles.selectedSpot}
-                            >
-                                {({ dragHandleProps, isDragging }) => (
-                                    <SelectedSpot
-                                        spot={spot}
-                                        onDelete={() => onDeleteSpot(index)}
-                                        onStayTimeUpdate={handleStayTimeUpdate}
-                                        dragHandleProps={dragHandleProps}
-                                        isDragging={isDragging}
-                                    />
-                                )}
-                            </SortableSpotWrapper>
-                        ))}
+                <div className={`${styles.containerWrapper} ${isOpen ? styles.open : ''}`} onClick={onClose}>
+                    <div
+                        className={`${styles.Container} ${isOpen ? styles.open : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className={styles.header}>
+                            start date-end date
+                            <span className={styles.closeBtn} onClick={onClose}>
+                                ✕
+                            </span>
+                        </div>
+                        <div className={styles.content}>
+                            {spots.map((spot, index) => (
+                                <SortableSpotWrapper
+                                    key={spot.name}
+                                    spot={spot}
+                                    onDelete={() => onDeleteSpot(index)}
+                                    onStayTimeUpdate={handleStayTimeUpdate}
+                                    className={styles.selectedSpot}
+                                >
+                                    {({ dragHandleProps, isDragging }) => (
+                                        <SelectedSpot
+                                            spot={spot}
+                                            onDelete={() => onDeleteSpot(index)}
+                                            onStayTimeUpdate={handleStayTimeUpdate}
+                                            dragHandleProps={dragHandleProps}
+                                            isDragging={isDragging}
+                                        />
+                                    )}
+                                </SortableSpotWrapper>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </SortableContext>

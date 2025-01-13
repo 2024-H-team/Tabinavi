@@ -22,6 +22,7 @@ export default function CreateSchedule() {
     const [recommendedSpots, setRecommendedSpots] = useState<PlaceDetails[]>([]);
     const [visibleRecommendedSpots, setVisibleRecommendedSpots] = useState<PlaceDetails[]>([]);
     const [focusedSpot, setFocusedSpot] = useState<PlaceDetails | null>(null);
+    const [isContainerOpen, setIsContainerOpen] = useState(false);
 
     const handleAddSpot = useCallback((spot: PlaceDetails) => {
         setSelectedSpots((prevSpots) => [...prevSpots, spot]);
@@ -81,6 +82,9 @@ export default function CreateSchedule() {
         setSelectedPlaces([]);
     }, []);
 
+    const toggleContainer = () => {
+        setIsContainerOpen(!isContainerOpen);
+    };
     return (
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
@@ -99,10 +103,15 @@ export default function CreateSchedule() {
                 onLoadMore={handleLoadMore}
                 onFocusSpot={handleFocusSpot}
             />
-            <div className={Styles.menuBtn}>
+            <div className={Styles.menuBtn} onClick={toggleContainer}>
                 <MdMenuOpen color="white" size={30} />
             </div>
-            <SelectedSpotsContainer selectedSpots={selectedSpots} onDeleteSpot={handleDeleteSpot} />
+            <SelectedSpotsContainer
+                selectedSpots={selectedSpots}
+                onDeleteSpot={handleDeleteSpot}
+                isOpen={isContainerOpen}
+                onClose={() => setIsContainerOpen(false)}
+            />
             <button onClick={handleRecommendClick} className={Styles.recommendButton}>
                 Recommend
             </button>
