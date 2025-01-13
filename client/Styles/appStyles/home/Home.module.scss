@@ -1,9 +1,11 @@
 .ContentWrap {
+    min-height: 100vh;
     padding: 24px;
     margin: auto;
     .ScheduleWrap {
         margin: auto;
         margin-top: 35px;
+        width: 100%;
     }
 
     .Calendar {
@@ -18,6 +20,6 @@
     .Setting {
         display: flex;
         justify-content: flex-start;
-        margin: 56px 0 0 24px;
+        margin: 24px 0 0 24px;
     }
 }

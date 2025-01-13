@@ -21,6 +21,7 @@
 html {
     font-size: 62.5%;
     box-sizing: border-box;
+    height: 100%;
 }
 *,
 *::before,
@@ -57,4 +58,6 @@ body {
     background-color: #f1f1f1;
     background-size: contain;
     background-position: top center;
+    min-height: 100vh;
+    position: relative;
 }
