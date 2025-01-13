@@ -28,7 +28,6 @@ export class UserController {
 
     async register(req: Request, res: Response) {
         try {
-            // Check validation results
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({
@@ -37,7 +36,6 @@ export class UserController {
                 });
             }
 
-            // Check if user exists
             const userExists = await this.userModel.checkUserExists(req.body.userName, req.body.email);
 
             if (userExists) {
@@ -47,7 +45,6 @@ export class UserController {
                 });
             }
 
-            // Register user
             const newUser = await this.userModel.registerUser({
                 userName: req.body.userName,
                 password: req.body.password,
@@ -92,24 +89,13 @@ export class UserController {
                 });
             }
 
-            // Check and update firstLogin
             const firstLogin = await this.userModel.checkAndUpdateFirstLogin(user.userID!);
 
-            // Generate JWT token
             const token = jwt.sign(
                 { userId: user.userID, userName: user.userName },
                 process.env.LOGIN_TOKEN_KEY as string,
                 { expiresIn: '7d' },
             );
-
-            // Set cookie
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: true,
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-                sameSite: 'none',
-                path: '/',
-            });
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...userWithoutPassword } = user;
@@ -119,7 +105,8 @@ export class UserController {
                 success: true,
                 message: 'Login successful',
                 data: {
-                    ...userWithoutPassword,
+                    token,
+                    user: userWithoutPassword,
                     firstLogin,
                 },
             });

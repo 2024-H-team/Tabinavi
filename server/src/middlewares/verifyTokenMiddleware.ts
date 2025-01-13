@@ -9,29 +9,32 @@ interface AuthRequest extends Request {
         exp?: number;
     };
 }
-export const verifyTokenMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
+
+export const verifyTokenMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
     try {
-        const token = req.cookies.token;
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
 
         if (!token) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 message: 'Access denied. No token provided.',
             });
+            return;
         }
 
         const decoded = jwt.verify(token, process.env.LOGIN_TOKEN_KEY as string) as {
             userId: number;
             userName: string;
         };
-        // Attach user info to request object
         req.user = decoded;
         next();
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             message: 'Invalid token',
         });
+        return;
     }
 };

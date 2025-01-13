@@ -16,4 +16,5 @@ router.post('/answers', verifyTokenMiddleware as express.RequestHandler, (req, r
 router.get('/answers', verifyTokenMiddleware as express.RequestHandler, (req, res, next) =>
     questionController.getUserAnswers(req, res, next),
 );
+
 export default router;

@@ -32,11 +32,14 @@ export default function LoginPage() {
             const response = await apiClient.post('/auth/login', data);
 
             if (response.data.success) {
+                localStorage.setItem('token', response.data.data.token);
+                localStorage.setItem('user', JSON.stringify(response.data.data.user));
+                document.cookie = `token=${response.data.data.token}; path=/`;
+
                 setLoading(false);
                 setError('');
-                const { firstLogin } = response.data.data;
 
-                if (firstLogin) {
+                if (response.data.data.firstLogin) {
                     router.push('/survey');
                 } else {
                     router.push('/home');
