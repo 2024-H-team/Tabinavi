@@ -15,7 +15,6 @@ import SelectedSpot from './SelectedSpot';
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
 import { PlaceDetails } from '@/types/PlaceDetails';
-import { useRouter } from 'next/navigation';
 
 interface SelectedSpotsContainerProps {
     selectedSpots: PlaceDetails[];
@@ -27,7 +26,6 @@ interface SpotWithInstanceId extends PlaceDetails {
 
 export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: SelectedSpotsContainerProps) {
     const [spots, setSpots] = useState<SpotWithInstanceId[]>([]);
-    const router = useRouter();
 
     useEffect(() => {
         const spotsWithIds = selectedSpots.map((spot, index) => ({
@@ -64,11 +62,6 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
         }
     };
 
-    const handleCreateSchedule = () => {
-        sessionStorage.setItem('ScheduleSpot', JSON.stringify(spots));
-        router.push('/create-schedule/schedule-preview');
-    };
-
     return (
         <DndContext
             sensors={sensors}
@@ -97,7 +90,6 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
                             )}
                         </SortableSpotWrapper>
                     ))}
-                    <button onClick={handleCreateSchedule}>スケジュール作成</button>
                 </div>
             </SortableContext>
         </DndContext>

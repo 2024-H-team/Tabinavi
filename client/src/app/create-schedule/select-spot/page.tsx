@@ -3,21 +3,24 @@
 import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { searchNearbyPlaces } from '@/utils/mapCalculations';
-import Styles from '@styles/appStyles/schedule/createSchedule.module.scss';
+import Styles from '@styles/appStyles/schedule/CreateSchedule.module.scss';
 import SpotInfo from '@/components/create-schedule/SpotInfo';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import SelectedSpotsContainer from '@/components/create-schedule/SelectedSpotsContainer';
 import RecommendSpotsContainer from '@/components/create-schedule/RecommendSpotsContainer';
 import apiClient from '@/lib/axios';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const CreateScheduleMap = dynamic(() => import('@/components/create-schedule/CreateScheduleMap'), { ssr: false });
 
 export default function CreateSchedule() {
+    const router = useRouter();
     const [selectedPlaces, setSelectedPlaces] = useState<PlaceDetails[]>([]);
     const [selectedSpots, setSelectedSpots] = useState<PlaceDetails[]>([]);
     const [recommendedSpots, setRecommendedSpots] = useState<PlaceDetails[]>([]);
     const [visibleRecommendedSpots, setVisibleRecommendedSpots] = useState<PlaceDetails[]>([]);
-    const [focusedSpot, setFocusedSpot] = useState<PlaceDetails | null>(null); // State để lưu spot được focus
+    const [focusedSpot, setFocusedSpot] = useState<PlaceDetails | null>(null);
 
     const handleAddSpot = useCallback((spot: PlaceDetails) => {
         setSelectedSpots((prevSpots) => [...prevSpots, spot]);
@@ -68,11 +71,13 @@ export default function CreateSchedule() {
             console.error('Error getting recommendations:', error);
         }
     };
-
+    const handleCreateSchedule = () => {
+        sessionStorage.setItem('ScheduleSpot', JSON.stringify(selectedSpots));
+        router.push('/create-schedule/schedule-preview');
+    };
     return (
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
-                <h1>スケジュール作成</h1>
                 <CreateScheduleMap
                     onPlaceSelect={setSelectedPlaces}
                     recommendedSpots={visibleRecommendedSpots}
@@ -87,17 +92,17 @@ export default function CreateSchedule() {
                 onFocusSpot={handleFocusSpot}
             />
             <SelectedSpotsContainer selectedSpots={selectedSpots} onDeleteSpot={handleDeleteSpot} />
-            <button
-                onClick={handleRecommendClick}
-                style={{
-                    position: 'absolute',
-                    top: '50px',
-                    right: '50px',
-                    padding: '10px 20px',
-                }}
-            >
+            <button onClick={handleRecommendClick} className={Styles.recommendButton}>
                 Recommend
             </button>
+            <div className={Styles.btnBox}>
+                <Link className={Styles.backBtn} href={'/create-schedule'}>
+                    戻る
+                </Link>
+                <button onClick={handleCreateSchedule} className={Styles.submitBtn}>
+                    スケジュール作成
+                </button>
+            </div>
         </div>
     );
 }

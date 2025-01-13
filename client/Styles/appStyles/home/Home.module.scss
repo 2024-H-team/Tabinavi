@@ -1,5 +1,5 @@
 .ContentWrap {
-    min-height: 100vh;
+    min-height: calc(100% - 60px);
     padding: 24px;
     margin: auto;
     .ScheduleWrap {

@@ -202,14 +202,19 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
             <style>{`
                 .gm-style-iw { display: none!important; }
                 .gm-style-iw-tc { display: none!important; }
+                .gm-fullscreen-control { display: none!important; }
+                .gm-svpc { display: none!important; }
+                .gmnoprint { display: none!important; }
             `}</style>
-            <div className={Styles.mapContainer}>
+            <div className={Styles.map}>
                 <Autocomplete
                     onLoad={(autocomplete) => (autoCompleteRef.current = autocomplete)}
                     onPlaceChanged={handlePlaceSelect}
                     className={Styles.searchBox}
                 >
-                    <input type="text" placeholder="Search for a place" />
+                    <div className={Styles.searchContainer}>
+                        <input type="text" placeholder="検索" />
+                    </div>
                 </Autocomplete>
 
                 <GoogleMap
@@ -219,9 +224,15 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                     mapContainerStyle={{ width: '100%', height: '100%' }}
                     onLoad={(map) => {
                         mapRef.current = map;
-                        map.setOptions({ mapId: '26a4732fc7efb60' });
+                        map.setOptions({
+                            mapId: '26a4732fc7efb60',
+                            gestureHandling: 'greedy',
+                        });
                     }}
                     onClick={handleMapClick}
+                    options={{
+                        gestureHandling: 'greedy',
+                    }}
                 />
             </div>
         </>

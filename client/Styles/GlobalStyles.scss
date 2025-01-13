@@ -50,7 +50,7 @@ h6 {
     margin: 0;
 }
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     margin: 0;
     padding: 0;
@@ -58,6 +58,6 @@ body {
     background-color: #fdfdfd;
     background-size: contain;
     background-position: top center;
-    min-height: 100vh;
+    height: 100%;
     position: relative;
 }
