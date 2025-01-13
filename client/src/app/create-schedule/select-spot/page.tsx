@@ -75,6 +75,11 @@ export default function CreateSchedule() {
         sessionStorage.setItem('ScheduleSpot', JSON.stringify(selectedSpots));
         router.push('/create-schedule/schedule-preview');
     };
+
+    const handleCloseSpotInfo = useCallback(() => {
+        setSelectedPlaces([]);
+    }, []);
+
     return (
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
@@ -85,7 +90,9 @@ export default function CreateSchedule() {
                     selectedSpots={selectedSpots}
                 />
             </div>
-            {selectedPlaces.length > 0 && <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} />}
+            {selectedPlaces.length > 0 && (
+                <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} onClose={handleCloseSpotInfo} />
+            )}
             <RecommendSpotsContainer
                 recommendedSpots={recommendedSpots}
                 onLoadMore={handleLoadMore}

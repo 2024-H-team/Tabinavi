@@ -3,13 +3,15 @@ import { useState, useRef, TouchEvent } from 'react';
 import Image from 'next/image';
 import styles from '@styles/componentStyles/create-schedule/SpotInfo.module.scss';
 import { PlaceDetails } from '@/types/PlaceDetails';
+import { CiShare1, CiBookmark } from 'react-icons/ci';
 
 interface SpotInfoProps {
     places: PlaceDetails[];
     onAddSpot: (spot: PlaceDetails) => void;
+    onClose: () => void;
 }
 
-export default function SpotInfo({ places, onAddSpot }: SpotInfoProps) {
+export default function SpotInfo({ places, onAddSpot, onClose }: SpotInfoProps) {
     const [currentTop, setCurrentTop] = useState('60');
     const [startY, setStartY] = useState(0);
     const [dragging, setDragging] = useState(false);
@@ -76,6 +78,17 @@ export default function SpotInfo({ places, onAddSpot }: SpotInfoProps) {
         >
             <div className={styles.content}>
                 <div className={styles.header}>
+                    <div className={styles.iconBox}>
+                        <div className={styles.closeBtn}>
+                            <CiBookmark />
+                        </div>
+                        <div className={styles.closeBtn}>
+                            <CiShare1 />
+                        </div>
+                        <div className={styles.closeBtn} onClick={onClose}>
+                            ✕
+                        </div>
+                    </div>
                     <div className={styles.dragBar}></div>
                     <p className={styles.name}>{place.name || '名称不明'}</p>
                     <div className={styles.bar}></div>
