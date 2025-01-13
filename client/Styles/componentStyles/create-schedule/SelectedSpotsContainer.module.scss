@@ -1,25 +1,39 @@
 .Container {
-    width: 100%;
-    height: 500px;
-    padding: 8px 20px;
-    padding-left: 50px;
-    overflow: auto;
-    background-color: #f5f3aa;
+    width: 70%;
+    height: 65%;
+    background-color: #fdfdfd;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    gap: 20px;
     position: absolute;
-    left: -100%;
-    button {
-        padding: 8px 20px;
-        border: none;
-        border-radius: 5px;
-        background-color: #afafaf;
-        color: white;
+    right: 0;
+    top: 18%;
+    filter: drop-shadow(0px 1px 1px rgba(57, 57, 57, 0.68));
+    border-radius: 10px 0 0 10px;
+    z-index: 101;
+    .content {
+        padding: 8px 8px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 12px;
+    }
+    .header {
+        width: 100%;
+        height: 4.4rem;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 12px 13px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #fdfdfd;
+        background-color: #436eee;
     }
     .selectedSpot {
         width: 100%;
+        color: #302f34;
     }
 }

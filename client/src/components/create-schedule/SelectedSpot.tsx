@@ -1,4 +1,3 @@
-// SelectedSpot.tsx
 'use client';
 import styles from '@styles/componentStyles/create-schedule/SelectedSpot.module.scss';
 import { PlaceDetails } from '@/types/PlaceDetails';
@@ -32,7 +31,9 @@ export default function SelectedSpot({
         setMinute(newMinute);
         onStayTimeUpdate(spot.name, { hour: newHour, minute: newMinute });
     };
-
+    const truncateText = (text: string, maxLength: number = 15) => {
+        return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    };
     return (
         <div
             className={styles.spot}
@@ -45,10 +46,10 @@ export default function SelectedSpot({
                     =
                 </div>
                 <div>
-                    <h3>{spot.name}</h3>
+                    <h3 title={spot.name}>{truncateText(spot.name)}</h3>
                 </div>
                 <div className={styles.closeBtn} onClick={onDelete}>
-                    X
+                    ✕
                 </div>
             </div>
             <div className={styles.timePickerGroup}>

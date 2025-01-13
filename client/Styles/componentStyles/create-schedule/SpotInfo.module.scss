@@ -141,12 +141,14 @@
 
                 .detailValue {
                     font-size: 1.2rem;
-
                     color: #555;
-
                     flex: 1;
+                    word-break: break-all;
+                    word-wrap: break-word;
                     a {
                         color: #007aff;
+                        word-break: break-all;
+                        word-wrap: break-word;
                     }
                     .weekdayList {
                         padding: 0;

@@ -20,19 +20,12 @@ interface SelectedSpotsContainerProps {
     selectedSpots: PlaceDetails[];
     onDeleteSpot: (index: number) => void;
 }
-interface SpotWithInstanceId extends PlaceDetails {
-    instanceId: string;
-}
 
 export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: SelectedSpotsContainerProps) {
-    const [spots, setSpots] = useState<SpotWithInstanceId[]>([]);
+    const [spots, setSpots] = useState<PlaceDetails[]>([]);
 
     useEffect(() => {
-        const spotsWithIds = selectedSpots.map((spot, index) => ({
-            ...spot,
-            instanceId: `${spot.placeId}-${Date.now()}-${index}`,
-        }));
-        setSpots(spotsWithIds);
+        setSpots(selectedSpots);
     }, [selectedSpots]);
 
     const sensors = useSensors(
@@ -56,8 +49,8 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
 
         const { active, over } = event;
         if (active.id !== over?.id) {
-            const oldIndex = spots.findIndex((spot) => spot.placeId === active.id);
-            const newIndex = spots.findIndex((spot) => spot.placeId === over?.id);
+            const oldIndex = spots.findIndex((spot) => spot.name === active.id);
+            const newIndex = spots.findIndex((spot) => spot.name === over?.id);
             setSpots((prev) => arrayMove(prev, oldIndex, newIndex));
         }
     };
@@ -69,27 +62,30 @@ export default function SelectedSpotsContainer({ selectedSpots, onDeleteSpot }: 
             onDragEnd={handleDragEnd}
             onDragStart={handleDragStart}
         >
-            <SortableContext items={spots.map((spot) => spot.instanceId)}>
+            <SortableContext items={spots.map((spot) => spot.name)}>
                 <div className={styles.Container}>
-                    {spots.map((spot) => (
-                        <SortableSpotWrapper
-                            key={spot.instanceId}
-                            spot={spot}
-                            onDelete={() => onDeleteSpot(spots.indexOf(spot))}
-                            onStayTimeUpdate={handleStayTimeUpdate}
-                            className={styles.selectedSpot}
-                        >
-                            {({ dragHandleProps, isDragging }) => (
-                                <SelectedSpot
-                                    spot={spot}
-                                    onDelete={() => onDeleteSpot(spots.indexOf(spot))}
-                                    onStayTimeUpdate={handleStayTimeUpdate}
-                                    dragHandleProps={dragHandleProps}
-                                    isDragging={isDragging}
-                                />
-                            )}
-                        </SortableSpotWrapper>
-                    ))}
+                    <div className={styles.header}>start date-end date</div>
+                    <div className={styles.content}>
+                        {spots.map((spot, index) => (
+                            <SortableSpotWrapper
+                                key={spot.name}
+                                spot={spot}
+                                onDelete={() => onDeleteSpot(index)}
+                                onStayTimeUpdate={handleStayTimeUpdate}
+                                className={styles.selectedSpot}
+                            >
+                                {({ dragHandleProps, isDragging }) => (
+                                    <SelectedSpot
+                                        spot={spot}
+                                        onDelete={() => onDeleteSpot(index)}
+                                        onStayTimeUpdate={handleStayTimeUpdate}
+                                        dragHandleProps={dragHandleProps}
+                                        isDragging={isDragging}
+                                    />
+                                )}
+                            </SortableSpotWrapper>
+                        ))}
+                    </div>
                 </div>
             </SortableContext>
         </DndContext>

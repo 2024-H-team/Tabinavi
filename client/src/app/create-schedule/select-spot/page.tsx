@@ -11,6 +11,7 @@ import RecommendSpotsContainer from '@/components/create-schedule/RecommendSpots
 import apiClient from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { MdMenuOpen } from 'react-icons/md';
 
 const CreateScheduleMap = dynamic(() => import('@/components/create-schedule/CreateScheduleMap'), { ssr: false });
 
@@ -98,6 +99,9 @@ export default function CreateSchedule() {
                 onLoadMore={handleLoadMore}
                 onFocusSpot={handleFocusSpot}
             />
+            <div className={Styles.menuBtn}>
+                <MdMenuOpen color="white" size={30} />
+            </div>
             <SelectedSpotsContainer selectedSpots={selectedSpots} onDeleteSpot={handleDeleteSpot} />
             <button onClick={handleRecommendClick} className={Styles.recommendButton}>
                 Recommend
