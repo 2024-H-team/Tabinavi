@@ -60,4 +60,6 @@ body {
     background-position: top center;
     height: 100%;
     position: relative;
+    overscroll-behavior: none;
+    overscroll-behavior-y: contain;
 }

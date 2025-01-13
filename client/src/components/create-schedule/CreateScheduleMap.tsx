@@ -95,7 +95,13 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
 
             highlightMarkerRef.current = newHighlightMarker;
 
-            mapRef.current!.setZoom(13);
+            if (mapRef.current) {
+                const map = mapRef.current;
+                const zoom = map.getZoom();
+                if (typeof zoom === 'number' && zoom < 13) {
+                    map.setZoom(13);
+                }
+            }
         };
 
         createHighlightMarker();
@@ -113,7 +119,13 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                 const newHighlightMarker = await createMarker(mapRef.current!, clickedLocation, 'red');
                 highlightMarkerRef.current = newHighlightMarker;
 
-                mapRef.current!.setZoom(13);
+                if (mapRef.current) {
+                    const map = mapRef.current;
+                    const zoom = map.getZoom();
+                    if (typeof zoom === 'number' && zoom < 13) {
+                        map.setZoom(13);
+                    }
+                }
                 mapRef.current!.panTo(clickedLocation);
             } catch (error) {
                 console.error('Error initializing AdvancedMarkerElement: ', error);
@@ -183,7 +195,6 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
         const latLng = e.latLng;
         if (!latLng || !mapRef.current) return;
 
-        // Check if click was on a POI
         if ('placeId' in e && e.placeId) {
             e.stop?.();
 
@@ -196,7 +207,6 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                 }
             });
         } else {
-            // Normal click on map
             fetchPlaceDetailsFromLatLng(mapRef.current, latLng, {
                 onLocationSet: setClickedLocation,
                 onPlacesFound: (places) => {

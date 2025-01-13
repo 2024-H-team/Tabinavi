@@ -85,7 +85,7 @@ export default function CreateSchedule() {
                     selectedSpots={selectedSpots}
                 />
             </div>
-            <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} />
+            {selectedPlaces.length > 0 && <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} />}
             <RecommendSpotsContainer
                 recommendedSpots={recommendedSpots}
                 onLoadMore={handleLoadMore}

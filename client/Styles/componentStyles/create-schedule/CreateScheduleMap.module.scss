@@ -25,7 +25,7 @@
             height: 18px;
             border: 2px solid #4285f4;
             border-radius: 50%;
-            z-index: 50;
+            z-index: 3;
         }
         .searchContainer::after {
             content: '';
@@ -37,7 +37,7 @@
             background-color: #4285f4;
             transform: rotate(45deg);
             border-radius: 1px;
-            z-index: 50;
+            z-index: 3;
         }
         input {
             width: 100%;
