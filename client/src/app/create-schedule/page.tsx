@@ -11,12 +11,21 @@ import { PlaceDetails } from '@/types/PlaceDetails';
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
 
+export type TravelMode = 'WALKING' | 'DRIVING' | 'TRANSIT';
+
+export interface TransportInfo {
+    mode: TravelMode;
+    duration: string;
+    routeDetails?: string[];
+}
+
 export interface DaySchedule {
     title?: string;
     date: string;
     startTime: string;
     endTime: string;
     spots: PlaceDetails[];
+    transports: TransportInfo[];
 }
 
 export default function InfoSetup() {
@@ -24,7 +33,13 @@ export default function InfoSetup() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [schedules, setSchedules] = useState<DaySchedule[]>([
-        { date: '', startTime: `${hours[0]}:${minutes[0]}`, endTime: `${hours[0]}:${minutes[0]}`, spots: [] },
+        {
+            date: '',
+            startTime: `${hours[0]}:${minutes[0]}`,
+            endTime: `${hours[0]}:${minutes[0]}`,
+            spots: [],
+            transports: [],
+        },
     ]);
     const [title, setTitle] = useState('');
 
@@ -54,36 +69,24 @@ export default function InfoSetup() {
                     startTime: `${hours[0]}:${minutes[0]}`,
                     endTime: `${hours[0]}:${minutes[0]}`,
                     spots: [],
+                    transports: [],
                 },
             ]);
         } else if (startDate && endDate) {
             const dates = getDateRange(startDate, endDate);
             const newSchedules: DaySchedule[] = dates.map((date, index) => {
-                if (index === 0) {
-                    return {
-                        title: title,
-                        date,
-                        startTime: `${hours[0]}:${minutes[0]}`,
-                        endTime: `${hours[23]}:${minutes[55]}`,
-                        spots: [],
-                    };
-                } else if (index === dates.length - 1) {
-                    return {
-                        title: title,
-                        date,
-                        startTime: `${hours[0]}:${minutes[0]}`,
-                        endTime: `${hours[0]}:${minutes[0]}`,
-                        spots: [],
-                    };
-                } else {
-                    return {
-                        title: title,
-                        date,
-                        startTime: `${hours[0]}:${minutes[0]}`,
-                        endTime: `${hours[23]}:${minutes[55]}`,
-                        spots: [],
-                    };
+                let transports: TransportInfo[] = [];
+                if (index < dates.length - 1) {
+                    transports = [{ mode: 'WALKING', duration: '計算中', routeDetails: undefined }];
                 }
+                return {
+                    title: title,
+                    date,
+                    startTime: index === 0 ? `${hours[0]}:${minutes[0]}` : `${hours[0]}:${minutes[0]}`,
+                    endTime: index === dates.length - 1 ? `${hours[0]}:${minutes[0]}` : `${hours[23]}:${minutes[55]}`,
+                    spots: [],
+                    transports,
+                };
             });
             setSchedules(newSchedules);
         }

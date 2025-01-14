@@ -16,6 +16,7 @@ import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { TravelTimeCalculator } from '@/components/create-schedule/TravelTimeCalculator';
 import { DaySchedule } from '@/app/create-schedule/page';
 import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
+import { IoBagAdd } from 'react-icons/io5';
 
 export default function PreviewSpotsContainer() {
     const [schedules, setSchedules] = useState<DaySchedule[]>([]);
@@ -68,41 +69,53 @@ export default function PreviewSpotsContainer() {
     };
 
     const handleDelete = (spotName: string) => {
-        setSchedules((prev) => {
-            const newSchedules = [...prev];
-            const currentDay = { ...newSchedules[activeDateIndex] };
-            currentDay.spots = currentDay.spots.filter((spot) => spot.name !== spotName);
-            newSchedules[activeDateIndex] = currentDay;
-            return newSchedules;
-        });
+        const isConfirmed = confirm(`${spotName}を削除してもよろしいですか？`);
+
+        if (isConfirmed) {
+            setSchedules((prev) => {
+                const newSchedules = [...prev];
+                const currentDay = { ...newSchedules[activeDateIndex] };
+                currentDay.spots = currentDay.spots.filter((spot) => spot.name !== spotName);
+                newSchedules[activeDateIndex] = currentDay;
+                return newSchedules;
+            });
+        }
     };
 
     const handleSave = () => {
         sessionStorage.setItem('schedules', JSON.stringify(schedules));
     };
 
-    const handlePrevDate = () => {
-        if (activeDateIndex > 0) {
-            setActiveDateIndex(activeDateIndex - 1);
-        }
-    };
-
-    const handleNextDate = () => {
-        if (activeDateIndex < schedules.length - 1) {
-            setActiveDateIndex(activeDateIndex + 1);
-        }
-    };
-
     return (
         <div className={styles.container}>
             <div className={styles.dateNav}>
-                <span onClick={handlePrevDate}>≪</span>
-                <p>{new Date(schedules[activeDateIndex]?.date).toLocaleDateString('ja-JP')}</p>
-                <span onClick={handleNextDate}>≫</span>
+                <div className={styles.header}>
+                    <h2 className={styles.title}>{schedules[0]?.title || 'スケジュール'}</h2>
+                    <div className={styles.dateInfo}>
+                        {schedules.length > 0 &&
+                            `${new Date(schedules[0].date).toLocaleDateString('ja-JP')} - 
+                         ${new Date(schedules[schedules.length - 1].date).toLocaleDateString('ja-JP')}`}
+                    </div>
+                </div>
+                <div className={styles.dateSelect}>
+                    {schedules.map((schedule, index) => (
+                        <div
+                            key={index}
+                            className={index === activeDateIndex ? styles.active : ''}
+                            onClick={() => setActiveDateIndex(index)}
+                        >
+                            {new Date(schedule.date).toLocaleDateString('ja-JP', {
+                                month: 'numeric',
+                                day: 'numeric',
+                            })}
+                        </div>
+                    ))}
+                </div>
             </div>
             <div className={styles.timeInfo}>
-                <p>開始時間: {schedules[activeDateIndex]?.startTime}</p>
-                <p>終了時間: {schedules[activeDateIndex]?.endTime}</p>
+                <p>
+                    予定時間：{schedules[activeDateIndex]?.startTime} - {schedules[activeDateIndex]?.endTime}
+                </p>
             </div>
 
             <DndContext
@@ -118,12 +131,12 @@ export default function PreviewSpotsContainer() {
                                 spot={spot}
                                 onDelete={() => handleDelete(spot.name)}
                                 onStayTimeUpdate={handleStayTimeUpdate}
+                                className={styles.selectedSpot}
                             >
                                 {({ dragHandleProps, isDragging }) => (
                                     <SchedulePreviewSpotItem
                                         name={spot.name}
                                         stayTime={spot.stayTime}
-                                        onStayTimeUpdate={handleStayTimeUpdate}
                                         dragHandleProps={dragHandleProps}
                                         onDelete={() => handleDelete(spot.name)}
                                         isDragging={isDragging}
@@ -140,9 +153,14 @@ export default function PreviewSpotsContainer() {
                     ))}
                 </SortableContext>
             </DndContext>
-            <button onClick={handleSave} className={styles.saveButton}>
-                保存
-            </button>
+            <div className={styles.btnBox}>
+                <button onClick={handleSave} className={styles.saveButton}>
+                    スケジュールを確定する
+                </button>
+                <button className={styles.addButton}>
+                    <IoBagAdd color="gray" size={30} />
+                </button>
+            </div>
         </div>
     );
 }

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
+import styles from '@styles/componentStyles/create-schedule/PreviewSpotItem.module.scss';
 import { BestRoute } from '@/types/TransferData';
 import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/axios';
@@ -231,7 +231,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                 <p className={styles.duration}>計算中...</p>
             ) : (
                 <p className={styles.duration}>
-                    移動時間: {duration}
+                    {duration}
                     {selectedMode === 'TRANSIT' && transferData && (
                         <span
                             onClick={handleDurationClick}
