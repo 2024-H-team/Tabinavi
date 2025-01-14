@@ -84,12 +84,8 @@ export default function PreviewSpotsContainer() {
         sessionStorage.setItem('schedules', JSON.stringify(schedules));
     };
 
-    // Sửa hàm để nhận thêm tham số index,
-    // lưu transportInfo vào vị trí currentDay.transports[index]
-    // thay vì luôn là transports[0].
     const handleTransportCalculated = useCallback(
         (transportInfo: TransportInfo, transportIndex: number) => {
-            // Kiểm tra có khác gì không
             setSchedules((prev) => {
                 const newSchedules = [...prev];
                 const currentDay = { ...newSchedules[activeDateIndex] };
@@ -98,7 +94,6 @@ export default function PreviewSpotsContainer() {
                     currentDay.transports = [];
                 }
 
-                // So sánh
                 const existingTransport = currentDay.transports[transportIndex];
                 const isSameAsBefore =
                     existingTransport &&
@@ -106,7 +101,6 @@ export default function PreviewSpotsContainer() {
                     existingTransport.duration === transportInfo.duration &&
                     JSON.stringify(existingTransport.routeDetail) === JSON.stringify(transportInfo.routeDetail);
 
-                // Nếu transportInfo giống y chang, trả về prev, không set lại
                 if (isSameAsBefore) {
                     return prev;
                 }
@@ -176,14 +170,12 @@ export default function PreviewSpotsContainer() {
                                 )}
                             </SortableSpotWrapper>
 
-                            {/* Nếu chưa phải spot cuối, hiển thị TravelTimeCalculator */}
                             {index < schedules[activeDateIndex].spots.length - 1 && (
                                 <TravelTimeCalculator
                                     origin={spot.location}
                                     destination={schedules[activeDateIndex].spots[index + 1].location}
-                                    // Truyền thêm index để biết đang tính transport cho đoạn thứ mấy
-                                    onTransportCalculated={
-                                        (transportInfo) => handleTransportCalculated(transportInfo, index) // <-- Sửa
+                                    onTransportCalculated={(transportInfo) =>
+                                        handleTransportCalculated(transportInfo, index)
                                     }
                                 />
                             )}
