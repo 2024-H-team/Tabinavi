@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { searchNearbyPlaces } from '@/utils/mapCalculations';
 import Styles from '@styles/appStyles/schedule/CreateSchedule.module.scss';
@@ -27,6 +27,9 @@ export default function CreateSchedule() {
 
     const [schedules, setSchedules] = useState<DaySchedule[]>([]);
     const [activeDateIndex, setActiveDateIndex] = useState<number>(0);
+    const [showRecommendations, setShowRecommendations] = useState(false);
+    const [recommendBtnBottom, setRecommendBtnBottom] = useState<number>(80);
+    const recommendContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const saved = sessionStorage.getItem('schedules');
@@ -34,6 +37,18 @@ export default function CreateSchedule() {
             setSchedules(JSON.parse(saved));
         }
     }, []);
+
+    useEffect(() => {
+        const updateRecommendButtonPosition = () => {
+            if (showRecommendations && recommendContainerRef.current) {
+                setRecommendBtnBottom(240);
+            } else {
+                setRecommendBtnBottom(80);
+            }
+        };
+
+        updateRecommendButtonPosition();
+    }, [showRecommendations]);
 
     const handleAddSpot = useCallback(
         (spot: PlaceDetails) => {
@@ -113,6 +128,7 @@ export default function CreateSchedule() {
                 const nearbyPlaces = await searchNearbyPlaces(schedules[activeDateIndex].spots, response.data.data);
                 setRecommendedSpots(nearbyPlaces || []);
                 setVisibleRecommendedSpots(nearbyPlaces?.slice(0, 5) || []);
+                setShowRecommendations(true);
             }
         } catch (error) {
             console.error('Error getting recommendations:', error);
@@ -132,6 +148,12 @@ export default function CreateSchedule() {
         setIsContainerOpen(!isContainerOpen);
     };
 
+    const handleCloseRecommendations = useCallback(() => {
+        setShowRecommendations(false);
+        setRecommendedSpots([]);
+        setVisibleRecommendedSpots([]);
+    }, []);
+
     return (
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
@@ -145,11 +167,16 @@ export default function CreateSchedule() {
             {selectedPlaces.length > 0 && (
                 <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} onClose={handleCloseSpotInfo} />
             )}
-            <RecommendSpotsContainer
-                recommendedSpots={recommendedSpots}
-                onLoadMore={handleLoadMore}
-                onFocusSpot={handleFocusSpot}
-            />
+            {showRecommendations && (
+                <div ref={recommendContainerRef}>
+                    <RecommendSpotsContainer
+                        recommendedSpots={recommendedSpots}
+                        onLoadMore={handleLoadMore}
+                        onFocusSpot={handleFocusSpot}
+                        onClose={handleCloseRecommendations}
+                    />
+                </div>
+            )}
             <div className={Styles.menuBtn} onClick={toggleContainer}>
                 <MdMenuOpen color="white" size={30} />
             </div>
@@ -162,8 +189,15 @@ export default function CreateSchedule() {
                 isOpen={isContainerOpen}
                 onClose={() => setIsContainerOpen(false)}
             />
-            <button onClick={handleRecommendClick} className={Styles.recommendButton}>
-                Recommend
+            <button
+                onClick={handleRecommendClick}
+                className={Styles.recommendButton}
+                style={{
+                    bottom: `${recommendBtnBottom}px`,
+                    transition: 'bottom 0.3s ease-in-out',
+                }}
+            >
+                AIにおすすめしてもらう
             </button>
             <div className={Styles.btnBox}>
                 <Link className={Styles.backBtn} href={'/create-schedule'}>

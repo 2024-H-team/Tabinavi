@@ -41,6 +41,14 @@ export default function SelectedSpotsContainer({
         setSpots(schedules[activeDateIndex]?.spots || []);
     }, [schedules, activeDateIndex]);
 
+    const getDateRange = () => {
+        if (!schedules || schedules.length === 0) return 'No dates';
+
+        const startDate = new Date(schedules[0].date).toLocaleDateString('ja-JP');
+        const endDate = new Date(schedules[schedules.length - 1].date).toLocaleDateString('ja-JP');
+
+        return `${startDate} - ${endDate}`;
+    };
     const handlePrevDate = () => {
         if (activeDateIndex > 0) {
             onDateChange(activeDateIndex - 1);
@@ -96,7 +104,7 @@ export default function SelectedSpotsContainer({
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className={styles.header}>
-                            {schedules[activeDateIndex]?.date || 'No date'}
+                            {getDateRange()}
                             <span className={styles.closeBtn} onClick={onClose}>
                                 ✕
                             </span>

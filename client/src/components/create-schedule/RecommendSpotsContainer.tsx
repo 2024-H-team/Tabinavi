@@ -7,12 +7,14 @@ interface RecommendSpotsContainerProps {
     recommendedSpots: PlaceDetails[];
     onLoadMore: (visibleSpots: PlaceDetails[]) => void;
     onFocusSpot?: (spot: PlaceDetails) => void;
+    onClose: () => void;
 }
 
 export default function RecommendSpotsContainer({
     recommendedSpots,
     onLoadMore,
     onFocusSpot,
+    onClose,
 }: RecommendSpotsContainerProps) {
     const [visibleItems, setVisibleItems] = useState(5);
 
@@ -34,7 +36,12 @@ export default function RecommendSpotsContainer({
 
     return (
         <div className={Styles.container}>
-            <h2>おすすめスポット</h2>
+            <h2>あなたへのおすすめはこちら</h2>
+            <div className={Styles.btnDiv}>
+                <div className={Styles.closeBtn} onClick={onClose}>
+                    ✕
+                </div>
+            </div>
             <div className={Styles.spotsGrid}>
                 {visibleSpots.map((spot) => (
                     <div
@@ -56,11 +63,7 @@ export default function RecommendSpotsContainer({
                                 />
                             </div>
                         )}
-                        <div className={Styles.spotInfo}>
-                            <h3>{spot.name}</h3>
-                            <p>{spot.address}</p>
-                            {spot.rating && <p>Rating: {spot.rating}★</p>}
-                        </div>
+                        <div className={Styles.spotInfo}>{spot.name}</div>
                     </div>
                 ))}
                 {hasMore && (

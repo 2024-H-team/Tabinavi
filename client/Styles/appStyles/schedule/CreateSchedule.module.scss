@@ -27,9 +27,17 @@
     }
     .recommendButton {
         position: absolute;
-        top: 50px;
-        right: 50px;
-        padding: 10px 20px;
+        width: 80%;
+        height: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 6px;
+        border: 2px solid #7bc3ff;
+        background: #fdfdfd;
+        box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.25);
+        color: #436eee;
+        font-size: 1.3rem;
+        font-weight: 700;
     }
     .btnBox {
         width: auto;
