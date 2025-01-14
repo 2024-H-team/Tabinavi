@@ -1,5 +1,6 @@
+// PreviewSpotsContainer.tsx
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -14,13 +15,14 @@ import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dra
 import SchedulePreviewSpotItem from '@/components/create-schedule/SchedulePreviewSpotItem';
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { TravelTimeCalculator } from '@/components/create-schedule/TravelTimeCalculator';
-import { DaySchedule } from '@/app/create-schedule/page';
+import { DaySchedule, TransportInfo } from '@/app/create-schedule/page';
 import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
 import { IoBagAdd } from 'react-icons/io5';
 
 export default function PreviewSpotsContainer() {
     const [schedules, setSchedules] = useState<DaySchedule[]>([]);
     const [activeDateIndex, setActiveDateIndex] = useState(0);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         const saved = sessionStorage.getItem('schedules');
@@ -30,26 +32,24 @@ export default function PreviewSpotsContainer() {
     }, []);
 
     const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                delay: 100,
-                tolerance: 5,
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        }),
+        useSensor(PointerSensor, { activationConstraint: { delay: 100, tolerance: 5 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
     );
 
-    const handleStayTimeUpdate = (spotName: string, stayTime: { hour: string; minute: string }) => {
-        setSchedules((prev) => {
-            const newSchedules = [...prev];
-            const currentDay = { ...newSchedules[activeDateIndex] };
-            currentDay.spots = currentDay.spots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot));
-            newSchedules[activeDateIndex] = currentDay;
-            return newSchedules;
-        });
-    };
+    const handleStayTimeUpdate = useCallback(
+        (spotName: string, stayTime: { hour: string; minute: string }) => {
+            setSchedules((prev) => {
+                const newSchedules = [...prev];
+                const currentDay = { ...newSchedules[activeDateIndex] };
+                currentDay.spots = currentDay.spots.map((spot) =>
+                    spot.name === spotName ? { ...spot, stayTime } : spot,
+                );
+                newSchedules[activeDateIndex] = currentDay;
+                return newSchedules;
+            });
+        },
+        [activeDateIndex],
+    );
 
     const handleDragEnd = (event: DragEndEvent) => {
         handleDragEndUtil();
@@ -57,7 +57,6 @@ export default function PreviewSpotsContainer() {
         if (active.id !== over?.id) {
             const oldIndex = schedules[activeDateIndex].spots.findIndex((spot) => spot.name === active.id);
             const newIndex = schedules[activeDateIndex].spots.findIndex((spot) => spot.name === over?.id);
-
             setSchedules((prev) => {
                 const newSchedules = [...prev];
                 const currentDay = { ...newSchedules[activeDateIndex] };
@@ -68,23 +67,54 @@ export default function PreviewSpotsContainer() {
         }
     };
 
-    const handleDelete = (spotName: string) => {
-        const isConfirmed = confirm(`${spotName}を削除してもよろしいですか？`);
-
-        if (isConfirmed) {
-            setSchedules((prev) => {
-                const newSchedules = [...prev];
-                const currentDay = { ...newSchedules[activeDateIndex] };
-                currentDay.spots = currentDay.spots.filter((spot) => spot.name !== spotName);
-                newSchedules[activeDateIndex] = currentDay;
-                return newSchedules;
-            });
-        }
-    };
+    const handleDelete = useCallback(
+        (spotName: string) => {
+            if (confirm(`${spotName}を削除してもよろしいですか？`)) {
+                setSchedules((prev) => {
+                    const newSchedules = [...prev];
+                    const currentDay = { ...newSchedules[activeDateIndex] };
+                    currentDay.spots = currentDay.spots.filter((spot) => spot.name !== spotName);
+                    newSchedules[activeDateIndex] = currentDay;
+                    return newSchedules;
+                });
+            }
+        },
+        [activeDateIndex],
+    );
 
     const handleSave = () => {
         sessionStorage.setItem('schedules', JSON.stringify(schedules));
     };
+
+    const handleTransportCalculated = useCallback(
+        (transportInfo: TransportInfo) => {
+            if (isUpdating) return;
+            setIsUpdating(true);
+            setSchedules((prev) => {
+                const newSchedules = [...prev];
+                const currentDay = { ...newSchedules[activeDateIndex] };
+                const existingTransport = currentDay.transports[0];
+                if (
+                    existingTransport &&
+                    existingTransport.mode === transportInfo.mode &&
+                    existingTransport.duration === transportInfo.duration &&
+                    JSON.stringify(existingTransport.routeDetail) === JSON.stringify(transportInfo.routeDetail)
+                ) {
+                    setIsUpdating(false);
+                    return prev;
+                }
+                if (currentDay.transports && currentDay.transports.length > 0) {
+                    currentDay.transports[0] = transportInfo;
+                } else {
+                    currentDay.transports.push(transportInfo);
+                }
+                newSchedules[activeDateIndex] = currentDay;
+                return newSchedules;
+            });
+            setIsUpdating(false);
+        },
+        [activeDateIndex, isUpdating],
+    );
 
     return (
         <div className={styles.container}>
@@ -94,7 +124,7 @@ export default function PreviewSpotsContainer() {
                     <div className={styles.dateInfo}>
                         {schedules.length > 0 &&
                             `${new Date(schedules[0].date).toLocaleDateString('ja-JP')} - 
-                         ${new Date(schedules[schedules.length - 1].date).toLocaleDateString('ja-JP')}`}
+                            ${new Date(schedules[schedules.length - 1].date).toLocaleDateString('ja-JP')}`}
                     </div>
                 </div>
                 <div className={styles.dateSelect}>
@@ -117,7 +147,6 @@ export default function PreviewSpotsContainer() {
                     予定時間：{schedules[activeDateIndex]?.startTime} - {schedules[activeDateIndex]?.endTime}
                 </p>
             </div>
-
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -147,6 +176,7 @@ export default function PreviewSpotsContainer() {
                                 <TravelTimeCalculator
                                     origin={spot.location}
                                     destination={schedules[activeDateIndex].spots[index + 1].location}
+                                    onTransportCalculated={handleTransportCalculated}
                                 />
                             )}
                         </React.Fragment>

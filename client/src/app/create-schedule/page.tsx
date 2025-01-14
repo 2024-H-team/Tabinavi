@@ -1,12 +1,12 @@
 // InfoSetup.tsx
 'use client';
-
 import { useState, useEffect } from 'react';
 import WheelPicker from '@/components/WheelPicker';
 import styles from '@styles/appStyles/schedule/InfoSetup.module.scss';
 import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
 import { PlaceDetails } from '@/types/PlaceDetails';
+import { BestRoute } from '@/types/TransferData';
 
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
@@ -16,7 +16,7 @@ export type TravelMode = 'WALKING' | 'DRIVING' | 'TRANSIT';
 export interface TransportInfo {
     mode: TravelMode;
     duration: string;
-    routeDetails?: string[];
+    routeDetail?: BestRoute;
 }
 
 export interface DaySchedule {
@@ -42,21 +42,18 @@ export default function InfoSetup() {
         },
     ]);
     const [title, setTitle] = useState('');
-
     const router = useRouter();
 
     const getDateRange = (start: string, end: string): string[] => {
         const startDt = new Date(start);
         const endDt = new Date(end);
         const dateArray: string[] = [];
-
         for (let dt = new Date(startDt); dt <= endDt; dt.setDate(dt.getDate() + 1)) {
             const year = dt.getFullYear();
             const month = (dt.getMonth() + 1).toString().padStart(2, '0');
             const day = dt.getDate().toString().padStart(2, '0');
             dateArray.push(`${year}-${month}-${day}`);
         }
-
         return dateArray;
     };
 
@@ -64,7 +61,7 @@ export default function InfoSetup() {
         if (isOneDay) {
             setSchedules([
                 {
-                    title: title,
+                    title,
                     date: startDate,
                     startTime: `${hours[0]}:${minutes[0]}`,
                     endTime: `${hours[0]}:${minutes[0]}`,
@@ -77,10 +74,10 @@ export default function InfoSetup() {
             const newSchedules: DaySchedule[] = dates.map((date, index) => {
                 let transports: TransportInfo[] = [];
                 if (index < dates.length - 1) {
-                    transports = [{ mode: 'WALKING', duration: '計算中', routeDetails: undefined }];
+                    transports = [{ mode: 'WALKING', duration: '計算中', routeDetail: undefined }];
                 }
                 return {
-                    title: title,
+                    title,
                     date,
                     startTime: index === 0 ? `${hours[0]}:${minutes[0]}` : `${hours[0]}:${minutes[0]}`,
                     endTime: index === dates.length - 1 ? `${hours[0]}:${minutes[0]}` : `${hours[23]}:${minutes[55]}`,
@@ -124,13 +121,11 @@ export default function InfoSetup() {
                         <span className={styles.slider}></span>
                     </label>
                 </div>
-
                 <div className={styles.datePickerContainer}>
                     <div className={styles.datePickerGroup}>
                         <p className={styles.dateText} data-checked={isOneDay}></p>
                         <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
                     </div>
-
                     {!isOneDay && (
                         <div className={styles.datePickerGroup}>
                             <p>終了日</p>
@@ -143,7 +138,6 @@ export default function InfoSetup() {
                         </div>
                     )}
                 </div>
-
                 {((isOneDay && startDate) || (!isOneDay && startDate && endDate)) &&
                     schedules.map((schedule, index) => (
                         <div key={index} className={styles.daySchedule}>
@@ -209,7 +203,6 @@ export default function InfoSetup() {
                             </div>
                         </div>
                     ))}
-
                 <div className={styles.btnBox}>
                     <button onClick={handleSubmit} className={styles.submitButton}>
                         次に進む

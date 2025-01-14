@@ -4,18 +4,20 @@ import styles from '@styles/componentStyles/create-schedule/PreviewSpotItem.modu
 import { BestRoute } from '@/types/TransferData';
 import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/axios';
+import { TransportInfo } from '@/app/create-schedule/page';
+
+type TravelMode = 'WALKING' | 'DRIVING' | 'TRANSIT';
+
 interface TravelTimeCalculatorProps {
     origin: google.maps.LatLngLiteral;
     destination: google.maps.LatLngLiteral;
-    onDurationCalculated?: (duration: string) => void;
+    onTransportCalculated?: (transportInfo: TransportInfo) => void;
 }
-
-type TravelMode = 'WALKING' | 'DRIVING' | 'TRANSIT';
 
 export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
     origin,
     destination,
-    onDurationCalculated,
+    onTransportCalculated,
 }) => {
     const router = useRouter();
     const [selectedMode, setSelectedMode] = useState<TravelMode>('WALKING');
@@ -23,6 +25,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
     const [transferData, setTransferData] = useState<BestRoute | null>(null);
     const [isGoogleMapsReady, setGoogleMapsReady] = useState(false);
     const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         const interval = setInterval(() => {
             if (window.google && window.google.maps && typeof window.google.maps.DirectionsService === 'function') {
@@ -32,21 +35,15 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
         });
         if (!isGoogleMapsReady) return;
 
-        const findNearestStation = async (
-            location: google.maps.LatLngLiteral,
-            types: string[],
-        ): Promise<google.maps.places.PlaceResult | null> => {
+        const findNearestStation = async (location: google.maps.LatLngLiteral, types: string[]) => {
             const placesService = new window.google.maps.places.PlacesService(document.createElement('div'));
-
             const isBusStation = (name: string) => {
                 const busKeywords = ['バス', 'bus', 'バス停', 'バスターミナル'];
                 return busKeywords.some((keyword) => name.toLowerCase().includes(keyword.toLowerCase()));
             };
-
             const isTrainStation = (name: string) => {
                 return name.endsWith('駅');
             };
-
             for (const type of types) {
                 try {
                     const result = await new Promise<google.maps.places.PlaceResult | null>((resolve, reject) => {
@@ -70,12 +67,8 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                         );
                     });
                     if (result) return result;
-                } catch (error) {
-                    console.warn(`No results found for type: ${type}, ${error}`);
-                }
+                } catch {}
             }
-
-            console.error('No stations found within range for all types.');
             return null;
         };
 
@@ -83,15 +76,12 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
             setLoading(true);
             const directionsService = new window.google.maps.DirectionsService();
             const stationTypes = ['transit_station', 'subway_station', 'train_station'];
-
             try {
                 const nearestOriginStation = await findNearestStation(origin, stationTypes);
                 const nearestDestinationStation = await findNearestStation(destination, stationTypes);
-
                 if (!nearestOriginStation || !nearestDestinationStation) {
-                    throw new Error('No stations found near origin or destination.');
+                    throw new Error();
                 }
-
                 const walkingToOriginStation = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
                     directionsService.route(
                         {
@@ -103,17 +93,12 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                             travelMode: google.maps.TravelMode.WALKING,
                         },
                         (response, status) => {
-                            if (status === google.maps.DirectionsStatus.OK && response) {
-                                resolve(response);
-                            } else {
-                                reject(status || 'No response received');
-                            }
+                            if (status === google.maps.DirectionsStatus.OK && response) resolve(response);
+                            else reject(status || 'No response received');
                         },
                     );
                 });
-
-                const walkingDurationToOriginStation = walkingToOriginStation.routes[0].legs[0].duration?.value || 0; // seconds
-
+                const walkingDurationToOriginStation = walkingToOriginStation.routes[0].legs[0].duration?.value || 0;
                 const walkingFromDestinationStation = await new Promise<google.maps.DirectionsResult>(
                     (resolve, reject) => {
                         directionsService.route(
@@ -126,51 +111,37 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                                 travelMode: google.maps.TravelMode.WALKING,
                             },
                             (response, status) => {
-                                if (status === google.maps.DirectionsStatus.OK && response) {
-                                    resolve(response);
-                                } else {
-                                    reject(status || 'No response received');
-                                }
+                                if (status === google.maps.DirectionsStatus.OK && response) resolve(response);
+                                else reject(status || 'No response received');
                             },
                         );
                     },
                 );
-
                 const walkingDurationFromDestinationStation =
                     walkingFromDestinationStation.routes[0].legs[0].duration?.value || 0;
-
-                const cleanStationName = (name: string) => name.replace(/駅$/, '');
-                const startName = cleanStationName(nearestOriginStation.name || '');
-                const endName = cleanStationName(nearestDestinationStation.name || '');
-
+                const startName = (nearestOriginStation.name || '').replace(/駅$/, '');
+                const endName = (nearestDestinationStation.name || '').replace(/駅$/, '');
                 const response = await apiClient.post('/route', {
                     startStation: startName,
                     endStation: endName,
                 });
-
                 const data: BestRoute = response.data;
                 setTransferData(data);
-                const trainCostMinutes = data.totalCost;
                 const totalTimeSeconds =
-                    walkingDurationToOriginStation + walkingDurationFromDestinationStation + trainCostMinutes * 60;
+                    walkingDurationToOriginStation + walkingDurationFromDestinationStation + data.totalCost * 60;
                 const totalHours = Math.floor(totalTimeSeconds / 3600);
                 const totalMinutes = Math.floor((totalTimeSeconds % 3600) / 60);
-                const totalDuration = totalHours > 0 ? `${totalHours}時間${totalMinutes}分` : `${totalMinutes}分`;
-
-                setDuration(totalDuration);
-                onDurationCalculated?.(totalDuration);
+                if (totalHours > 0) setDuration(`${totalHours}時間${totalMinutes}分`);
+                else setDuration(`${totalMinutes}分`);
                 setLoading(false);
-            } catch (error) {
-                console.error('Failed to calculate durations:', error);
+            } catch {
                 setDuration('経路が見つかりません');
-                onDurationCalculated?.('N/A');
             }
         };
 
         const calculateRegularDuration = async () => {
             setLoading(true);
             const directionsService = new window.google.maps.DirectionsService();
-
             try {
                 const result = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
                     directionsService.route(
@@ -180,23 +151,16 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                             travelMode: google.maps.TravelMode[selectedMode],
                         },
                         (response, status) => {
-                            if (status === google.maps.DirectionsStatus.OK && response) {
-                                resolve(response);
-                            } else {
-                                reject(status);
-                            }
+                            if (status === google.maps.DirectionsStatus.OK && response) resolve(response);
+                            else reject(status);
                         },
                     );
                 });
-
                 const durationText = result.routes[0].legs[0].duration?.text || 'N/A';
                 setDuration(durationText);
-                onDurationCalculated?.(durationText);
                 setLoading(false);
-            } catch (error) {
-                console.error('Failed to calculate duration:', error);
+            } catch {
                 setDuration('N/A');
-                onDurationCalculated?.('N/A');
             }
         };
 
@@ -205,14 +169,22 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
         } else {
             calculateRegularDuration();
         }
-    }, [origin, destination, selectedMode, onDurationCalculated, isGoogleMapsReady]);
+    }, [origin, destination, selectedMode, isGoogleMapsReady]);
+
+    useEffect(() => {
+        if (!loading && duration !== '計算中' && duration !== 'N/A') {
+            onTransportCalculated?.({
+                mode: selectedMode,
+                duration,
+                routeDetail: transferData || undefined,
+            });
+        }
+    }, [loading, duration, selectedMode, transferData, onTransportCalculated]);
 
     const handleDurationClick = () => {
         if (transferData) {
             sessionStorage.setItem('transferData', JSON.stringify(transferData));
             router.push('/create-schedule/schedule-preview/transfer');
-        } else {
-            console.error('No transfer data to save');
         }
     };
 
@@ -235,12 +207,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                     {selectedMode === 'TRANSIT' && transferData && (
                         <span
                             onClick={handleDurationClick}
-                            style={{
-                                cursor: 'pointer',
-                                marginLeft: '8px',
-                                color: 'blue',
-                                fontWeight: 'bold',
-                            }}
+                            style={{ cursor: 'pointer', marginLeft: '8px', color: 'blue', fontWeight: 'bold' }}
                         >
                             &gt;
                         </span>
