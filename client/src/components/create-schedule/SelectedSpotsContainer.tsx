@@ -97,7 +97,7 @@ export default function SelectedSpotsContainer({
             onDragEnd={handleDragEnd}
             onDragStart={handleDragStart}
         >
-            <SortableContext items={spots.map((spot, index) => `${spot.name}-${index}`)}>
+            <SortableContext items={spots.map((spot) => spot.name)}>
                 <div className={`${styles.containerWrapper} ${isOpen ? styles.open : ''}`} onClick={onClose}>
                     <div
                         className={`${styles.Container} ${isOpen ? styles.open : ''}`}

@@ -164,7 +164,7 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                 selectedSpots.forEach((spot) => {
                     bounds.extend(new google.maps.LatLng(spot.location.lat, spot.location.lng));
                 });
-                mapRef.current.fitBounds(bounds, 75);
+                // mapRef.current.fitBounds(bounds, 75);
             }
         };
 
