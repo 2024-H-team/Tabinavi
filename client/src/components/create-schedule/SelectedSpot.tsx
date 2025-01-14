@@ -21,8 +21,8 @@ export default function SelectedSpot({
     dragHandleProps,
     isDragging,
 }: SelectedSpotProps) {
-    const defaultHour = spot.stayTime?.hour || '10';
-    const defaultMinute = spot.stayTime?.minute || '10';
+    const defaultHour = spot.stayTime?.hour || '00';
+    const defaultMinute = spot.stayTime?.minute || '00';
 
     const handleTimeChange = (newHour: string, newMinute: string) => {
         onStayTimeUpdate(spot.name, { hour: newHour, minute: newMinute });
