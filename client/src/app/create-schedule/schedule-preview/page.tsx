@@ -10,50 +10,23 @@ import {
     DragEndEvent,
 } from '@dnd-kit/core';
 import { SortableContext, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
 import SchedulePreviewSpotItem from '@/components/create-schedule/SchedulePreviewSpotItem';
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
-import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
-import { PlaceDetails } from '@/types/PlaceDetails';
 import { TravelTimeCalculator } from '@/components/create-schedule/TravelTimeCalculator';
-
-interface ScheduleTime {
-    startTime: string;
-    endTime: string;
-    selectedDate: string;
-}
+import { DaySchedule } from '@/app/create-schedule/page';
+import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
 
 export default function PreviewSpotsContainer() {
-    const [spots, setSpots] = useState<PlaceDetails[]>([]);
-    const [scheduleTime, setScheduleTime] = useState<ScheduleTime>({
-        startTime: '',
-        endTime: '',
-        selectedDate: '',
-    });
+    const [schedules, setSchedules] = useState<DaySchedule[]>([]);
+    const [activeDateIndex, setActiveDateIndex] = useState(0);
 
     useEffect(() => {
-        const startTime = sessionStorage.getItem('startTime') || '';
-        const endTime = sessionStorage.getItem('endTime') || '';
-        const selectedDate = sessionStorage.getItem('selectedDate') || '';
-
-        setScheduleTime({
-            startTime,
-            endTime,
-            selectedDate,
-        });
-
-        const scheduleSpots = sessionStorage.getItem('ScheduleSpot');
-        if (scheduleSpots) {
-            setSpots(JSON.parse(scheduleSpots));
+        const saved = sessionStorage.getItem('schedules');
+        if (saved) {
+            setSchedules(JSON.parse(saved));
         }
     }, []);
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('ja-JP', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-        });
-    };
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -68,75 +41,108 @@ export default function PreviewSpotsContainer() {
     );
 
     const handleStayTimeUpdate = (spotName: string, stayTime: { hour: string; minute: string }) => {
-        setSpots((prevSpots) => prevSpots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot)));
+        setSchedules((prev) => {
+            const newSchedules = [...prev];
+            const currentDay = { ...newSchedules[activeDateIndex] };
+            currentDay.spots = currentDay.spots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot));
+            newSchedules[activeDateIndex] = currentDay;
+            return newSchedules;
+        });
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
         handleDragEndUtil();
-
         const { active, over } = event;
         if (active.id !== over?.id) {
-            const oldIndex = spots.findIndex((spot) => spot.name === active.id);
-            const newIndex = spots.findIndex((spot) => spot.name === over?.id);
-            setSpots((prev) => arrayMove(prev, oldIndex, newIndex));
+            const oldIndex = schedules[activeDateIndex].spots.findIndex((spot) => spot.name === active.id);
+            const newIndex = schedules[activeDateIndex].spots.findIndex((spot) => spot.name === over?.id);
+
+            setSchedules((prev) => {
+                const newSchedules = [...prev];
+                const currentDay = { ...newSchedules[activeDateIndex] };
+                currentDay.spots = arrayMove(currentDay.spots, oldIndex, newIndex);
+                newSchedules[activeDateIndex] = currentDay;
+                return newSchedules;
+            });
         }
     };
 
     const handleDelete = (spotName: string) => {
-        setSpots(spots.filter((spot) => spot.name !== spotName));
+        setSchedules((prev) => {
+            const newSchedules = [...prev];
+            const currentDay = { ...newSchedules[activeDateIndex] };
+            currentDay.spots = currentDay.spots.filter((spot) => spot.name !== spotName);
+            newSchedules[activeDateIndex] = currentDay;
+            return newSchedules;
+        });
     };
 
     const handleSave = () => {
-        sessionStorage.setItem('ScheduleSpot', JSON.stringify(spots));
+        sessionStorage.setItem('schedules', JSON.stringify(schedules));
+    };
+
+    const handlePrevDate = () => {
+        if (activeDateIndex > 0) {
+            setActiveDateIndex(activeDateIndex - 1);
+        }
+    };
+
+    const handleNextDate = () => {
+        if (activeDateIndex < schedules.length - 1) {
+            setActiveDateIndex(activeDateIndex + 1);
+        }
     };
 
     return (
-        <div>
+        <div className={styles.container}>
+            <div className={styles.dateNav}>
+                <span onClick={handlePrevDate}>≪</span>
+                <p>{new Date(schedules[activeDateIndex]?.date).toLocaleDateString('ja-JP')}</p>
+                <span onClick={handleNextDate}>≫</span>
+            </div>
+            <div className={styles.timeInfo}>
+                <p>開始時間: {schedules[activeDateIndex]?.startTime}</p>
+                <p>終了時間: {schedules[activeDateIndex]?.endTime}</p>
+            </div>
+
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
                 onDragStart={handleDragStart}
             >
-                <SortableContext items={spots.map((spot) => spot.name)}>
-                    <div>
-                        <div>
-                            <h2>スケジュール</h2>
-                            <p>予定日：{scheduleTime.selectedDate ? formatDate(scheduleTime.selectedDate) : ''}</p>
-                            <p>
-                                予定時間：{scheduleTime.startTime} - {scheduleTime.endTime}
-                            </p>
-                        </div>
-                        {spots.map((spot, index) => (
-                            <React.Fragment key={spot.name}>
-                                <SortableSpotWrapper
-                                    spot={spot}
-                                    onDelete={() => handleDelete(spot.name)}
-                                    onStayTimeUpdate={handleStayTimeUpdate}
-                                >
-                                    {({ dragHandleProps, isDragging }) => (
-                                        <SchedulePreviewSpotItem
-                                            name={spot.name}
-                                            stayTime={spot.stayTime}
-                                            onStayTimeUpdate={handleStayTimeUpdate}
-                                            dragHandleProps={dragHandleProps}
-                                            onDelete={() => handleDelete(spot.name)}
-                                            isDragging={isDragging}
-                                        />
-                                    )}
-                                </SortableSpotWrapper>
-                                {index < spots.length - 1 && (
-                                    <TravelTimeCalculator
-                                        origin={spot.location}
-                                        destination={spots[index + 1].location}
+                <SortableContext items={schedules[activeDateIndex]?.spots.map((spot) => spot.name) || []}>
+                    {schedules[activeDateIndex]?.spots.map((spot, index) => (
+                        <React.Fragment key={spot.name}>
+                            <SortableSpotWrapper
+                                spot={spot}
+                                onDelete={() => handleDelete(spot.name)}
+                                onStayTimeUpdate={handleStayTimeUpdate}
+                            >
+                                {({ dragHandleProps, isDragging }) => (
+                                    <SchedulePreviewSpotItem
+                                        name={spot.name}
+                                        stayTime={spot.stayTime}
+                                        onStayTimeUpdate={handleStayTimeUpdate}
+                                        dragHandleProps={dragHandleProps}
+                                        onDelete={() => handleDelete(spot.name)}
+                                        isDragging={isDragging}
                                     />
                                 )}
-                            </React.Fragment>
-                        ))}
-                        <button onClick={handleSave}>保存</button>
-                    </div>
+                            </SortableSpotWrapper>
+                            {index < schedules[activeDateIndex].spots.length - 1 && (
+                                <TravelTimeCalculator
+                                    origin={spot.location}
+                                    destination={schedules[activeDateIndex].spots[index + 1].location}
+                                />
+                            )}
+                        </React.Fragment>
+                    ))}
                 </SortableContext>
             </DndContext>
+            <button onClick={handleSave} className={styles.saveButton}>
+                保存
+            </button>
         </div>
     );
 }

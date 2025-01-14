@@ -36,4 +36,5 @@ export interface PlaceDetails {
     iconMaskBaseUri?: string;
     primaryType?: string;
     userRatingsTotal?: number;
+    packingList?: string[];
 }

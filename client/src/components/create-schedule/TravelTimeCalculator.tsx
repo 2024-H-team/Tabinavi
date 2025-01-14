@@ -53,7 +53,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                         placesService.nearbySearch(
                             {
                                 location,
-                                radius: 1000,
+                                radius: 1500,
                                 type: type as string,
                             },
                             (results, status) => {
@@ -157,13 +157,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                 const totalMinutes = Math.floor((totalTimeSeconds % 3600) / 60);
                 const totalDuration = totalHours > 0 ? `${totalHours}時間${totalMinutes}分` : `${totalMinutes}分`;
 
-                setDuration(
-                    `出発徒歩: ${Math.floor(
-                        walkingDurationToOriginStation / 60,
-                    )}分, 電車時間: ${trainCostMinutes}分, 目的地歩き: ${Math.floor(
-                        walkingDurationFromDestinationStation / 60,
-                    )}分, 合計: ${totalDuration}`,
-                );
+                setDuration(totalDuration);
                 onDurationCalculated?.(totalDuration);
                 setLoading(false);
             } catch (error) {
