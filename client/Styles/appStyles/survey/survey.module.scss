@@ -5,6 +5,11 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     overflow-y: auto;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .questionBlock {

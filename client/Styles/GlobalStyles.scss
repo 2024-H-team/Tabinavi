@@ -62,4 +62,9 @@ body {
     position: relative;
     overscroll-behavior: none;
     overscroll-behavior-y: contain;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
