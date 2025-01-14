@@ -107,6 +107,8 @@ export default function PreviewSpotsContainer() {
 
                 currentDay.transports[transportIndex] = transportInfo;
                 newSchedules[activeDateIndex] = currentDay;
+                // Save immediately after updating
+                sessionStorage.setItem('schedules', JSON.stringify(newSchedules));
                 return newSchedules;
             });
         },
@@ -177,6 +179,7 @@ export default function PreviewSpotsContainer() {
                                     onTransportCalculated={(transportInfo) =>
                                         handleTransportCalculated(transportInfo, index)
                                     }
+                                    transportInfo={schedules[activeDateIndex].transports?.[index]}
                                 />
                             )}
                         </React.Fragment>

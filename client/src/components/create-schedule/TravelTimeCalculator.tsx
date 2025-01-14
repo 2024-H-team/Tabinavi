@@ -12,20 +12,27 @@ interface TravelTimeCalculatorProps {
     origin: google.maps.LatLngLiteral;
     destination: google.maps.LatLngLiteral;
     onTransportCalculated?: (transportInfo: TransportInfo) => void;
+    transportInfo?: TransportInfo;
 }
 
 export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
     origin,
     destination,
     onTransportCalculated,
+    transportInfo,
 }) => {
     const router = useRouter();
-    const [selectedMode, setSelectedMode] = useState<TravelMode>('WALKING');
+    const [selectedMode, setSelectedMode] = useState<TravelMode>(transportInfo?.mode || 'WALKING');
     const [duration, setDuration] = useState<string>('計算中');
     const [transferData, setTransferData] = useState<BestRoute | null>(null);
     const [isGoogleMapsReady, setGoogleMapsReady] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        if (transportInfo?.mode && transportInfo.mode !== selectedMode) {
+            setSelectedMode(transportInfo.mode);
+        }
+    }, [transportInfo, selectedMode]);
     useEffect(() => {
         const interval = setInterval(() => {
             if (window.google && window.google.maps && typeof window.google.maps.DirectionsService === 'function') {
