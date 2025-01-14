@@ -47,7 +47,6 @@ export default function SpotInfo({ places, onAddSpot, onClose }: SpotInfoProps) 
             if (containerRef.current.scrollTop > 0) return; // let content scroll
         }
 
-        e.preventDefault();
         if (newTop < 5) {
             setCurrentTop('5');
         } else if (newTop > 60) {

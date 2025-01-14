@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
     DndContext,
     closestCenter,
@@ -9,21 +9,22 @@ import {
     useSensors,
     DragEndEvent,
 } from '@dnd-kit/core';
-import { SortableContext, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import styles from '@styles/componentStyles/create-schedule/SelectedSpotsContainer.module.scss';
-import SelectedSpot from './SelectedSpot';
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { handleDragStart, handleDragEnd as handleDragEndUtil } from '@/utils/dragHandlers';
-import { PlaceDetails } from '@/types/PlaceDetails';
 import { DaySchedule } from '@/app/create-schedule/page';
+import SelectedSpot from './SelectedSpot';
+
 interface SelectedSpotsContainerProps {
     schedules: DaySchedule[];
     activeDateIndex: number;
     onDateChange: (index: number) => void;
     onDeleteSpot: (index: number) => void;
-    onReorderSpots: (oldIndex: number, newIndex: number) => void; // Add this
+    onReorderSpots: (oldIndex: number, newIndex: number) => void;
     isOpen: boolean;
     onClose: () => void;
+    onStayTimeUpdate: (spotName: string, stayTime: { hour: string; minute: string }) => void;
 }
 
 export default function SelectedSpotsContainer({
@@ -34,21 +35,17 @@ export default function SelectedSpotsContainer({
     onReorderSpots,
     isOpen,
     onClose,
+    onStayTimeUpdate,
 }: SelectedSpotsContainerProps) {
-    const [spots, setSpots] = useState<PlaceDetails[]>([]);
-
-    useEffect(() => {
-        setSpots(schedules[activeDateIndex]?.spots || []);
-    }, [schedules, activeDateIndex]);
+    const spots = schedules[activeDateIndex]?.spots || [];
 
     const getDateRange = () => {
         if (!schedules || schedules.length === 0) return 'No dates';
-
         const startDate = new Date(schedules[0].date).toLocaleDateString('ja-JP');
         const endDate = new Date(schedules[schedules.length - 1].date).toLocaleDateString('ja-JP');
-
         return `${startDate} - ${endDate}`;
     };
+
     const handlePrevDate = () => {
         if (activeDateIndex > 0) {
             onDateChange(activeDateIndex - 1);
@@ -73,20 +70,13 @@ export default function SelectedSpotsContainer({
         }),
     );
 
-    const handleStayTimeUpdate = (spotName: string, stayTime: { hour: string; minute: string }) => {
-        setSpots((prevSpots) => prevSpots.map((spot) => (spot.name === spotName ? { ...spot, stayTime } : spot)));
-    };
-
     const handleDragEnd = (event: DragEndEvent) => {
         handleDragEndUtil();
-
         const { active, over } = event;
         if (active.id !== over?.id) {
             const oldIndex = spots.findIndex((spot) => spot.name === active.id);
             const newIndex = spots.findIndex((spot) => spot.name === over?.id);
-
             onReorderSpots(oldIndex, newIndex);
-            setSpots((prev) => arrayMove(prev, oldIndex, newIndex));
         }
     };
 
@@ -122,14 +112,14 @@ export default function SelectedSpotsContainer({
                                     key={`${spot.name}-${index}`}
                                     spot={spot}
                                     onDelete={() => onDeleteSpot(index)}
-                                    onStayTimeUpdate={handleStayTimeUpdate}
+                                    onStayTimeUpdate={onStayTimeUpdate}
                                     className={styles.selectedSpot}
                                 >
                                     {({ dragHandleProps, isDragging }) => (
                                         <SelectedSpot
                                             spot={spot}
                                             onDelete={() => onDeleteSpot(index)}
-                                            onStayTimeUpdate={handleStayTimeUpdate}
+                                            onStayTimeUpdate={onStayTimeUpdate}
                                             dragHandleProps={dragHandleProps}
                                             isDragging={isDragging}
                                         />

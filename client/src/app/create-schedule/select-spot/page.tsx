@@ -31,6 +31,8 @@ export default function CreateSchedule() {
     const [recommendBtnBottom, setRecommendBtnBottom] = useState<number>(80);
     const recommendContainerRef = useRef<HTMLDivElement>(null);
 
+    const stayTimeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
     useEffect(() => {
         const saved = sessionStorage.getItem('schedules');
         if (saved) {
@@ -39,15 +41,11 @@ export default function CreateSchedule() {
     }, []);
 
     useEffect(() => {
-        const updateRecommendButtonPosition = () => {
-            if (showRecommendations && recommendContainerRef.current) {
-                setRecommendBtnBottom(240);
-            } else {
-                setRecommendBtnBottom(80);
-            }
-        };
-
-        updateRecommendButtonPosition();
+        if (showRecommendations && recommendContainerRef.current) {
+            setRecommendBtnBottom(240);
+        } else {
+            setRecommendBtnBottom(80);
+        }
     }, [showRecommendations]);
 
     const handleAddSpot = useCallback(
@@ -154,6 +152,35 @@ export default function CreateSchedule() {
         setVisibleRecommendedSpots([]);
     }, []);
 
+    const handleStayTimeUpdate = useCallback(
+        (spotName: string, stayTime: { hour: string; minute: string }) => {
+            setSchedules((prev) => {
+                const newSchedules = [...prev];
+                const currentDay = { ...newSchedules[activeDateIndex] };
+                const spotIndex = currentDay.spots.findIndex((s) => s.name === spotName);
+
+                if (spotIndex !== -1) {
+                    currentDay.spots[spotIndex] = {
+                        ...currentDay.spots[spotIndex],
+                        stayTime,
+                    };
+                }
+                newSchedules[activeDateIndex] = currentDay;
+
+                if (stayTimeTimerRef.current) {
+                    clearTimeout(stayTimeTimerRef.current);
+                }
+
+                stayTimeTimerRef.current = setTimeout(() => {
+                    sessionStorage.setItem('schedules', JSON.stringify(newSchedules));
+                }, 300);
+
+                return newSchedules;
+            });
+        },
+        [activeDateIndex],
+    );
+
     return (
         <div className={Styles.page}>
             <div className={Styles.mapContainer}>
@@ -193,6 +220,7 @@ export default function CreateSchedule() {
                 onReorderSpots={handleReorderSpots}
                 isOpen={isContainerOpen}
                 onClose={() => setIsContainerOpen(false)}
+                onStayTimeUpdate={handleStayTimeUpdate}
             />
             <button
                 onClick={handleRecommendClick}

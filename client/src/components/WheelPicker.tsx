@@ -25,7 +25,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
                 const scrollPosition = index * itemHeight;
                 containerRef.current.scrollTo({
                     top: scrollPosition,
-                    behavior: 'smooth',
+                    behavior: 'auto',
                 });
             }
         },
