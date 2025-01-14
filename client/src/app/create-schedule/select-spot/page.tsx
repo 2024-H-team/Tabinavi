@@ -179,6 +179,11 @@ export default function CreateSchedule() {
             )}
             <div className={Styles.menuBtn} onClick={toggleContainer}>
                 <MdMenuOpen color="white" size={30} />
+                {schedules[activeDateIndex]?.spots.length > 0 && (
+                    <div className={Styles.spotCountBox}>
+                        <span className={Styles.spotCount}>{schedules[activeDateIndex]?.spots.length}</span>
+                    </div>
+                )}
             </div>
             <SelectedSpotsContainer
                 schedules={schedules}

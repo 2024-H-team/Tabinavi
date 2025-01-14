@@ -110,7 +110,13 @@ export default function SpotInfo({ places, onAddSpot, onClose }: SpotInfoProps) 
             return false;
         });
     };
-
+    const handleAddSpot = (place: PlaceDetails) => {
+        onAddSpot(place);
+        setCurrentTop('60');
+        if (containerRef.current) {
+            containerRef.current.scrollTop = 0;
+        }
+    };
     return (
         <div
             ref={containerRef}
@@ -215,7 +221,7 @@ export default function SpotInfo({ places, onAddSpot, onClose }: SpotInfoProps) 
                         </div>
                     </div>
                 </div>
-                <button className={styles.addButton} onClick={() => onAddSpot(place)}>
+                <button className={styles.addButton} onClick={() => handleAddSpot(place)}>
                     行き先を追加する
                 </button>
             </div>

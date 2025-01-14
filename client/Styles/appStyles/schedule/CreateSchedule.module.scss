@@ -24,6 +24,23 @@
         justify-content: center;
         align-items: center;
         z-index: 1;
+        .spotCountBox {
+            position: relative;
+            .spotCount {
+                position: absolute;
+                width: 15px;
+                height: 15px;
+                background-color: red;
+                border-radius: 50%;
+                font-size: 1.2rem;
+                color: #fff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                bottom: -25px;
+                right: 27px;
+            }
+        }
     }
     .recommendButton {
         position: absolute;
