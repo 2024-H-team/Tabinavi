@@ -1,4 +1,3 @@
-// PreviewSpotsContainer.tsx
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
@@ -22,7 +21,6 @@ import { IoBagAdd } from 'react-icons/io5';
 export default function PreviewSpotsContainer() {
     const [schedules, setSchedules] = useState<DaySchedule[]>([]);
     const [activeDateIndex, setActiveDateIndex] = useState(0);
-    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         const saved = sessionStorage.getItem('schedules');
@@ -86,34 +84,39 @@ export default function PreviewSpotsContainer() {
         sessionStorage.setItem('schedules', JSON.stringify(schedules));
     };
 
+    // Sửa hàm để nhận thêm tham số index,
+    // lưu transportInfo vào vị trí currentDay.transports[index]
+    // thay vì luôn là transports[0].
     const handleTransportCalculated = useCallback(
-        (transportInfo: TransportInfo) => {
-            if (isUpdating) return;
-            setIsUpdating(true);
+        (transportInfo: TransportInfo, transportIndex: number) => {
+            // Kiểm tra có khác gì không
             setSchedules((prev) => {
                 const newSchedules = [...prev];
                 const currentDay = { ...newSchedules[activeDateIndex] };
-                const existingTransport = currentDay.transports[0];
-                if (
+
+                if (!currentDay.transports) {
+                    currentDay.transports = [];
+                }
+
+                // So sánh
+                const existingTransport = currentDay.transports[transportIndex];
+                const isSameAsBefore =
                     existingTransport &&
                     existingTransport.mode === transportInfo.mode &&
                     existingTransport.duration === transportInfo.duration &&
-                    JSON.stringify(existingTransport.routeDetail) === JSON.stringify(transportInfo.routeDetail)
-                ) {
-                    setIsUpdating(false);
+                    JSON.stringify(existingTransport.routeDetail) === JSON.stringify(transportInfo.routeDetail);
+
+                // Nếu transportInfo giống y chang, trả về prev, không set lại
+                if (isSameAsBefore) {
                     return prev;
                 }
-                if (currentDay.transports && currentDay.transports.length > 0) {
-                    currentDay.transports[0] = transportInfo;
-                } else {
-                    currentDay.transports.push(transportInfo);
-                }
+
+                currentDay.transports[transportIndex] = transportInfo;
                 newSchedules[activeDateIndex] = currentDay;
                 return newSchedules;
             });
-            setIsUpdating(false);
         },
-        [activeDateIndex, isUpdating],
+        [activeDateIndex],
     );
 
     return (
@@ -172,11 +175,16 @@ export default function PreviewSpotsContainer() {
                                     />
                                 )}
                             </SortableSpotWrapper>
+
+                            {/* Nếu chưa phải spot cuối, hiển thị TravelTimeCalculator */}
                             {index < schedules[activeDateIndex].spots.length - 1 && (
                                 <TravelTimeCalculator
                                     origin={spot.location}
                                     destination={schedules[activeDateIndex].spots[index + 1].location}
-                                    onTransportCalculated={handleTransportCalculated}
+                                    // Truyền thêm index để biết đang tính transport cho đoạn thứ mấy
+                                    onTransportCalculated={
+                                        (transportInfo) => handleTransportCalculated(transportInfo, index) // <-- Sửa
+                                    }
                                 />
                             )}
                         </React.Fragment>
