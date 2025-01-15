@@ -29,17 +29,12 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (transportInfo?.mode && transportInfo.mode !== selectedMode) {
-            setSelectedMode(transportInfo.mode);
-        }
-    }, [transportInfo, selectedMode]);
-    useEffect(() => {
         const interval = setInterval(() => {
             if (window.google && window.google.maps && typeof window.google.maps.DirectionsService === 'function') {
                 setGoogleMapsReady(true);
                 clearInterval(interval);
             }
-        });
+        }, 300);
         if (!isGoogleMapsReady) return;
 
         const findNearestStation = async (location: google.maps.LatLngLiteral, types: string[]) => {
@@ -138,7 +133,7 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                     walkingDurationToOriginStation + walkingDurationFromDestinationStation + data.totalCost * 60;
                 const totalHours = Math.floor(totalTimeSeconds / 3600);
                 const totalMinutes = Math.floor((totalTimeSeconds % 3600) / 60);
-                if (totalHours > 0) setDuration(`${totalHours}時間${totalMinutes}分`);
+                if (totalHours > 0) setDuration(`歩き：${totalHours}時間${totalMinutes}分`);
                 else setDuration(`${totalMinutes}分`);
                 setLoading(false);
             } catch {
