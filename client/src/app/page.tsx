@@ -7,12 +7,7 @@ import Link from 'next/link';
 import apiClient from '@/lib/axios';
 import styles from '@styles/appStyles/auth/auth.module.scss';
 import { AxiosError } from 'axios';
-
-interface LoginFormData {
-    userName: string;
-    password: string;
-}
-
+import Image from 'next/image';
 interface LoginFormData {
     userName: string;
     password: string;
@@ -38,22 +33,18 @@ export default function LoginPage() {
     } = useForm<LoginFormData>();
 
     const onSubmit = async (data: LoginFormData) => {
-        setLoading(true);
-        setError('');
-
         try {
-            setLoading(false);
+            setLoading(true);
             setError('');
+
             const response = await apiClient.post('/auth/login', data);
             if (response.data.success) {
                 const { token, user } = response.data.data;
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', JSON.stringify(user));
-
                 const expirationDate = new Date();
                 expirationDate.setDate(expirationDate.getDate() + 7);
                 document.cookie = `token=${token}; path=/; expires=${expirationDate.toUTCString()}`;
-
                 const firstLoginData = localStorage.getItem('firstLoginData');
                 const firstLoginUsers: UserData[] = firstLoginData ? JSON.parse(firstLoginData) : [];
 
@@ -66,14 +57,15 @@ export default function LoginPage() {
                 } else {
                     router.push('/home');
                 }
+                setError('');
             }
         } catch (err) {
             if (err instanceof AxiosError) {
                 setError(err.response?.data?.message || 'Login failed');
+                console.log(err.response?.data);
             } else {
                 setError('An unexpected error occurred');
             }
-            setLoading(false);
         } finally {
             setLoading(false);
         }
@@ -82,16 +74,19 @@ export default function LoginPage() {
     return (
         <div className={styles.authContainer}>
             <div className={styles.formWrapper}>
+                <div className={styles.logo}>
+                    <Image className={styles.logoImg} src="/logo.png" alt="a" width={150} height={150} />
+                </div>
                 <div className={styles.header}>
-                    <h1>Login to your account</h1>
+                    <h1>ログイン</h1>
                 </div>
 
                 <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
                     <div className={styles.formGroup}>
-                        <label>Username</label>
+                        <label>ユーザー名</label>
                         <input
                             {...register('userName', {
-                                required: 'Username is required',
+                                required: 'ユーザー名は必須です',
                             })}
                             className={errors.userName ? styles.error : ''}
                         />
@@ -99,11 +94,11 @@ export default function LoginPage() {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label>Password</label>
+                        <label>パスワード</label>
                         <input
                             type="password"
                             {...register('password', {
-                                required: 'Password is required',
+                                required: 'パスワードは必須です',
                             })}
                             className={errors.password ? styles.error : ''}
                         />
@@ -113,13 +108,13 @@ export default function LoginPage() {
                     {error && <div className={styles.errorMessage}>{error}</div>}
 
                     <button type="submit" disabled={loading} className={styles.submitButton}>
-                        {loading ? 'Logging in...' : 'Login'}
+                        {loading ? '送信中' : 'ログイン'}
                     </button>
 
-                    <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-                        Dont have an account?{' '}
+                    <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '1.2rem' }}>
+                        アカウントをお持ちでない場合は、
                         <Link href="/register" style={{ color: '#4f46e5' }}>
-                            Register here
+                            こちら
                         </Link>
                     </p>
                 </form>
