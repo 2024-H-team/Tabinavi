@@ -20,6 +20,7 @@ export interface TransportInfo {
 }
 
 export interface DaySchedule {
+    id?: number;
     title?: string;
     date: string;
     startTime: string;
@@ -101,7 +102,39 @@ export default function InfoSetup() {
         );
     };
 
+    const validateSchedules = () => {
+        if (!title.trim()) {
+            alert('タイトルを入力してください。');
+            return false;
+        }
+
+        if (!startDate) {
+            alert('開始日を選択してください。');
+            return false;
+        }
+
+        if (!isOneDay && !endDate) {
+            alert('終了日を選択してください。');
+            return false;
+        }
+
+        for (const schedule of schedules) {
+            if (schedule.startTime === schedule.endTime) {
+                alert('開始時間と終了時間が同じです。');
+                return false;
+            }
+            if (schedule.startTime > schedule.endTime) {
+                alert('開始時間は終了時間より前である必要があります。');
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     const handleSubmit = () => {
+        if (!validateSchedules()) return;
+
         sessionStorage.setItem('schedules', JSON.stringify(schedules));
         router.push('/create-schedule/select-spot');
     };

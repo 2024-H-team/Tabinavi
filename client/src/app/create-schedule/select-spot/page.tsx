@@ -35,10 +35,12 @@ export default function CreateSchedule() {
 
     useEffect(() => {
         const saved = sessionStorage.getItem('schedules');
-        if (saved) {
-            setSchedules(JSON.parse(saved));
+        if (!saved) {
+            router.replace('/create-schedule');
+            return;
         }
-    }, []);
+        setSchedules(JSON.parse(saved));
+    }, [router]);
 
     useEffect(() => {
         if (showRecommendations && recommendContainerRef.current) {

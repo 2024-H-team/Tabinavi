@@ -60,6 +60,7 @@ export default function PreviewSpotsContainer() {
                 const currentDay = { ...newSchedules[activeDateIndex] };
                 currentDay.spots = arrayMove(currentDay.spots, oldIndex, newIndex);
                 newSchedules[activeDateIndex] = currentDay;
+                sessionStorage.setItem('schedules', JSON.stringify(newSchedules));
                 return newSchedules;
             });
         }
