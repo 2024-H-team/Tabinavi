@@ -41,8 +41,9 @@ export default function LoginPage() {
                 document.cookie = `token=${token}; path=/; expires=${expirationDate.toUTCString()}`;
 
                 const firstLoginData = localStorage.getItem('firstLoginData');
+                const firstLoginUser = firstLoginData ? JSON.parse(firstLoginData) : null;
 
-                if (!firstLoginData) {
+                if (!firstLoginUser || firstLoginUser.id !== user.id) {
                     localStorage.setItem('firstLoginData', JSON.stringify(user));
                     router.push('/survey');
                 } else {
