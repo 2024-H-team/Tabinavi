@@ -161,8 +161,15 @@ export default function PreviewSpotsContainer() {
     };
 
     const handleBack = () => {
+        const profileEdit = sessionStorage.getItem('profileScheduleEdit');
         const editSchedules = sessionStorage.getItem('editSchedules');
-        if (editSchedules) {
+
+        if (profileEdit) {
+            sessionStorage.removeItem('profileScheduleEdit');
+            sessionStorage.removeItem('editSchedules');
+            sessionStorage.removeItem('schedules');
+            router.push('/profile');
+        } else if (editSchedules) {
             sessionStorage.removeItem('editSchedules');
             sessionStorage.removeItem('schedules');
             router.push('/home');
@@ -195,7 +202,6 @@ export default function PreviewSpotsContainer() {
                     alert('スケジュールが更新されました！自動でホーム画面に移動します。');
                 }
             } else {
-                // Create new schedule
                 response = await apiClient.post('/schedules/create', formattedScheduleData);
                 if (response.data.success) {
                     alert('スケジュールが保存されました！自動でホーム画面に移動します。');

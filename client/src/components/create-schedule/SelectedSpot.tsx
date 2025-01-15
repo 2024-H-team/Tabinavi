@@ -26,7 +26,6 @@ export default function SelectedSpot({
 
     const handleTimeChange = (newHour: string, newMinute: string) => {
         onStayTimeUpdate(spot.name, { hour: newHour, minute: newMinute });
-        console.log('stay time updated', spot.name, newHour, newMinute);
     };
     const truncateText = (text: string, maxLength: number = 15) => {
         return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;

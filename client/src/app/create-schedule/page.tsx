@@ -153,7 +153,7 @@ export default function InfoSetup() {
     return (
         <>
             <div className={styles.infoSetup}>
-                <h2>新しい予定</h2>
+                <h2>新しいスケジュール</h2>
                 <div className={styles.titleBox}>
                     <p>タイトル：</p>
                     <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />

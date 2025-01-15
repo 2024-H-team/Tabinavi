@@ -16,9 +16,10 @@ interface Schedule {
 
 interface ScheduleViewProps {
     schedules: Schedule[];
+    viewAll?: boolean;
 }
 
-export default function ScheduleView({ schedules }: ScheduleViewProps) {
+export default function ScheduleView({ schedules, viewAll = false }: ScheduleViewProps) {
     const router = useRouter();
 
     const parseSchedules = (scheduleData: DaySchedule[] | string): DaySchedule[] | null => {
@@ -37,33 +38,20 @@ export default function ScheduleView({ schedules }: ScheduleViewProps) {
         }
     };
 
-    const filteredSchedules = schedules
-        .filter((schedule) => {
-            const startDate = new Date(schedule.start_date);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            return startDate >= today;
-        })
-        .sort((a, b) => {
-            return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
-        })
-        .slice(0, 3);
-
-    if (!filteredSchedules.length) {
+    const sortedSchedules = schedules.sort((a, b) => {
         return (
-            <>
-                <h2 style={{ fontSize: '16px' }}>直近の予定</h2>
-                <div
-                    style={{
-                        textAlign: 'center',
-                        padding: '20px',
-                        color: '#666',
-                        fontSize: '14px',
-                    }}
-                >
-                    直近スケジュールがございません。
-                </div>
-            </>
+            Math.abs(new Date(a.start_date).getTime() - new Date().getTime()) -
+            Math.abs(new Date(b.start_date).getTime() - new Date().getTime())
+        );
+    });
+
+    const displaySchedules = viewAll ? sortedSchedules : sortedSchedules.slice(0, 3);
+
+    if (!displaySchedules.length) {
+        return (
+            <div style={{ textAlign: 'center', padding: '20px', color: '#666', fontSize: '14px' }}>
+                スケジュールがございません。
+            </div>
         );
     }
 
@@ -81,7 +69,7 @@ export default function ScheduleView({ schedules }: ScheduleViewProps) {
             transports: day.transports || [],
         }));
         sessionStorage.setItem('editSchedules', JSON.stringify(editSchedules));
-        sessionStorage.removeItem('profileScheduleEdit');
+        sessionStorage.setItem('profileScheduleEdit', 'fromProfile');
         router.push('/create-schedule/schedule-preview');
     };
     const truncateTitle = (title: string, maxLength: number = 15) => {
@@ -89,8 +77,7 @@ export default function ScheduleView({ schedules }: ScheduleViewProps) {
     };
     return (
         <>
-            <h2 style={{ fontSize: '16px' }}>直近の予定</h2>
-            {filteredSchedules.map((schedule, index) => {
+            {sortedSchedules.map((schedule, index) => {
                 const dailySchedules = parseSchedules(schedule.schedules);
                 if (!dailySchedules) return null;
 
