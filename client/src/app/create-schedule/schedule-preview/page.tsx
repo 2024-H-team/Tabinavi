@@ -36,11 +36,18 @@ export default function PreviewSpotsContainer() {
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        const saved = sessionStorage.getItem('schedules');
-        if (saved) {
-            setSchedules(JSON.parse(saved));
+        const editSchedules = sessionStorage.getItem('editSchedules');
+        const regularSchedules = sessionStorage.getItem('schedules');
+
+        if (editSchedules) {
+            setSchedules(JSON.parse(editSchedules));
+            // sessionStorage.removeItem('editSchedules');
+        } else if (regularSchedules) {
+            setSchedules(JSON.parse(regularSchedules));
+        } else {
+            router.push('/home');
         }
-    }, []);
+    }, [router]);
 
     useEffect(() => {
         if (schedules[0]?.title) {
@@ -166,6 +173,7 @@ export default function PreviewSpotsContainer() {
     const handleSave = async () => {
         try {
             setIsSaving(true);
+            const scheduleId = schedules[0]?.SchedulesID;
 
             const formattedScheduleData = {
                 title: titleValue,
@@ -174,13 +182,23 @@ export default function PreviewSpotsContainer() {
                 schedules: JSON.stringify(schedules),
             };
 
-            console.log('Sending schedule data:', formattedScheduleData);
-
-            const response = await apiClient.post('/schedules/create', formattedScheduleData);
+            let response;
+            if (scheduleId) {
+                response = await apiClient.put(`/schedules/${scheduleId}`, formattedScheduleData);
+                if (response.data.success) {
+                    alert('スケジュールが更新されました！自動でホーム画面に移動します。');
+                }
+            } else {
+                // Create new schedule
+                response = await apiClient.post('/schedules/create', formattedScheduleData);
+                if (response.data.success) {
+                    alert('スケジュールが保存されました！自動でホーム画面に移動します。');
+                }
+            }
 
             if (response.data.success) {
-                alert('スケジュールが保存されました！, 自動でホーム画面に移動します。');
                 sessionStorage.removeItem('schedules');
+                sessionStorage.removeItem('editSchedules');
                 router.push('/home');
             }
         } catch (error) {
