@@ -4,19 +4,19 @@ import { UserModel } from '../models/userModel';
 import jwt from 'jsonwebtoken';
 
 export const registerValidation = [
-    body('userName').trim().isLength({ min: 3, max: 30 }).withMessage('Username must be between 3 and 30 characters'),
-    body('email').isEmail().normalizeEmail().withMessage('Must be a valid email'),
+    body('userName').trim().isLength({ min: 3, max: 30 }).withMessage('ユーザー名は3〜30文字である必要があります'),
+    body('email').isEmail().normalizeEmail().withMessage('有効なメールアドレスを入力してください'),
     body('password')
         .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters')
+        .withMessage('パスワードは6文字以上である必要があります')
         .matches(/\d/)
-        .withMessage('Password must contain a number'),
-    body('fullName').trim().notEmpty().withMessage('Full name is required'),
+        .withMessage('パスワードには数字を含める必要があります'),
+    body('fullName').trim().notEmpty().withMessage('氏名は必須項目です'),
 ];
 
 export const loginValidation = [
-    body('userName').trim().notEmpty().withMessage('Username is required'),
-    body('password').notEmpty().withMessage('Password is required'),
+    body('userName').trim().notEmpty().withMessage('ユーザー名を入力してください'),
+    body('password').notEmpty().withMessage('パスワードを入力してください'),
 ];
 
 export class UserController {

@@ -29,7 +29,7 @@ export const handleAddSpot = (
     setShowNotification(true);
     setTimeout(() => {
         setShowNotification(false);
-    }, 1200);
+    }, 1000);
 };
 
 // Delete a spot from the current day's schedule

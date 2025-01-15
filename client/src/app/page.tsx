@@ -13,6 +13,19 @@ interface LoginFormData {
     password: string;
 }
 
+interface LoginFormData {
+    userName: string;
+    password: string;
+}
+
+interface UserData {
+    id: number;
+    userName: string;
+    email?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -29,8 +42,9 @@ export default function LoginPage() {
         setError('');
 
         try {
+            setLoading(false);
+            setError('');
             const response = await apiClient.post('/auth/login', data);
-
             if (response.data.success) {
                 const { token, user } = response.data.data;
                 localStorage.setItem('token', token);
@@ -41,17 +55,17 @@ export default function LoginPage() {
                 document.cookie = `token=${token}; path=/; expires=${expirationDate.toUTCString()}`;
 
                 const firstLoginData = localStorage.getItem('firstLoginData');
-                const firstLoginUser = firstLoginData ? JSON.parse(firstLoginData) : null;
+                const firstLoginUsers: UserData[] = firstLoginData ? JSON.parse(firstLoginData) : [];
 
-                if (!firstLoginUser || firstLoginUser.id !== user.id) {
-                    localStorage.setItem('firstLoginData', JSON.stringify(user));
+                const existingUser = firstLoginUsers.find((u: UserData) => u.id === user.id);
+
+                if (!existingUser) {
+                    firstLoginUsers.push(user);
+                    localStorage.setItem('firstLoginData', JSON.stringify(firstLoginUsers));
                     router.push('/survey');
                 } else {
                     router.push('/home');
                 }
-
-                setLoading(false);
-                setError('');
             }
         } catch (err) {
             if (err instanceof AxiosError) {
@@ -59,6 +73,8 @@ export default function LoginPage() {
             } else {
                 setError('An unexpected error occurred');
             }
+            setLoading(false);
+        } finally {
             setLoading(false);
         }
     };
@@ -70,7 +86,7 @@ export default function LoginPage() {
                     <h1>Login to your account</h1>
                 </div>
 
-                <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+                <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
                     <div className={styles.formGroup}>
                         <label>Username</label>
                         <input

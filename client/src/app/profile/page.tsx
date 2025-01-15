@@ -7,8 +7,10 @@ import { RiCalendarScheduleLine } from 'react-icons/ri';
 import Image from 'next/image';
 import apiClient from '@/lib/axios';
 import ScheduleView from '@/components/profile/ScheduleView';
+import { useRouter } from 'next/navigation';
 
 export default function Profile() {
+    const router = useRouter();
     const [schedules, setSchedules] = useState([]);
     const [loading, setLoading] = useState(true);
     const [viewAll, setViewAll] = useState(false);
@@ -29,6 +31,17 @@ export default function Profile() {
 
         fetchSchedules();
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+
+        router.push('/');
+        router.refresh();
+    };
+
     if (loading) {
         return;
     }
@@ -57,7 +70,9 @@ export default function Profile() {
                         <div className={styles.buttons}>
                             <button className={styles.editBtn}>プロフィールを変更</button>
                             <button className={styles.editBtn}>アンケートの回答を変更</button>
-                            <button className={styles.logoutBtn}>ログアウト</button>
+                            <button className={styles.logoutBtn} onClick={handleLogout}>
+                                ログアウト
+                            </button>
                         </div>
                     </div>
                 </div>

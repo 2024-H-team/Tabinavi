@@ -12,17 +12,17 @@ interface AuthRequest extends Request {
 }
 
 export const createScheduleValidation = [
-    body('title').trim().notEmpty().withMessage('Title is required'),
-    body('start_date').isDate().withMessage('Start date must be a valid date'),
-    body('end_date').isDate().withMessage('End date must be a valid date'),
-    body('schedules').isString().notEmpty().withMessage('Schedules data is required'),
+    body('title').trim().notEmpty().withMessage('タイトルを入力してください'),
+    body('start_date').isDate().withMessage('開始日は有効な日付である必要があります'),
+    body('end_date').isDate().withMessage('終了日は有効な日付である必要があります'),
+    body('schedules').isString().notEmpty().withMessage('スケジュールデータが必要です'),
 ];
 
 export const updateScheduleValidation = [
-    body('title').optional().trim().notEmpty().withMessage('Title cannot be empty'),
-    body('start_date').optional().isDate().withMessage('Start date must be a valid date'),
-    body('end_date').optional().isDate().withMessage('End date must be a valid date'),
-    body('schedules').optional().isString().notEmpty().withMessage('Schedules data cannot be empty'),
+    body('title').optional().trim().notEmpty().withMessage('タイトルを入力してください'),
+    body('start_date').optional().isDate().withMessage('開始日は有効な日付である必要があります'),
+    body('end_date').optional().isDate().withMessage('終了日は有効な日付である必要があります'),
+    body('schedules').optional().isString().notEmpty().withMessage('スケジュールデータが必要です'),
 ];
 
 export class ScheduleController {
