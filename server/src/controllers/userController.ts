@@ -41,7 +41,7 @@ export class UserController {
             if (userExists) {
                 return res.status(409).json({
                     success: false,
-                    message: 'Username or email already exists',
+                    message: 'ユーザー名またはメールアドレスは既に使用されています',
                 });
             }
 
@@ -85,7 +85,7 @@ export class UserController {
             if (!user) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Invalid username or password',
+                    message: 'ユーザー名またはパスワードが正しくありません',
                 });
             }
 
