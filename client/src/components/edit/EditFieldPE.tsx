@@ -2,6 +2,7 @@ import styles from '@styles/componentStyles/edit/Content.module.scss';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
 import { useState, useEffect, useRef } from 'react';
+import { DaySchedule } from '@/app/create-schedule/page';
 
 type EditFieldPEProps = {
     title: string;
@@ -9,7 +10,6 @@ type EditFieldPEProps = {
 };
 
 export default function EditFieldPE({ title, data }: EditFieldPEProps) {
-    const [visibleEffects, setVisibleEffects] = useState<boolean[]>([]);
     const [personalEffects, setPersonalEffects] = useState(data || []);
     const [newItem, setNewItem] = useState('');
     const [isAdding, setIsAdding] = useState(false);
@@ -24,23 +24,36 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
     useEffect(() => {
         if (data) {
             setPersonalEffects(data);
-            setVisibleEffects(data.map(() => true));
         }
     }, [data]);
 
-    const handleDelete = (index: number) => {
-        setVisibleEffects((prev) => {
-            const newVisibility = [...prev];
-            newVisibility[index] = false;
-            return newVisibility;
+    const updateStorages = (newPackingList: { Name: string }[]) => {
+        // Update editSpot
+        const editSpot = JSON.parse(sessionStorage.getItem('editSpot') || '{}');
+        editSpot.packingList = newPackingList.map((item) => item.Name);
+        sessionStorage.setItem('editSpot', JSON.stringify(editSpot));
+
+        const schedules = JSON.parse(sessionStorage.getItem('schedules') || '[]');
+        schedules.forEach((schedule: DaySchedule) => {
+            schedule.spots = schedule.spots.map((s) =>
+                s.placeId === editSpot.placeId ? { ...s, packingList: newPackingList.map((item) => item.Name) } : s,
+            );
         });
+        sessionStorage.setItem('schedules', JSON.stringify(schedules));
+    };
+
+    const handleDelete = (index: number) => {
+        const newEffects = personalEffects.filter((_, i) => i !== index);
+        setPersonalEffects(newEffects);
+        updateStorages(newEffects);
     };
 
     const handleAdd = () => {
         if (newItem.trim()) {
-            setPersonalEffects((prev) => [...prev, { Name: newItem }]);
-            setVisibleEffects((prev) => [...prev, true]);
+            const newEffects = [...personalEffects, { Name: newItem }];
+            setPersonalEffects(newEffects);
             setNewItem('');
+            updateStorages(newEffects);
         }
     };
 
@@ -48,16 +61,13 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
         setIsAdding((prev) => !prev);
     };
 
-    const hasVisibleItems = visibleEffects.some((isVisible) => isVisible);
-
     return (
         <div className={styles.EditWrap}>
             <div>
                 <h2>{title}</h2>
-                {hasVisibleItems ? (
-                    personalEffects.map((effect, index) => {
-                        if (!visibleEffects[index]) return null;
-                        return (
+                <div className={styles.PersonalEffectsWrap}>
+                    {personalEffects.length > 0 ? (
+                        personalEffects.map((effect, index) => (
                             <div key={index} className={styles.PersonalEffects}>
                                 <p>
                                     {effect.Name}
@@ -66,11 +76,11 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
                                     </button>
                                 </p>
                             </div>
-                        );
-                    })
-                ) : (
-                    <p className={styles.NoItems}>持ち物がありません</p>
-                )}
+                        ))
+                    ) : (
+                        <p className={styles.NoItems}>持ち物がありません</p>
+                    )}
+                </div>
 
                 {isAdding && (
                     <div className={styles.AddItemForm}>

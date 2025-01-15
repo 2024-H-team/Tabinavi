@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -15,12 +15,20 @@ import SchedulePreviewSpotItem from '@/components/create-schedule/SchedulePrevie
 import SortableSpotWrapper from '@/components/SortableSpotWrapper';
 import { TravelTimeCalculator } from '@/components/create-schedule/TravelTimeCalculator';
 import { DaySchedule, TransportInfo } from '@/app/create-schedule/page';
-import styles from '@styles/componentStyles/create-schedule/SchedulePreview.module.scss';
+import styles from '@styles/appStyles/schedule/SchedulePreview.module.scss';
 import { IoBagAdd } from 'react-icons/io5';
+import { IoIosArrowBack } from 'react-icons/io';
+import { HiOutlinePencil } from 'react-icons/hi2';
+import { useRouter } from 'next/navigation';
 
 export default function PreviewSpotsContainer() {
+    const router = useRouter();
     const [schedules, setSchedules] = useState<DaySchedule[]>([]);
     const [activeDateIndex, setActiveDateIndex] = useState(0);
+
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [titleValue, setTitleValue] = useState('');
+    const titleInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const saved = sessionStorage.getItem('schedules');
@@ -28,6 +36,12 @@ export default function PreviewSpotsContainer() {
             setSchedules(JSON.parse(saved));
         }
     }, []);
+
+    useEffect(() => {
+        if (schedules[0]?.title) {
+            setTitleValue(schedules[0].title);
+        }
+    }, [schedules]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { delay: 100, tolerance: 5 } }),
@@ -116,11 +130,53 @@ export default function PreviewSpotsContainer() {
         [activeDateIndex],
     );
 
+    const handleTitleClick = () => {
+        setIsEditingTitle(true);
+        setTimeout(() => {
+            titleInputRef.current?.focus();
+        }, 0);
+    };
+
+    const handleTitleBlur = () => {
+        setIsEditingTitle(false);
+        setSchedules((prev) => {
+            const newSchedules = prev.map((schedule) => ({
+                ...schedule,
+                title: titleValue,
+            }));
+            sessionStorage.setItem('schedules', JSON.stringify(newSchedules));
+            return newSchedules;
+        });
+    };
+
+    const truncateTitle = (title: string, maxLength: number = 15) => {
+        return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
+    };
+
+    const handleBack = () => {
+        router.push('/create-schedule/select-spot');
+    };
     return (
         <div className={styles.container}>
             <div className={styles.dateNav}>
                 <div className={styles.header}>
-                    <h2 className={styles.title}>{schedules[0]?.title || 'スケジュール'}</h2>
+                    <IoIosArrowBack color="white" size={30} className={styles.back} onClick={handleBack} />
+                    <HiOutlinePencil color="white" className={styles.edit} onClick={handleTitleClick} />
+                    {isEditingTitle ? (
+                        <input
+                            ref={titleInputRef}
+                            type="text"
+                            value={titleValue}
+                            onChange={(e) => setTitleValue(e.target.value)}
+                            onBlur={handleTitleBlur}
+                            className={styles.titleInput}
+                            autoFocus
+                        />
+                    ) : (
+                        <div className={styles.title} onClick={handleTitleClick}>
+                            {truncateTitle(titleValue) || 'スケジュール'}
+                        </div>
+                    )}
                     <div className={styles.dateInfo}>
                         {schedules.length > 0 &&
                             `${new Date(schedules[0].date).toLocaleDateString('ja-JP')} - 
@@ -164,8 +220,7 @@ export default function PreviewSpotsContainer() {
                             >
                                 {({ dragHandleProps, isDragging }) => (
                                     <SchedulePreviewSpotItem
-                                        name={spot.name}
-                                        stayTime={spot.stayTime}
+                                        spot={spot}
                                         dragHandleProps={dragHandleProps}
                                         onDelete={() => handleDelete(spot.name)}
                                         isDragging={isDragging}

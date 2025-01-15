@@ -2,38 +2,26 @@
 import Content from '@/components/edit/Content';
 import EditHeader from '@/components/edit/EditHeader';
 import { useEffect, useState } from 'react';
-
-type ScheduleData = {
-    id: number;
-    Location: string;
-    Time: string;
-    PersonalEffects: { Name: string }[];
-    Memo: string;
-};
+import { PlaceDetails } from '@/types/PlaceDetails';
+import { useRouter } from 'next/navigation';
 
 export default function Edit() {
-    const [scheduleData, setScheduleData] = useState<ScheduleData | undefined>(undefined);
-    useEffect(() => {
-        const fetchSchedule = async () => {
-            try {
-                const res = await fetch('/ScheduleEdit.json');
-                if (!res.ok) {
-                    throw new Error('データの取得に失敗しました');
-                }
-                const data = await res.json();
-                setScheduleData(data.scheduleData[0]);
-            } catch (error) {
-                console.error(error);
-            }
-        };
+    const [spot, setSpot] = useState<PlaceDetails | undefined>(undefined);
+    const router = useRouter();
 
-        fetchSchedule();
-    }, []);
+    useEffect(() => {
+        const savedSpot = sessionStorage.getItem('editSpot');
+        if (!savedSpot) {
+            router.replace('/home');
+            return;
+        }
+        setSpot(JSON.parse(savedSpot));
+    }, [router]);
 
     return (
         <div>
-            <EditHeader location={scheduleData?.Location || '未設定'} />
-            <Content data={scheduleData || undefined} />
+            <EditHeader location={spot?.name || '未設定'} />
+            <Content spot={spot} />
         </div>
     );
 }

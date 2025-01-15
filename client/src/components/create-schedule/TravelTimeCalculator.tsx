@@ -5,6 +5,7 @@ import { BestRoute } from '@/types/TransferData';
 import { useRouter } from 'next/navigation';
 import { TransportInfo } from '@/app/create-schedule/page';
 import { calculateWalkingToNearestStation, calculateRegularDuration } from '@/utils/mapTransportCalculations';
+import { GrNext } from 'react-icons/gr';
 
 type TravelMode = 'WALKING' | 'DRIVING' | 'TRANSIT';
 
@@ -78,11 +79,8 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
                 <p className={styles.duration}>
                     {duration}
                     {selectedMode === 'TRANSIT' && transferData && (
-                        <span
-                            onClick={handleDurationClick}
-                            style={{ cursor: 'pointer', marginLeft: '8px', color: 'blue', fontWeight: 'bold' }}
-                        >
-                            &gt;
+                        <span onClick={handleDurationClick} className={styles.transferDetail}>
+                            <GrNext />
                         </span>
                     )}
                 </p>

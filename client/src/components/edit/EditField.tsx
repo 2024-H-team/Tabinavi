@@ -1,63 +1,73 @@
+'use client';
+import { useState } from 'react';
 import styles from '@styles/componentStyles/edit/Content.module.scss';
 import { HiOutlinePencil } from 'react-icons/hi2';
-import { useState, useRef, useEffect } from 'react';
+import WheelPicker from '../WheelPicker';
+import { PlaceDetails } from '@/types/PlaceDetails';
+import { DaySchedule } from '@/app/create-schedule/page';
 
-type EditFieldProps = {
+const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
+
+interface EditFieldTimeProps {
     title: string;
-    value: string;
-};
+    spot: PlaceDetails;
+}
 
-export default function EditField({ title, value }: EditFieldProps) {
-    const [isEditable, setIsEditable] = useState(false);
-    const [inputValue, setInputValue] = useState(value);
-    const inputRef = useRef<HTMLTextAreaElement>(null);
+export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
+    const [showPicker, setShowPicker] = useState(false);
+    const [hour, setHour] = useState(spot.stayTime?.hour || '0');
+    const [minute, setMinute] = useState(spot.stayTime?.minute || '0');
 
-    useEffect(() => {
-        setInputValue(value);
-    }, [value]);
+    const updateStorages = (newHour: string, newMinute: string) => {
+        const editSpot = JSON.parse(sessionStorage.getItem('editSpot') || '{}');
+        editSpot.stayTime = { hour: newHour, minute: newMinute };
+        sessionStorage.setItem('editSpot', JSON.stringify(editSpot));
 
-    const handleEnableEdit = () => {
-        setIsEditable(true);
-        if (inputRef.current) {
-            inputRef.current.focus();
-            const length = inputRef.current.value.length;
-            inputRef.current.setSelectionRange(length, length);
+        const schedules: DaySchedule[] = JSON.parse(sessionStorage.getItem('schedules') || '[]');
+        schedules.forEach((schedule) => {
+            schedule.spots = schedule.spots.map((s) =>
+                s.placeId === spot.placeId ? { ...s, stayTime: { hour: newHour, minute: newMinute } } : s,
+            );
+        });
+        sessionStorage.setItem('schedules', JSON.stringify(schedules));
+    };
+
+    const handleTimeChange = (type: 'hour' | 'minute', value: string) => {
+        if (type === 'hour') {
+            setHour(value);
+            updateStorages(value, minute);
+        } else {
+            setMinute(value);
+            updateStorages(hour, value);
         }
     };
-
-    const handleBlur = () => {
-        setIsEditable(false);
-    };
-
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setInputValue(event.target.value);
-    };
-
-    const handleAutoResize = () => {
-        if (inputRef.current) {
-            inputRef.current.style.height = '16px';
-            inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
-        }
-    };
-
-    useEffect(() => {
-        handleAutoResize();
-    }, [inputValue]);
 
     return (
         <div className={styles.EditWrap}>
-            <div>
+            <div className={styles.EditFieldWrap}>
                 <h2>{title}</h2>
-                <textarea
-                    className={styles.EditField}
-                    ref={inputRef}
-                    value={inputValue}
-                    readOnly={!isEditable}
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                />
+                {showPicker ? (
+                    <div className={styles.timePickerContainer}>
+                        <WheelPicker
+                            data={hours}
+                            defaultSelection={hours.indexOf(hour)}
+                            onChange={(value) => handleTimeChange('hour', value)}
+                        />
+                        <span>時間</span>
+                        <WheelPicker
+                            data={minutes}
+                            defaultSelection={minutes.indexOf(minute)}
+                            onChange={(value) => handleTimeChange('minute', value)}
+                        />
+                        <span>分</span>
+                        <button onClick={() => setShowPicker(false)}>確定</button>
+                    </div>
+                ) : (
+                    <div className={styles.EditField}>{`${hour}時間${minute}分`}</div>
+                )}
             </div>
-            <button className={styles.EditBtn} onClick={handleEnableEdit}>
+            <button className={styles.EditBtn} onClick={() => setShowPicker(true)}>
                 <HiOutlinePencil color="#929292" />
             </button>
         </div>

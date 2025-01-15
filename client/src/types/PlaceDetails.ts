@@ -37,4 +37,5 @@ export interface PlaceDetails {
     primaryType?: string;
     userRatingsTotal?: number;
     packingList?: string[];
+    note?: string;
 }

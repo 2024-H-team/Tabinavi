@@ -92,13 +92,16 @@ export default function InfoSetup() {
 
     const handleTimeChange = (index: number, type: 'start' | 'end', value: string) => {
         setSchedules((prev) =>
-            prev.map((schedule, i) =>
-                i === index
-                    ? type === 'start'
-                        ? { ...schedule, startTime: value }
-                        : { ...schedule, endTime: value }
-                    : schedule,
-            ),
+            prev.map((schedule, i) => {
+                if (i !== index) return schedule;
+
+                const [hours, minutes] = value.split(':');
+                const formattedTime = `${hours || '00'}:${minutes || '00'}`;
+
+                return type === 'start'
+                    ? { ...schedule, startTime: formattedTime }
+                    : { ...schedule, endTime: formattedTime };
+            }),
         );
     };
 

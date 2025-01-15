@@ -108,8 +108,10 @@ export const calculateWalkingToNearestStation = async (
         });
 
         const data: BestRoute = response.data;
+        if (data.totalCost === 0) {
+            throw new Error('No route found');
+        }
         setTransferData(data);
-
         const totalTimeSeconds =
             walkingDurationToOriginStation + walkingDurationFromDestinationStation + data.totalCost * 60;
         const totalHours = Math.floor(totalTimeSeconds / 3600);
@@ -121,6 +123,7 @@ export const calculateWalkingToNearestStation = async (
         setLoading(false);
     } catch {
         setDuration('経路が見つかりません');
+        setLoading(false);
     }
 };
 
@@ -154,5 +157,6 @@ export const calculateRegularDuration = async (
         setLoading(false);
     } catch {
         setDuration('N/A');
+        setLoading(false);
     }
 };
