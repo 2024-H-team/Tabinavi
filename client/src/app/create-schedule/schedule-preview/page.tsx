@@ -20,6 +20,7 @@ import { IoBagAdd } from 'react-icons/io5';
 import { IoIosArrowBack } from 'react-icons/io';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { useRouter } from 'next/navigation';
+import PackingItemList from '@/components/create-schedule/PackingItemList';
 
 export default function PreviewSpotsContainer() {
     const router = useRouter();
@@ -29,6 +30,7 @@ export default function PreviewSpotsContainer() {
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [titleValue, setTitleValue] = useState('');
     const titleInputRef = useRef<HTMLInputElement>(null);
+    const [showPackingList, setShowPackingList] = useState(false);
 
     useEffect(() => {
         const saved = sessionStorage.getItem('schedules');
@@ -156,6 +158,11 @@ export default function PreviewSpotsContainer() {
     const handleBack = () => {
         router.push('/create-schedule/select-spot');
     };
+
+    const getAllPackingItems = useCallback(() => {
+        const allItems = schedules.flatMap((schedule) => schedule.spots.flatMap((spot) => spot.packingList || []));
+        return [...new Set(allItems)];
+    }, [schedules]);
     return (
         <div className={styles.container}>
             <div className={styles.dateNav}>
@@ -242,12 +249,19 @@ export default function PreviewSpotsContainer() {
                     ))}
                 </SortableContext>
             </DndContext>
+            {showPackingList && (
+                <PackingItemList items={getAllPackingItems()} onClose={() => setShowPackingList(false)} />
+            )}
+
             <div className={styles.btnBox}>
                 <button onClick={handleSave} className={styles.saveButton}>
                     スケジュールを確定する
                 </button>
-                <button className={styles.addButton}>
-                    <IoBagAdd color="gray" size={30} />
+                <button
+                    className={`${styles.addButton} ${getAllPackingItems().length > 0 ? styles.active : ''}`}
+                    onClick={() => setShowPackingList(true)}
+                >
+                    <IoBagAdd color={getAllPackingItems().length > 0 ? 'blue' : 'gray'} size={30} />
                 </button>
             </div>
         </div>

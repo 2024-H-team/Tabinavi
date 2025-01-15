@@ -157,6 +157,12 @@
             width: 50px;
             border-radius: 50%;
             border: 3px solid #cccccc;
+            &.active {
+                border: 3px solid #436eee;
+                svg {
+                    color: #436eee;
+                }
+            }
         }
     }
 }
