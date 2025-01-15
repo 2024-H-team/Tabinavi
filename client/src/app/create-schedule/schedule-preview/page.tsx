@@ -21,6 +21,7 @@ import { IoIosArrowBack } from 'react-icons/io';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { useRouter } from 'next/navigation';
 import PackingItemList from '@/components/create-schedule/PackingItemList';
+import apiClient from '@/lib/axios';
 
 export default function PreviewSpotsContainer() {
     const router = useRouter();
@@ -31,6 +32,8 @@ export default function PreviewSpotsContainer() {
     const [titleValue, setTitleValue] = useState('');
     const titleInputRef = useRef<HTMLInputElement>(null);
     const [showPackingList, setShowPackingList] = useState(false);
+
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         const saved = sessionStorage.getItem('schedules');
@@ -97,10 +100,6 @@ export default function PreviewSpotsContainer() {
         [activeDateIndex],
     );
 
-    const handleSave = () => {
-        sessionStorage.setItem('schedules', JSON.stringify(schedules));
-    };
-
     const handleTransportCalculated = useCallback(
         (transportInfo: TransportInfo, transportIndex: number) => {
             setSchedules((prev) => {
@@ -163,6 +162,35 @@ export default function PreviewSpotsContainer() {
         const allItems = schedules.flatMap((schedule) => schedule.spots.flatMap((spot) => spot.packingList || []));
         return [...new Set(allItems)];
     }, [schedules]);
+
+    const handleSave = async () => {
+        try {
+            setIsSaving(true);
+
+            const formattedScheduleData = {
+                title: titleValue,
+                start_date: new Date(schedules[0].date).toISOString().split('T')[0],
+                end_date: new Date(schedules[schedules.length - 1].date).toISOString().split('T')[0],
+                schedules: JSON.stringify(schedules),
+            };
+
+            console.log('Sending schedule data:', formattedScheduleData);
+
+            const response = await apiClient.post('/schedules/create', formattedScheduleData);
+
+            if (response.data.success) {
+                alert('スケジュールが保存されました！, 自動でホーム画面に移動します。');
+                sessionStorage.removeItem('schedules');
+                router.push('/home');
+            }
+        } catch (error) {
+            console.error('Save schedule error:', error);
+            alert('スケジュールの保存に失敗しました。');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.dateNav}>
@@ -254,8 +282,8 @@ export default function PreviewSpotsContainer() {
             )}
 
             <div className={styles.btnBox}>
-                <button onClick={handleSave} className={styles.saveButton}>
-                    スケジュールを確定する
+                <button onClick={handleSave} className={styles.saveButton} disabled={isSaving}>
+                    {isSaving ? '保存中...' : 'スケジュールを確定する'}
                 </button>
                 <button
                     className={`${styles.addButton} ${getAllPackingItems().length > 0 ? styles.active : ''}`}
