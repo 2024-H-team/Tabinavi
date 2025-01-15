@@ -20,7 +20,7 @@ export interface TransportInfo {
 }
 
 export interface DaySchedule {
-    id?: number;
+    SchedulesID?: number;
     title?: string;
     date: string;
     startTime: string;
