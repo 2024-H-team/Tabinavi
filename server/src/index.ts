@@ -3,7 +3,6 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import path from 'path';
 
 import { initGraph } from './utils/graphManager';
 import webRoutes from './routers/web';
@@ -26,15 +25,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-// Serve static files from 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
 // Routes
 app.use('/api', webRoutes);
 
-// Default route serves index.html
 app.get('/', (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.send('Hello World!');
 });
 
 // Initialize graph and start server

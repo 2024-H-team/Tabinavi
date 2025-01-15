@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { ScheduleModel } from '../models/scheduleModel';
+import { getCurrentTime } from '~/utils/timeNow';
 
 interface AuthRequest extends Request {
     user?: {
@@ -57,7 +58,7 @@ export class ScheduleController {
                 end_date: new Date(req.body.end_date),
                 schedules: req.body.schedules,
             });
-
+            console.log('Schedule created:', userId, newSchedule.title, getCurrentTime());
             return res.status(201).json({
                 success: true,
                 message: 'Schedule created successfully',
@@ -141,7 +142,7 @@ export class ScheduleController {
                     message: 'Schedule not found or unauthorized',
                 });
             }
-
+            console.log('Schedule updated:', userId, scheduleId, getCurrentTime());
             return res.status(200).json({
                 success: true,
                 message: 'Schedule updated successfully',
@@ -181,7 +182,7 @@ export class ScheduleController {
                     message: 'Schedule not found or unauthorized',
                 });
             }
-
+            console.log('Schedule deleted:', userId, scheduleId, getCurrentTime());
             return res.status(200).json({
                 success: true,
                 message: 'Schedule deleted successfully',
