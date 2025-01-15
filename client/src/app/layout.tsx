@@ -1,11 +1,11 @@
-import { Roboto } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import 'normalize.css';
 import '@styles/GlobalStyles.scss';
 import { MapProvider } from '@/components/MapProvider';
 
-const roboto = Roboto({
+const inter = Inter({
     subsets: ['latin'],
-    weight: ['100', '300', '400', '500', '700', '900'],
+    weight: ['100', '300', '400', '500', '600', '700', '800', '900'],
     display: 'swap',
 });
 
@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={roboto.className}>
+            <body className={inter.className}>
                 <MapProvider>{children}</MapProvider>
             </body>
         </html>

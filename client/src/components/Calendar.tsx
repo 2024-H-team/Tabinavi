@@ -12,18 +12,19 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 dayjs.extend(isSameOrBefore);
 
-type CalendarData = {
-    id: number;
-    startDate: string;
-    endDate: string;
-    period: string;
-};
-
 type SpecialDate = {
     date: Dayjs;
     period: string;
 };
 
+type CalendarProps = {
+    schedules: Array<{
+        id?: number;
+        start_date: string;
+        end_date: string;
+        title: string;
+    }>;
+};
 const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: SpecialDate[] }) => {
     const { day, selected, specialDates, ...other } = props;
 
@@ -67,41 +68,31 @@ const CustomDay = (props: PickersDayProps<Dayjs> & { specialDates: SpecialDate[]
     );
 };
 
-export default function Calendar() {
+export default function Calendar({ schedules }: CalendarProps) {
     const [specialDates, setSpecialDates] = useState<SpecialDate[]>([]);
 
     useEffect(() => {
-        const fetchSpecialDates = async () => {
-            const response = await fetch('/ScheduleData.json');
-            const data: CalendarData[] = await response.json();
+        const dates = schedules.flatMap((schedule) => {
+            const start = dayjs(schedule.start_date);
+            const end = dayjs(schedule.end_date);
 
-            const dates = data.flatMap((entry) => {
-                const start = dayjs(entry.startDate);
-                const end = dayjs(entry.endDate);
+            const days: SpecialDate[] = [];
 
-                const days: SpecialDate[] = [];
-
-                if (start.isSame(end, 'day')) {
-                    days.push({ date: start, period: 'single' });
-                } else {
-                    let current = start;
-
-                    while (current.isSameOrBefore(end, 'day')) {
-                        const period = 'multiple';
-
-                        days.push({ date: current, period });
-                        current = current.add(1, 'day');
-                    }
+            if (start.isSame(end, 'day')) {
+                days.push({ date: start, period: 'single' });
+            } else {
+                let current = start;
+                while (current.isSameOrBefore(end, 'day')) {
+                    days.push({ date: current, period: 'multiple' });
+                    current = current.add(1, 'day');
                 }
+            }
 
-                return days;
-            });
+            return days;
+        });
 
-            setSpecialDates(dates);
-        };
-
-        fetchSpecialDates();
-    }, []);
+        setSpecialDates(dates);
+    }, [schedules]);
 
     return (
         <div>

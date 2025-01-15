@@ -1,11 +1,8 @@
-// SelectedSpot.tsx
 'use client';
 import styles from '@styles/componentStyles/create-schedule/SelectedSpot.module.scss';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import WheelPicker from '@/components/WheelPicker';
-import { useState } from 'react';
 
-// Time arrays
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
 
@@ -24,13 +21,14 @@ export default function SelectedSpot({
     dragHandleProps,
     isDragging,
 }: SelectedSpotProps) {
-    const [hour, setHour] = useState(hours[1]);
-    const [minute, setMinute] = useState(minutes[0]);
+    const defaultHour = spot.stayTime?.hour || '00';
+    const defaultMinute = spot.stayTime?.minute || '00';
 
     const handleTimeChange = (newHour: string, newMinute: string) => {
-        setHour(newHour);
-        setMinute(newMinute);
         onStayTimeUpdate(spot.name, { hour: newHour, minute: newMinute });
+    };
+    const truncateText = (text: string, maxLength: number = 15) => {
+        return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
     };
 
     return (
@@ -45,10 +43,10 @@ export default function SelectedSpot({
                     =
                 </div>
                 <div>
-                    <h3>{spot.name}</h3>
+                    <h3 title={spot.name}>{truncateText(spot.name)}</h3>
                 </div>
                 <div className={styles.closeBtn} onClick={onDelete}>
-                    X
+                    ✕
                 </div>
             </div>
             <div className={styles.timePickerGroup}>
@@ -56,18 +54,16 @@ export default function SelectedSpot({
                 <div className={styles.pickers}>
                     <WheelPicker
                         data={hours}
-                        defaultSelection={1}
+                        defaultSelection={hours.indexOf(defaultHour)}
                         onChange={(value) => {
-                            setHour(value);
-                            handleTimeChange(value, minute);
+                            handleTimeChange(value, defaultMinute);
                         }}
                     />
                     <WheelPicker
                         data={minutes}
-                        defaultSelection={0}
+                        defaultSelection={minutes.indexOf(defaultMinute)}
                         onChange={(value) => {
-                            setMinute(value);
-                            handleTimeChange(hour, value);
+                            handleTimeChange(defaultHour, value);
                         }}
                     />
                 </div>

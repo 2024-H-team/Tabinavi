@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import styles from '@styles/appStyles/schedule/InfoSetup.module.scss';
+import styles from '@styles/componentStyles/create-schedule/WheelPicker.module.scss';
 
 interface WheelPickerProps {
     data: string[];
@@ -16,7 +16,9 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     defaultSelection = 0,
     onChange,
 }) => {
-    const [selectedIndex, setSelectedIndex] = useState<number>(defaultSelection);
+    // Đảm bảo defaultSelection luôn hợp lệ
+    const initialIndex = defaultSelection >= 0 && defaultSelection < data.length ? defaultSelection : 0;
+    const [selectedIndex, setSelectedIndex] = useState<number>(initialIndex);
     const containerRef = useRef<HTMLDivElement>(null);
 
     const scrollToIndex = useCallback(
@@ -25,15 +27,23 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
                 const scrollPosition = index * itemHeight;
                 containerRef.current.scrollTo({
                     top: scrollPosition,
-                    behavior: 'smooth',
+                    behavior: 'auto',
                 });
             }
         },
         [itemHeight],
     );
+
     useEffect(() => {
         scrollToIndex(selectedIndex);
     }, [selectedIndex, scrollToIndex]);
+
+    useEffect(() => {
+        if (defaultSelection >= 0 && defaultSelection < data.length) {
+            setSelectedIndex(defaultSelection);
+            scrollToIndex(defaultSelection);
+        }
+    }, [defaultSelection, data.length, scrollToIndex]);
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollTop = e.currentTarget.scrollTop;

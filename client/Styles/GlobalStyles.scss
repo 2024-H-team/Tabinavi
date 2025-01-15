@@ -21,6 +21,7 @@
 html {
     font-size: 62.5%;
     box-sizing: border-box;
+    height: 100%;
 }
 *,
 *::before,
@@ -49,12 +50,21 @@ h6 {
     margin: 0;
 }
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    background-color: #f1f1f1;
+    background-color: #fdfdfd;
     background-size: contain;
     background-position: top center;
+    height: 100%;
+    position: relative;
+    overscroll-behavior: none;
+    overscroll-behavior-y: contain;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

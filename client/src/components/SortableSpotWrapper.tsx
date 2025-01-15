@@ -21,8 +21,8 @@ export default function SortableSpotWrapper({ spot, children, className }: Sorta
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
+        opacity: isDragging ? 0.5 : 1,
     };
-
     return (
         <div ref={setNodeRef} style={style} className={className}>
             {children({

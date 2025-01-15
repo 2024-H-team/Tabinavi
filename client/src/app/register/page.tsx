@@ -52,24 +52,24 @@ export default function RegisterPage() {
         <div className={styles.authContainer}>
             <div className={styles.formWrapper}>
                 <div className={styles.header}>
-                    <h1>Create your account</h1>
+                    <h1>新規アカウント作成</h1>
                 </div>
 
                 {success ? (
                     <div className={styles.successMessage}>
-                        Registration successful! You can now{' '}
+                        アカウントが作成されました。ログインしてください。
                         <Link href="/" style={{ color: '#059669', textDecoration: 'underline' }}>
-                            login
+                            ログイン
                         </Link>
                         .
                     </div>
                 ) : (
                     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
                         <div className={styles.formGroup}>
-                            <label>Username</label>
+                            <label>ユーザー名</label>
                             <input
                                 {...register('userName', {
-                                    required: 'Username is required',
+                                    required: 'ユーザー名は必須です',
                                     minLength: 3,
                                 })}
                                 className={errors.userName ? styles.error : ''}
@@ -78,14 +78,14 @@ export default function RegisterPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Email</label>
+                            <label>メール</label>
                             <input
                                 type="email"
                                 {...register('email', {
-                                    required: 'Email is required',
+                                    required: 'メールアドレスは必須です',
                                     pattern: {
                                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                        message: 'Invalid email address',
+                                        message: 'メールアドレスが有効ではありません',
                                     },
                                 })}
                                 className={errors.email ? styles.error : ''}
@@ -94,14 +94,14 @@ export default function RegisterPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Password</label>
+                            <label>パスワード</label>
                             <input
                                 type="password"
                                 {...register('password', {
-                                    required: 'Password is required',
+                                    required: 'パスワードが必要です',
                                     minLength: {
                                         value: 6,
-                                        message: 'Password must be at least 6 characters',
+                                        message: 'パスワードは6文字以上である必要があります',
                                     },
                                 })}
                                 className={errors.password ? styles.error : ''}
@@ -110,12 +110,12 @@ export default function RegisterPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Confirm Password</label>
+                            <label>パスワード確認</label>
                             <input
                                 type="password"
                                 {...register('confirmPassword', {
-                                    required: 'Please confirm your password',
-                                    validate: (value) => value === password || 'Passwords do not match',
+                                    required: '再確認のためにパスワードを入力してください',
+                                    validate: (value) => value === password || 'パスワードが一致しません',
                                 })}
                                 className={errors.confirmPassword ? styles.error : ''}
                             />
@@ -125,10 +125,10 @@ export default function RegisterPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Full Name</label>
+                            <label>氏名</label>
                             <input
                                 {...register('fullName', {
-                                    required: 'Full name is required',
+                                    required: '氏名は必須です',
                                 })}
                                 className={errors.fullName ? styles.error : ''}
                             />
@@ -138,7 +138,7 @@ export default function RegisterPage() {
                         {error && <div className={styles.errorMessage}>{error}</div>}
 
                         <button type="submit" disabled={loading} className={styles.submitButton}>
-                            {loading ? 'Registering...' : 'Register'}
+                            {loading ? '送信中' : '登録'}
                         </button>
                     </form>
                 )}

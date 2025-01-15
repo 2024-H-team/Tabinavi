@@ -12,6 +12,10 @@ export interface PlaceDetails {
     reviews?: google.maps.places.PlaceReview[];
     openingHours?: {
         weekday_text?: string[];
+        periods?: {
+            open: { day: number; hours: number; minutes: number };
+            close: { day: number; hours: number; minutes: number };
+        }[];
     };
     stayTime?: {
         hour: string;
@@ -32,4 +36,6 @@ export interface PlaceDetails {
     iconMaskBaseUri?: string;
     primaryType?: string;
     userRatingsTotal?: number;
+    packingList?: string[];
+    note?: string;
 }

@@ -1,9 +1,18 @@
 .ContentWrap {
+    min-height: calc(100% - 60px);
     padding: 24px;
     margin: auto;
+    overflow: auto;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     .ScheduleWrap {
+        color: #302f34;
         margin: auto;
         margin-top: 35px;
+        width: 100%;
     }
 
     .Calendar {
@@ -18,6 +27,6 @@
     .Setting {
         display: flex;
         justify-content: flex-start;
-        margin: 56px 0 0 24px;
+        margin: 24px 0 0 24px;
     }
 }

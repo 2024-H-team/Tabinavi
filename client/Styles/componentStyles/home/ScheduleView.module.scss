@@ -8,9 +8,10 @@
         margin: 8px;
         border-radius: 6px;
         background: #fff;
+        width: 100%;
         .ScheduleContents {
+            padding: 0 0 0 17px;
             height: 78px;
-            margin-left: 17px;
             display: flex;
             flex-direction: column;
             align-items: left;
@@ -30,7 +31,7 @@
         }
 
         .BiChevronRight {
-            margin-right: 16px;
+            padding-left: 10px;
             display: flex;
             flex-direction: column;
             justify-content: center;

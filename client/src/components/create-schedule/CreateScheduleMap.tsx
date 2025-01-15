@@ -91,9 +91,17 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                 highlightMarkerRef.current = null;
             }
 
-            const newHighlightMarker = await createMarker(mapRef.current!, position);
+            const newHighlightMarker = await createMarker(mapRef.current!, position, 'red');
 
             highlightMarkerRef.current = newHighlightMarker;
+
+            if (mapRef.current) {
+                const map = mapRef.current;
+                const zoom = map.getZoom();
+                if (typeof zoom === 'number' && zoom < 13) {
+                    map.setZoom(13);
+                }
+            }
         };
 
         createHighlightMarker();
@@ -110,6 +118,15 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                 }
                 const newHighlightMarker = await createMarker(mapRef.current!, clickedLocation, 'red');
                 highlightMarkerRef.current = newHighlightMarker;
+
+                if (mapRef.current) {
+                    const map = mapRef.current;
+                    const zoom = map.getZoom();
+                    if (typeof zoom === 'number' && zoom < 13) {
+                        map.setZoom(13);
+                    }
+                }
+                mapRef.current!.panTo(clickedLocation);
             } catch (error) {
                 console.error('Error initializing AdvancedMarkerElement: ', error);
             }
@@ -141,6 +158,14 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                     }
                 }),
             );
+
+            if (selectedSpots.length > 0 && mapRef.current) {
+                const bounds = new google.maps.LatLngBounds();
+                selectedSpots.forEach((spot) => {
+                    bounds.extend(new google.maps.LatLng(spot.location.lat, spot.location.lng));
+                });
+                // mapRef.current.fitBounds(bounds, 75);
+            }
         };
 
         manageSelectedMarkers();
@@ -170,20 +195,19 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
         const latLng = e.latLng;
         if (!latLng || !mapRef.current) return;
 
-        // Check if click was on a POI
         if ('placeId' in e && e.placeId) {
             e.stop?.();
 
             const service = new google.maps.places.PlacesService(mapRef.current);
             getPlaceDetails(service, e.placeId as string).then((place) => {
                 if (place) {
+                    smoothPanTo(mapRef.current, latLng);
                     setClickedLocation(latLng);
                     setSelectedPlaces([place]);
                     onPlaceSelect([place]);
                 }
             });
         } else {
-            // Normal click on map
             fetchPlaceDetailsFromLatLng(mapRef.current, latLng, {
                 onLocationSet: setClickedLocation,
                 onPlacesFound: (places) => {
@@ -202,14 +226,19 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
             <style>{`
                 .gm-style-iw { display: none!important; }
                 .gm-style-iw-tc { display: none!important; }
+                .gm-fullscreen-control { display: none!important; }
+                .gm-svpc { display: none!important; }
+                .gmnoprint { display: none!important; }
             `}</style>
-            <div className={Styles.mapContainer}>
+            <div className={Styles.map}>
                 <Autocomplete
                     onLoad={(autocomplete) => (autoCompleteRef.current = autocomplete)}
                     onPlaceChanged={handlePlaceSelect}
                     className={Styles.searchBox}
                 >
-                    <input type="text" placeholder="Search for a place" />
+                    <div className={Styles.searchContainer}>
+                        <input type="text" placeholder="検索" />
+                    </div>
                 </Autocomplete>
 
                 <GoogleMap
@@ -219,9 +248,15 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
                     mapContainerStyle={{ width: '100%', height: '100%' }}
                     onLoad={(map) => {
                         mapRef.current = map;
-                        map.setOptions({ mapId: '26a4732fc7efb60' });
+                        map.setOptions({
+                            mapId: '26a4732fc7efb60',
+                            gestureHandling: 'greedy',
+                        });
                     }}
                     onClick={handleMapClick}
+                    options={{
+                        gestureHandling: 'greedy',
+                    }}
                 />
             </div>
         </>

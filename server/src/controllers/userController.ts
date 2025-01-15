@@ -4,19 +4,19 @@ import { UserModel } from '../models/userModel';
 import jwt from 'jsonwebtoken';
 
 export const registerValidation = [
-    body('userName').trim().isLength({ min: 3, max: 30 }).withMessage('Username must be between 3 and 30 characters'),
-    body('email').isEmail().normalizeEmail().withMessage('Must be a valid email'),
+    body('userName').trim().isLength({ min: 3, max: 30 }).withMessage('ユーザー名は3〜30文字である必要があります'),
+    body('email').isEmail().normalizeEmail().withMessage('有効なメールアドレスを入力してください'),
     body('password')
         .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters')
+        .withMessage('パスワードは6文字以上である必要があります')
         .matches(/\d/)
-        .withMessage('Password must contain a number'),
-    body('fullName').trim().notEmpty().withMessage('Full name is required'),
+        .withMessage('パスワードには数字を含める必要があります'),
+    body('fullName').trim().notEmpty().withMessage('氏名は必須項目です'),
 ];
 
 export const loginValidation = [
-    body('userName').trim().notEmpty().withMessage('Username is required'),
-    body('password').notEmpty().withMessage('Password is required'),
+    body('userName').trim().notEmpty().withMessage('ユーザー名を入力してください'),
+    body('password').notEmpty().withMessage('パスワードを入力してください'),
 ];
 
 export class UserController {
@@ -28,7 +28,6 @@ export class UserController {
 
     async register(req: Request, res: Response) {
         try {
-            // Check validation results
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({
@@ -37,17 +36,15 @@ export class UserController {
                 });
             }
 
-            // Check if user exists
             const userExists = await this.userModel.checkUserExists(req.body.userName, req.body.email);
 
             if (userExists) {
                 return res.status(409).json({
                     success: false,
-                    message: 'Username or email already exists',
+                    message: 'ユーザー名またはメールアドレスは既に使用されています',
                 });
             }
 
-            // Register user
             const newUser = await this.userModel.registerUser({
                 userName: req.body.userName,
                 password: req.body.password,
@@ -88,28 +85,17 @@ export class UserController {
             if (!user) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Invalid username or password',
+                    message: 'ユーザー名またはパスワードが正しくありません',
                 });
             }
 
-            // Check and update firstLogin
             const firstLogin = await this.userModel.checkAndUpdateFirstLogin(user.userID!);
 
-            // Generate JWT token
             const token = jwt.sign(
                 { userId: user.userID, userName: user.userName },
                 process.env.LOGIN_TOKEN_KEY as string,
                 { expiresIn: '7d' },
             );
-
-            // Set cookie
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-                sameSite: 'lax',
-                path: '/',
-            });
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...userWithoutPassword } = user;
@@ -119,7 +105,8 @@ export class UserController {
                 success: true,
                 message: 'Login successful',
                 data: {
-                    ...userWithoutPassword,
+                    token,
+                    user: userWithoutPassword,
                     firstLogin,
                 },
             });
