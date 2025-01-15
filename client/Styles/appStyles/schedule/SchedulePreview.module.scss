@@ -40,11 +40,24 @@
             }
             .edit {
                 position: absolute;
-                top: 40%;
-                right: 20px;
+                top: 45%;
+                right: 25%;
                 transform: translateY(-50%);
                 width: 20px;
                 height: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .deleteBtn {
+                position: absolute;
+                top: 45%;
+                right: 5%;
+                transform: translateY(-50%);
+                width: 30px;
+                height: 30px;
+                background-color: rgba(255, 255, 255, 0.5);
+                border-radius: 50%;
                 display: flex;
                 justify-content: center;
                 align-items: center;

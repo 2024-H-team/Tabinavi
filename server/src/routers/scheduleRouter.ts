@@ -31,4 +31,11 @@ router.put(
     updateScheduleValidation,
     asyncHandler((req, res) => scheduleController.updateSchedule(req, res)),
 );
+
+router.delete(
+    '/:id',
+    verifyTokenMiddleware,
+    asyncHandler((req, res) => scheduleController.deleteSchedule(req, res)),
+);
+
 export default router;

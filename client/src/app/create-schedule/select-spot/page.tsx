@@ -1,19 +1,27 @@
+// components/CreateSchedule.tsx
+
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { searchNearbyPlaces } from '@/utils/mapCalculations';
 import Styles from '@styles/appStyles/schedule/CreateSchedule.module.scss';
 import SpotInfo from '@/components/create-schedule/SpotInfo';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import SelectedSpotsContainer from '@/components/create-schedule/SelectedSpotsContainer';
 import RecommendSpotsContainer from '@/components/create-schedule/RecommendSpotsContainer';
-import apiClient from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MdMenuOpen } from 'react-icons/md';
 import { DaySchedule } from '@/app/create-schedule/page';
-import { arrayMove } from '@dnd-kit/sortable';
+
+import {
+    handleAddSpot,
+    handleDeleteSpot,
+    handleReorderSpots,
+    handleRecommendClick,
+    handleCreateSchedule,
+    handleStayTimeUpdate,
+} from '@/utils/createScheduleUtils';
 
 const CreateScheduleMap = dynamic(() => import('@/components/create-schedule/CreateScheduleMap'), { ssr: false });
 
@@ -30,6 +38,7 @@ export default function CreateSchedule() {
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [recommendBtnBottom, setRecommendBtnBottom] = useState<number>(80);
     const recommendContainerRef = useRef<HTMLDivElement>(null);
+    const [showNotification, setShowNotification] = useState(false);
 
     const stayTimeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -50,101 +59,47 @@ export default function CreateSchedule() {
         }
     }, [showRecommendations]);
 
-    const saveToSessionStorage = (schedules: DaySchedule[]) => {
-        sessionStorage.setItem('schedules', JSON.stringify(schedules));
-    };
-
-    const handleAddSpot = useCallback(
+    const handleAddSpotCallback = useCallback(
         (spot: PlaceDetails) => {
-            setSchedules((prev) => {
-                const newSchedules = [...prev];
-                const currentDay = { ...newSchedules[activeDateIndex] };
-                currentDay.spots = [...currentDay.spots, spot];
-                newSchedules[activeDateIndex] = currentDay;
-                saveToSessionStorage(newSchedules);
-                return newSchedules;
-            });
+            handleAddSpot(schedules, setSchedules, activeDateIndex, spot, setShowNotification);
         },
-        [activeDateIndex],
+        [schedules, activeDateIndex],
     );
 
-    const handleDeleteSpot = useCallback(
+    const handleDeleteSpotCallback = useCallback(
         (index: number) => {
-            setSchedules((prev) => {
-                const newSchedules = [...prev];
-                const currentDay = { ...newSchedules[activeDateIndex] };
-                currentDay.spots = currentDay.spots.filter((_, i) => i !== index);
-                newSchedules[activeDateIndex] = currentDay;
-                saveToSessionStorage(newSchedules);
-                return newSchedules;
-            });
+            handleDeleteSpot(schedules, setSchedules, activeDateIndex, index);
         },
-        [activeDateIndex],
+        [schedules, activeDateIndex],
     );
 
-    const handleReorderSpots = useCallback(
+    const handleReorderSpotsCallback = useCallback(
         (oldIndex: number, newIndex: number) => {
-            setSchedules((prev) => {
-                const newSchedules = [...prev];
-                const currentDay = { ...newSchedules[activeDateIndex] };
-                currentDay.spots = arrayMove(currentDay.spots, oldIndex, newIndex);
-                newSchedules[activeDateIndex] = currentDay;
-                return newSchedules;
-            });
+            handleReorderSpots(schedules, setSchedules, activeDateIndex, oldIndex, newIndex);
         },
-        [activeDateIndex],
+        [schedules, activeDateIndex],
     );
 
-    const handleLoadMore = (visibleSpots: PlaceDetails[]) => {
-        setVisibleRecommendedSpots(visibleSpots);
-    };
+    const handleRecommendClickCallback = useCallback(async () => {
+        await handleRecommendClick(
+            schedules,
+            activeDateIndex,
+            setRecommendedSpots,
+            setVisibleRecommendedSpots,
+            setShowRecommendations,
+        );
+    }, [schedules, activeDateIndex]);
 
-    const handleFocusSpot = useCallback((spot: PlaceDetails) => {
-        setFocusedSpot(spot);
-        setSelectedPlaces([spot]);
-    }, []);
+    const handleCreateScheduleCallback = useCallback(() => {
+        handleCreateSchedule(schedules, router);
+    }, [schedules, router]);
 
-    const handleRecommendClick = async () => {
-        if (schedules[activeDateIndex]?.spots.length === 0) {
-            alert('少なくとも1つの場所を選択してください');
-            return;
-        }
-
-        try {
-            const processedSpots = schedules[activeDateIndex].spots.reduce(
-                (acc: { type: string; count: number }[], spot) => {
-                    const type = spot.primaryType;
-                    if (!type) return acc;
-                    const existing = acc.find((item) => item.type === type);
-                    if (existing) {
-                        existing.count++;
-                    } else {
-                        acc.push({ type, count: 1 });
-                    }
-                    return acc;
-                },
-                [],
-            );
-
-            const response = await apiClient.post('/recommended-place-types', {
-                selectedPlaces: processedSpots,
-            });
-
-            if (response.data.success) {
-                const nearbyPlaces = await searchNearbyPlaces(schedules[activeDateIndex].spots, response.data.data);
-                setRecommendedSpots(nearbyPlaces || []);
-                setVisibleRecommendedSpots(nearbyPlaces?.slice(0, 5) || []);
-                setShowRecommendations(true);
-            }
-        } catch (error) {
-            console.error('Error getting recommendations:', error);
-        }
-    };
-
-    const handleCreateSchedule = () => {
-        sessionStorage.setItem('schedules', JSON.stringify(schedules));
-        router.push('/create-schedule/schedule-preview');
-    };
+    const handleStayTimeUpdateCallback = useCallback(
+        (spotName: string, stayTime: { hour: string; minute: string }) => {
+            handleStayTimeUpdate(schedules, setSchedules, activeDateIndex, spotName, stayTime, stayTimeTimerRef);
+        },
+        [schedules, activeDateIndex],
+    );
 
     const handleCloseSpotInfo = useCallback(() => {
         setSelectedPlaces([]);
@@ -160,34 +115,14 @@ export default function CreateSchedule() {
         setVisibleRecommendedSpots([]);
     }, []);
 
-    const handleStayTimeUpdate = useCallback(
-        (spotName: string, stayTime: { hour: string; minute: string }) => {
-            setSchedules((prev) => {
-                const newSchedules = [...prev];
-                const currentDay = { ...newSchedules[activeDateIndex] };
-                const spotIndex = currentDay.spots.findIndex((s) => s.name === spotName);
+    const handleFocusSpot = useCallback((spot: PlaceDetails) => {
+        setFocusedSpot(spot);
+        setSelectedPlaces([spot]);
+    }, []);
 
-                if (spotIndex !== -1) {
-                    currentDay.spots[spotIndex] = {
-                        ...currentDay.spots[spotIndex],
-                        stayTime,
-                    };
-                }
-                newSchedules[activeDateIndex] = currentDay;
-
-                if (stayTimeTimerRef.current) {
-                    clearTimeout(stayTimeTimerRef.current);
-                }
-
-                stayTimeTimerRef.current = setTimeout(() => {
-                    sessionStorage.setItem('schedules', JSON.stringify(newSchedules));
-                }, 300);
-
-                return newSchedules;
-            });
-        },
-        [activeDateIndex],
-    );
+    const handleLoadMore = (visibleSpots: PlaceDetails[]) => {
+        setVisibleRecommendedSpots(visibleSpots);
+    };
 
     return (
         <div className={Styles.page}>
@@ -200,7 +135,7 @@ export default function CreateSchedule() {
                 />
             </div>
             {selectedPlaces.length > 0 && (
-                <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpot} onClose={handleCloseSpotInfo} />
+                <SpotInfo places={selectedPlaces} onAddSpot={handleAddSpotCallback} onClose={handleCloseSpotInfo} />
             )}
             {showRecommendations && (
                 <div ref={recommendContainerRef}>
@@ -224,14 +159,14 @@ export default function CreateSchedule() {
                 schedules={schedules}
                 activeDateIndex={activeDateIndex}
                 onDateChange={setActiveDateIndex}
-                onDeleteSpot={handleDeleteSpot}
-                onReorderSpots={handleReorderSpots}
+                onDeleteSpot={handleDeleteSpotCallback}
+                onReorderSpots={handleReorderSpotsCallback}
                 isOpen={isContainerOpen}
                 onClose={() => setIsContainerOpen(false)}
-                onStayTimeUpdate={handleStayTimeUpdate}
+                onStayTimeUpdate={handleStayTimeUpdateCallback}
             />
             <button
-                onClick={handleRecommendClick}
+                onClick={handleRecommendClickCallback}
                 className={Styles.recommendButton}
                 style={{
                     bottom: `${recommendBtnBottom}px`,
@@ -240,11 +175,14 @@ export default function CreateSchedule() {
             >
                 AIにおすすめしてもらう
             </button>
+            <div className={`${Styles.addSpotNotification} ${showNotification ? Styles.show : ''}`}>
+                スポットを追加しました。
+            </div>
             <div className={Styles.btnBox}>
                 <Link className={Styles.backBtn} href={'/create-schedule'}>
                     戻る
                 </Link>
-                <button onClick={handleCreateSchedule} className={Styles.submitBtn}>
+                <button onClick={handleCreateScheduleCallback} className={Styles.submitBtn}>
                     スケジュール作成
                 </button>
             </div>

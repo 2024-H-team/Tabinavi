@@ -100,6 +100,7 @@ export class ScheduleController {
             });
         }
     }
+
     async updateSchedule(req: AuthRequest, res: Response) {
         try {
             const errors = validationResult(req);
@@ -147,6 +148,46 @@ export class ScheduleController {
             });
         } catch (error) {
             console.error('Update schedule error:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error',
+            });
+        }
+    }
+
+    async deleteSchedule(req: AuthRequest, res: Response) {
+        try {
+            const userId = req.user?.userId;
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'User not authenticated',
+                });
+            }
+
+            const scheduleId = parseInt(req.params.id);
+            if (isNaN(scheduleId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid schedule ID',
+                });
+            }
+
+            const deleteResult = await this.scheduleModel.deleteSchedule(scheduleId, userId);
+
+            if (!deleteResult) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Schedule not found or unauthorized',
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: 'Schedule deleted successfully',
+            });
+        } catch (error) {
+            console.error('Delete schedule error:', error);
             return res.status(500).json({
                 success: false,
                 message: 'Internal server error',

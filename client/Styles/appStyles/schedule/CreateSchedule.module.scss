@@ -56,6 +56,30 @@
         font-size: 1.3rem;
         font-weight: 700;
     }
+    .addSpotNotification {
+        position: absolute;
+        width: 180px;
+        height: 30px;
+        color: #f4f4f4;
+        background: #2629f1;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 700;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 0;
+        z-index: 15;
+        opacity: 0;
+        transition: top 0.5s, opacity 0.5s;
+        &.show {
+            opacity: 1;
+            visibility: visible;
+            top: 20px;
+        }
+    }
     .btnBox {
         width: auto;
         position: absolute;

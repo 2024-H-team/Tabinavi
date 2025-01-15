@@ -21,7 +21,8 @@ import { IoIosArrowBack } from 'react-icons/io';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { useRouter } from 'next/navigation';
 import PackingItemList from '@/components/create-schedule/PackingItemList';
-import apiClient from '@/lib/axios';
+import { RiDeleteBin6Line } from 'react-icons/ri';
+import { truncateTitle, handleBack, handleSaveSchedule, handleDeleteSchedule } from '@/utils/scheduleUtils';
 
 export default function PreviewSpotsContainer() {
     const router = useRouter();
@@ -156,26 +157,8 @@ export default function PreviewSpotsContainer() {
         });
     };
 
-    const truncateTitle = (title: string, maxLength: number = 15) => {
-        return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
-    };
-
-    const handleBack = () => {
-        const profileEdit = sessionStorage.getItem('profileScheduleEdit');
-        const editSchedules = sessionStorage.getItem('editSchedules');
-
-        if (profileEdit) {
-            sessionStorage.removeItem('profileScheduleEdit');
-            sessionStorage.removeItem('editSchedules');
-            sessionStorage.removeItem('schedules');
-            router.push('/profile');
-        } else if (editSchedules) {
-            sessionStorage.removeItem('editSchedules');
-            sessionStorage.removeItem('schedules');
-            router.push('/home');
-        } else {
-            router.push('/create-schedule/select-spot');
-        }
+    const handleBackClick = () => {
+        handleBack(router, sessionStorage);
     };
 
     const getAllPackingItems = useCallback(() => {
@@ -184,48 +167,21 @@ export default function PreviewSpotsContainer() {
     }, [schedules]);
 
     const handleSave = async () => {
-        try {
-            setIsSaving(true);
-            const scheduleId = schedules[0]?.SchedulesID;
+        await handleSaveSchedule(schedules, titleValue, router, sessionStorage, setIsSaving);
+    };
 
-            const formattedScheduleData = {
-                title: titleValue,
-                start_date: new Date(schedules[0].date).toISOString().split('T')[0],
-                end_date: new Date(schedules[schedules.length - 1].date).toISOString().split('T')[0],
-                schedules: JSON.stringify(schedules),
-            };
-
-            let response;
-            if (scheduleId) {
-                response = await apiClient.put(`/schedules/${scheduleId}`, formattedScheduleData);
-                if (response.data.success) {
-                    alert('スケジュールが更新されました！自動でホーム画面に移動します。');
-                }
-            } else {
-                response = await apiClient.post('/schedules/create', formattedScheduleData);
-                if (response.data.success) {
-                    alert('スケジュールが保存されました！自動でホーム画面に移動します。');
-                }
-            }
-
-            if (response.data.success) {
-                sessionStorage.removeItem('schedules');
-                sessionStorage.removeItem('editSchedules');
-                router.push('/home');
-            }
-        } catch (error) {
-            console.error('Save schedule error:', error);
-            alert('スケジュールの保存に失敗しました。');
-        } finally {
-            setIsSaving(false);
-        }
+    const handleDeleteScheduleClick = async () => {
+        await handleDeleteSchedule(schedules, router, sessionStorage);
     };
 
     return (
         <div className={styles.container}>
             <div className={styles.dateNav}>
                 <div className={styles.header}>
-                    <IoIosArrowBack color="white" size={30} className={styles.back} onClick={handleBack} />
+                    <div className={styles.deleteBtn} onClick={handleDeleteScheduleClick}>
+                        <RiDeleteBin6Line className={styles.delete} color="red" size={20} />
+                    </div>
+                    <IoIosArrowBack color="white" size={30} className={styles.back} onClick={handleBackClick} />
                     <HiOutlinePencil color="white" className={styles.edit} onClick={handleTitleClick} />
                     {isEditingTitle ? (
                         <input
