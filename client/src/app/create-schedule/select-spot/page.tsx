@@ -39,6 +39,7 @@ export default function CreateSchedule() {
     const [recommendBtnBottom, setRecommendBtnBottom] = useState<number>(80);
     const recommendContainerRef = useRef<HTMLDivElement>(null);
     const [showNotification, setShowNotification] = useState(false);
+    const [isRecommending, setIsRecommending] = useState(false);
 
     const stayTimeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -87,6 +88,7 @@ export default function CreateSchedule() {
             setRecommendedSpots,
             setVisibleRecommendedSpots,
             setShowRecommendations,
+            setIsRecommending,
         );
     }, [schedules, activeDateIndex]);
 
@@ -172,8 +174,9 @@ export default function CreateSchedule() {
                     bottom: `${recommendBtnBottom}px`,
                     transition: 'bottom 0.3s ease-in-out',
                 }}
+                disabled={isRecommending}
             >
-                AIにおすすめしてもらう
+                {isRecommending ? '送信中...' : 'AIにおすすめしてもらう'}
             </button>
             <div className={`${Styles.addSpotNotification} ${showNotification ? Styles.show : ''}`}>
                 スポットを追加しました。

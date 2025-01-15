@@ -126,7 +126,7 @@ export default function SurveyPage() {
             });
 
             if (unansweredQuestions.length > 0) {
-                alert(`Please answer all questions.`);
+                alert(`未回答の質問があります:`);
                 return;
             }
             const userAnswers: UserAnswer[] = [];
@@ -153,20 +153,21 @@ export default function SurveyPage() {
             });
 
             if (!userAnswers.length) {
-                alert('You have not selected any answers!');
+                alert('アンケートを全て回答してください。');
                 return;
             }
 
             const res = await apiClient.post('/answers', { answers: userAnswers });
             if (res.data?.success) {
-                alert('Submitted successfully!');
+                alert('アンケートが正常に送信されました。');
+
                 if (res.data.data.isUpdate) {
                     router.push('/profile');
                 } else {
                     router.push('/home');
                 }
             } else {
-                alert('Failed to submit');
+                alert('アンケートの送信中にエラーが発生しました。');
             }
         } catch (error) {
             console.error('Submit error:', error);
@@ -174,75 +175,90 @@ export default function SurveyPage() {
         }
     };
 
+    if (!questions.length) {
+        return;
+    }
     return (
         <div className={styles.container}>
-            <h2>Survey</h2>
-            {questions.map((q) => (
-                <div key={q.id} className={styles.questionBlock}>
-                    <div className={styles.questionText}>{q.text}</div>
-                    <div className={styles.choiceList}>
-                        {q.type === 'single' &&
-                            q.choices.map((choice) => (
-                                <div
-                                    key={choice.id}
-                                    className={`${styles.choiceItem} ${
-                                        answers[q.id] === choice.id ? styles.selected : ''
-                                    }`}
-                                    onClick={() => handleSingleChange(q.id, choice.id)}
-                                >
-                                    <div
-                                        className={`${styles.choiceCircle} ${
-                                            answers[q.id] === choice.id ? styles.selected : ''
-                                        }`}
-                                    ></div>
-                                    <span className={styles.choiceText}>{choice.text}</span>
-                                </div>
-                            ))}
-
-                        {q.type === 'multiple' &&
-                            q.choices.map((choice) => {
-                                const selected = Array.isArray(answers[q.id])
-                                    ? (answers[q.id] as number[]).includes(choice.id)
-                                    : false;
-                                return (
+            <div className={styles.header}>
+                <h2>アンケート</h2>
+                <p>
+                    このアンケートは、AIによるおすすめの旅行スポットを最適化するために活用されます。
+                    <br />
+                    （後からプロフィール画面から回答を変更することができます。）
+                </p>
+            </div>
+            <div className={styles.questionList}>
+                {questions.map((q) => (
+                    <div key={q.id} className={styles.questionBlock}>
+                        <div className={styles.questionText}>{q.text}</div>
+                        <div className={styles.choiceList}>
+                            {q.type === 'single' &&
+                                q.choices.map((choice) => (
                                     <div
                                         key={choice.id}
-                                        className={`${styles.choiceItem} ${selected ? styles.selected : ''}`}
-                                        onClick={() => handleMultipleChange(q.id, choice.id, !selected)}
+                                        className={`${styles.choiceItem} ${
+                                            answers[q.id] === choice.id ? styles.selected : ''
+                                        }`}
+                                        onClick={() => handleSingleChange(q.id, choice.id)}
                                     >
                                         <div
-                                            className={`${styles.choiceCircle} ${selected ? styles.selected : ''}`}
+                                            className={`${styles.choiceCircle} ${
+                                                answers[q.id] === choice.id ? styles.selected : ''
+                                            }`}
                                         ></div>
                                         <span className={styles.choiceText}>{choice.text}</span>
                                     </div>
-                                );
-                            })}
+                                ))}
 
-                        {q.type === 'priority' &&
-                            q.choices.map((choice) => {
-                                const current = (answers[q.id] as number[]) || [];
-                                const isSelected = current.includes(choice.id);
-                                const rank = current.indexOf(choice.id) + 1;
-                                return (
-                                    <div
-                                        key={choice.id}
-                                        className={`${styles.choiceItem} ${isSelected ? styles.selected : ''}`}
-                                        onClick={() => handlePriorityToggle(q.id, choice.id)}
-                                    >
-                                        <div className={`${styles.choiceCircle} ${isSelected ? styles.selected : ''}`}>
-                                            {isSelected ? rank : ''}
+                            {q.type === 'multiple' &&
+                                q.choices.map((choice) => {
+                                    const selected = Array.isArray(answers[q.id])
+                                        ? (answers[q.id] as number[]).includes(choice.id)
+                                        : false;
+                                    return (
+                                        <div
+                                            key={choice.id}
+                                            className={`${styles.choiceItem} ${selected ? styles.selected : ''}`}
+                                            onClick={() => handleMultipleChange(q.id, choice.id, !selected)}
+                                        >
+                                            <div
+                                                className={`${styles.choiceCircle} ${selected ? styles.selected : ''}`}
+                                            ></div>
+                                            <span className={styles.choiceText}>{choice.text}</span>
                                         </div>
-                                        <span className={styles.choiceText}>{choice.text}</span>
-                                    </div>
-                                );
-                            })}
-                    </div>
-                </div>
-            ))}
+                                    );
+                                })}
 
-            <button className={styles.submitButton} onClick={handleSubmit}>
-                Submit
-            </button>
+                            {q.type === 'priority' &&
+                                q.choices.map((choice) => {
+                                    const current = (answers[q.id] as number[]) || [];
+                                    const isSelected = current.includes(choice.id);
+                                    const rank = current.indexOf(choice.id) + 1;
+                                    return (
+                                        <div
+                                            key={choice.id}
+                                            className={`${styles.choiceItem} ${isSelected ? styles.selected : ''}`}
+                                            onClick={() => handlePriorityToggle(q.id, choice.id)}
+                                        >
+                                            <div
+                                                className={`${styles.choiceCircle} ${
+                                                    isSelected ? styles.selected : ''
+                                                }`}
+                                            >
+                                                {isSelected ? rank : ''}
+                                            </div>
+                                            <span className={styles.choiceText}>{choice.text}</span>
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                    </div>
+                ))}
+                <button className={styles.submitButton} onClick={handleSubmit}>
+                    Submit
+                </button>
+            </div>
         </div>
     );
 }

@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-
 import styles from '@styles/appStyles/profile/profile.module.scss';
 import Footer from '@/components/Footer';
 import { RiCalendarScheduleLine } from 'react-icons/ri';
@@ -48,6 +47,9 @@ export default function Profile() {
     const truncateTitle = (title: string, maxLength: number = 15) => {
         return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
     };
+    const handleSurveyClick = () => {
+        router.push('/survey');
+    };
     return (
         <>
             <div className={styles.container}>
@@ -69,7 +71,9 @@ export default function Profile() {
                     <div className={styles.profileInfo}>
                         <div className={styles.buttons}>
                             <button className={styles.editBtn}>プロフィールを変更</button>
-                            <button className={styles.editBtn}>アンケートの回答を変更</button>
+                            <button onClick={handleSurveyClick} className={styles.surveyButton}>
+                                アンケートの回答を変更
+                            </button>
                             <button className={styles.logoutBtn} onClick={handleLogout}>
                                 ログアウト
                             </button>
