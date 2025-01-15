@@ -84,7 +84,9 @@ export default function ScheduleView({ schedules }: ScheduleViewProps) {
         sessionStorage.setItem('editSchedules', JSON.stringify(editSchedules));
         router.push('/create-schedule/schedule-preview');
     };
-
+    const truncateTitle = (title: string, maxLength: number = 15) => {
+        return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
+    };
     return (
         <>
             <h2 style={{ fontSize: '16px' }}>直近の予定</h2>
@@ -111,7 +113,7 @@ export default function ScheduleView({ schedules }: ScheduleViewProps) {
                                 <p className={styles.time}>
                                     {firstDay.startTime}~{firstDay.endTime}
                                 </p>
-                                <h3>{schedule.title}</h3>
+                                <h3>{truncateTitle(schedule.title)}</h3>
                             </div>
                             <div className={styles.BiChevronRight}>
                                 <BiChevronRight size="30px" color="blue" />

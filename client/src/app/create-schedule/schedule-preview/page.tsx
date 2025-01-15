@@ -162,7 +162,12 @@ export default function PreviewSpotsContainer() {
     };
 
     const handleBack = () => {
-        router.push('/create-schedule/select-spot');
+        const editSchedules = sessionStorage.getItem('editSchedules');
+        if (editSchedules) {
+            router.push('/home');
+        } else {
+            router.push('/create-schedule/select-spot');
+        }
     };
 
     const getAllPackingItems = useCallback(() => {
