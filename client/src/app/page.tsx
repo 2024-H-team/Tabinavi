@@ -32,21 +32,25 @@ export default function LoginPage() {
             const response = await apiClient.post('/auth/login', data);
 
             if (response.data.success) {
-                localStorage.setItem('token', response.data.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.data.user));
+                const { token, user } = response.data.data;
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
 
                 const expirationDate = new Date();
                 expirationDate.setDate(expirationDate.getDate() + 7);
-                document.cookie = `token=${response.data.data.token}; path=/; expires=${expirationDate.toUTCString()}`;
+                document.cookie = `token=${token}; path=/; expires=${expirationDate.toUTCString()}`;
 
-                setLoading(false);
-                setError('');
+                const firstLoginData = localStorage.getItem('firstLoginData');
 
-                if (response.data.data.firstLogin) {
+                if (!firstLoginData) {
+                    localStorage.setItem('firstLoginData', JSON.stringify(user));
                     router.push('/survey');
                 } else {
                     router.push('/home');
                 }
+
+                setLoading(false);
+                setError('');
             }
         } catch (err) {
             if (err instanceof AxiosError) {
