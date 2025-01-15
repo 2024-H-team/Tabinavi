@@ -201,6 +201,7 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
             const service = new google.maps.places.PlacesService(mapRef.current);
             getPlaceDetails(service, e.placeId as string).then((place) => {
                 if (place) {
+                    smoothPanTo(mapRef.current, latLng);
                     setClickedLocation(latLng);
                     setSelectedPlaces([place]);
                     onPlaceSelect([place]);

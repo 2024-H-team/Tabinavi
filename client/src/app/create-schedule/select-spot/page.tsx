@@ -48,6 +48,10 @@ export default function CreateSchedule() {
         }
     }, [showRecommendations]);
 
+    const saveToSessionStorage = (schedules: DaySchedule[]) => {
+        sessionStorage.setItem('schedules', JSON.stringify(schedules));
+    };
+
     const handleAddSpot = useCallback(
         (spot: PlaceDetails) => {
             setSchedules((prev) => {
@@ -55,6 +59,7 @@ export default function CreateSchedule() {
                 const currentDay = { ...newSchedules[activeDateIndex] };
                 currentDay.spots = [...currentDay.spots, spot];
                 newSchedules[activeDateIndex] = currentDay;
+                saveToSessionStorage(newSchedules);
                 return newSchedules;
             });
         },
@@ -68,6 +73,7 @@ export default function CreateSchedule() {
                 const currentDay = { ...newSchedules[activeDateIndex] };
                 currentDay.spots = currentDay.spots.filter((_, i) => i !== index);
                 newSchedules[activeDateIndex] = currentDay;
+                saveToSessionStorage(newSchedules);
                 return newSchedules;
             });
         },
