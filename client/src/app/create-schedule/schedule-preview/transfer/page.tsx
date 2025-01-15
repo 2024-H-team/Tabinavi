@@ -114,6 +114,7 @@ export default function Page() {
     };
 
     const handleBack = () => {
+        sessionStorage.removeItem('transferData');
         router.push('/create-schedule/schedule-preview');
     };
 

@@ -1,4 +1,3 @@
-// InfoSetup.tsx
 'use client';
 import { useState, useEffect } from 'react';
 import WheelPicker from '@/components/WheelPicker';
@@ -80,8 +79,8 @@ export default function InfoSetup() {
                 return {
                     title,
                     date,
-                    startTime: index === 0 ? `${hours[0]}:${minutes[0]}` : `${hours[0]}:${minutes[0]}`,
-                    endTime: index === dates.length - 1 ? `${hours[0]}:${minutes[0]}` : `${hours[23]}:${minutes[55]}`,
+                    startTime: `${hours[0]}:${minutes[0]}`, // Đảm bảo startTime luôn hợp lệ
+                    endTime: index === dates.length - 1 ? `${hours[0]}:${minutes[0]}` : `${hours[23]}:${minutes[55]}`, // Đảm bảo endTime luôn hợp lệ
                     spots: [],
                     transports,
                 };
@@ -95,8 +94,10 @@ export default function InfoSetup() {
             prev.map((schedule, i) => {
                 if (i !== index) return schedule;
 
-                const [hours, minutes] = value.split(':');
-                const formattedTime = `${hours || '00'}:${minutes || '00'}`;
+                const [hour, minute] = value.split(':');
+                const formattedHour = hours.includes(hour) ? hour : hours[0];
+                const formattedMinute = minutes.includes(minute) ? minute : minutes[0];
+                const formattedTime = `${formattedHour}:${formattedMinute}`;
 
                 return type === 'start'
                     ? { ...schedule, startTime: formattedTime }
@@ -122,6 +123,10 @@ export default function InfoSetup() {
         }
 
         for (const schedule of schedules) {
+            if (!schedule.startTime || !schedule.endTime) {
+                alert('すべてのスケジュールで開始時間と終了時間を設定してください。');
+                return false;
+            }
             if (schedule.startTime === schedule.endTime) {
                 alert('開始時間と終了時間が同じです。');
                 return false;
@@ -139,6 +144,9 @@ export default function InfoSetup() {
         if (!validateSchedules()) return;
 
         sessionStorage.setItem('schedules', JSON.stringify(schedules));
+        sessionStorage.removeItem('editSchedules');
+        sessionStorage.removeItem('editSpot');
+        sessionStorage.removeItem('transferData');
         router.push('/create-schedule/select-spot');
     };
 

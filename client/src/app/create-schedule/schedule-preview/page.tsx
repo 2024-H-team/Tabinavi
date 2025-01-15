@@ -41,7 +41,6 @@ export default function PreviewSpotsContainer() {
 
         if (editSchedules) {
             setSchedules(JSON.parse(editSchedules));
-            // sessionStorage.removeItem('editSchedules');
         } else if (regularSchedules) {
             setSchedules(JSON.parse(regularSchedules));
         } else {
@@ -164,6 +163,8 @@ export default function PreviewSpotsContainer() {
     const handleBack = () => {
         const editSchedules = sessionStorage.getItem('editSchedules');
         if (editSchedules) {
+            sessionStorage.removeItem('editSchedules');
+            sessionStorage.removeItem('schedules');
             router.push('/home');
         } else {
             router.push('/create-schedule/select-spot');

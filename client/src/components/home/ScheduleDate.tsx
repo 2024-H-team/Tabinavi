@@ -10,11 +10,11 @@ interface ScheduleDateProps {
 
 export default function ScheduleDate({ data }: ScheduleDateProps) {
     const getMonthAndDay = (date: string) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [year, month, day] = date.split('-');
-        return { month: parseInt(month), day: parseInt(day) };
+        const parsedDate = new Date(date);
+        const month = parsedDate.getUTCMonth() + 1;
+        const day = parsedDate.getUTCDate() + 1;
+        return { month, day };
     };
-
     const start = getMonthAndDay(data.startDate);
     const end = getMonthAndDay(data.endDate);
 

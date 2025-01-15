@@ -20,7 +20,7 @@ interface ScheduleViewProps {
 
 export default function ScheduleView({ schedules }: ScheduleViewProps) {
     const router = useRouter();
-
+    console.log(schedules);
     const parseSchedules = (scheduleData: DaySchedule[] | string): DaySchedule[] | null => {
         try {
             if (Array.isArray(scheduleData)) {
@@ -80,7 +80,6 @@ export default function ScheduleView({ schedules }: ScheduleViewProps) {
             spots: day.spots,
             transports: day.transports || [],
         }));
-
         sessionStorage.setItem('editSchedules', JSON.stringify(editSchedules));
         router.push('/create-schedule/schedule-preview');
     };
