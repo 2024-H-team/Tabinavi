@@ -1,26 +1,57 @@
-<!-- index.html -->
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>路線検索</title>
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<div class="container">
-			<h1>路線検索</h1>
-			<form id="routeForm">
-				<div class="form-group">
-					<input type="text" id="startStation" placeholder="出発駅を入力" required />
-				</div>
-				<div class="form-group">
-					<input type="text" id="endStation" placeholder="到着駅を入力" required />
-				</div>
-				<button type="submit">検索</button>
-			</form>
-			<div id="result"></div>
-		</div>
-		<script src="script.js"></script>
-	</body>
+<!doctype html>
+<html>
+    <head>
+        <title>Server Logs</title>
+        <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+        <style>
+            body {
+                margin: 0;
+                font-family: sans-serif;
+                background: #1e1e1e;
+            }
+            #logs {
+                height: 90dvh;
+                width: 98%;
+                color: #00ff00;
+                padding: 10px;
+                font-family: monospace;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            .log-entry {
+                font-size: 13px;
+                word-break: break-all;
+                word-wrap: break-word;
+                border-bottom: 1px solid #333;
+                padding: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="logs"></div>
+        <script>
+            const socket = io('http://localhost:5000');
+            const logsDiv = document.getElementById('logs');
+
+            fetch('/api/logs')
+                .then((res) => res.json())
+                .then((logs) => {
+                    logs.forEach((log) => {
+                        addLogEntry(log);
+                    });
+                });
+
+            socket.on('log', (log) => {
+                addLogEntry(log);
+            });
+
+            function addLogEntry(log) {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.textContent = `${log}`;
+                logsDiv.appendChild(entry);
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+            }
+        </script>
+    </body>
 </html>

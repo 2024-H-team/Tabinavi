@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { UserModel } from '../models/userModel';
 import jwt from 'jsonwebtoken';
+import { getCurrentTime } from '~/utils/timeNow';
 
 export const registerValidation = [
     body('userName').trim().isLength({ min: 3, max: 30 }).withMessage('ユーザー名は3〜30文字である必要があります'),
@@ -55,7 +56,7 @@ export class UserController {
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...userWithoutPassword } = newUser;
-
+            console.log('User registered:', newUser.userName, getCurrentTime());
             return res.status(201).json({
                 success: true,
                 message: 'User registered successfully',
@@ -100,7 +101,7 @@ export class UserController {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...userWithoutPassword } = user;
 
-            console.log('User logged in:', user.userName);
+            console.log('User logged in:', user.userName, getCurrentTime());
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',

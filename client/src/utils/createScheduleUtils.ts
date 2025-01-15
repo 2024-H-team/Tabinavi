@@ -69,12 +69,13 @@ export const handleRecommendClick = async (
     setRecommendedSpots: React.Dispatch<React.SetStateAction<PlaceDetails[]>>,
     setVisibleRecommendedSpots: React.Dispatch<React.SetStateAction<PlaceDetails[]>>,
     setShowRecommendations: React.Dispatch<React.SetStateAction<boolean>>,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
     if (schedules[activeDateIndex]?.spots.length === 0) {
         alert('少なくとも1つの場所を選択してください');
         return;
     }
-
+    setIsLoading(true);
     try {
         const processedSpots = schedules[activeDateIndex].spots.reduce(
             (acc: { type: string; count: number }[], spot) => {
@@ -103,6 +104,8 @@ export const handleRecommendClick = async (
         }
     } catch (error) {
         console.error('Error getting recommendations:', error);
+    } finally {
+        setIsLoading(false);
     }
 };
 

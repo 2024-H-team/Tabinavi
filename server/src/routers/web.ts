@@ -5,6 +5,7 @@ import authRouter from './authRouter';
 import questionRouter from './questionRouter';
 import recommendedPlaceRouter from './recommendedPlaceRouter';
 import scheduleRouter from './scheduleRouter';
+import logRouter from './logRouter';
 
 const web = express.Router();
 
@@ -14,5 +15,6 @@ web.use('/auth', authRouter);
 web.use('/', questionRouter);
 web.use('/', recommendedPlaceRouter);
 web.use('/schedules', scheduleRouter);
+web.use('/logs', logRouter);
 
 export default web;

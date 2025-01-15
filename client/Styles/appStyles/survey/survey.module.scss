@@ -1,30 +1,65 @@
 .container {
-    padding: 1rem;
     max-width: 600px;
     margin: 0 auto;
-    border: 1px solid #ccc;
-    border-radius: 8px;
     overflow-y: auto;
     &::-webkit-scrollbar {
         display: none;
     }
     -ms-overflow-style: none;
     scrollbar-width: none;
+    letter-spacing: 0.6px;
 }
-
+.header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    background-color: #436eee;
+    color: #fdfdfd;
+    p {
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 30px;
+        line-height: 16px;
+    }
+}
+.questionList {
+    height: calc(100vh - 132px);
+    overflow-y: auto;
+    padding: 30px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
 .questionBlock {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0.6rem;
+    background: #fff;
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
 }
 
 .questionText {
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    padding: 1rem;
+    font-size: 14px;
+    border-bottom: 0.5px solid #bdbdbd;
+    margin-bottom: 10px;
 }
 
 .choiceList {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    padding: 5px;
 }
 
 /* Default style for all choices */
@@ -49,8 +84,8 @@
 
 /* Circle for single/multi/priority */
 .choiceCircle {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border: 2px solid #ddd;
     border-radius: 50%;
     display: flex;
@@ -70,18 +105,19 @@
 
 .choiceText {
     flex: 1;
+    font-size: 14px;
 }
 
 /* Submit button */
 .submitButton {
-    padding: 0.5rem 1rem;
+    width: 80%;
     background-color: #0070f3;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     text-align: center;
-
+    padding: 10px;
     &:hover {
         background-color: #005bb5;
     }
