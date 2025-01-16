@@ -1,4 +1,3 @@
-// recommendedPlaceController.ts
 import { Request, Response, NextFunction } from 'express';
 import { RecommendedPlaceModel, SelectedPlace } from '../models/PlaceRecommendationModel';
 import mysql from 'mysql2/promise';
@@ -17,12 +16,6 @@ export class RecommendedPlaceController {
         this.recommendedPlaceModel = new RecommendedPlaceModel(pool);
     }
 
-    /**
-     * Handles the request to get recommended place types.
-     * @param req - The request object containing user info and selected places.
-     * @param res - The response object to send back the recommended types.
-     * @param next - The next middleware function.
-     */
     async getRecommendedPlaceTypes(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const userId = req.user?.userId;
@@ -34,12 +27,19 @@ export class RecommendedPlaceController {
                 return;
             }
 
-            const selectedPlaces: SelectedPlace[] = req.body.selectedPlaces || [];
+            const { selectedPlaces, dayStartTime, dayEndTime } = req.body as {
+                selectedPlaces: SelectedPlace[];
+                dayStartTime?: string;
+                dayEndTime?: string;
+            };
 
-            // Validate selectedPlaces if necessary
-            // ...
+            const recommendation = await this.recommendedPlaceModel.fetchRecommendedPlaceTypes(
+                userId,
+                selectedPlaces || [],
+                dayStartTime,
+                dayEndTime,
+            );
 
-            const recommendation = await this.recommendedPlaceModel.fetchRecommendedPlaceTypes(userId, selectedPlaces);
             console.log('Recommended place types fetched:', userId, getCurrentTime());
             if (recommendation.success) {
                 res.status(200).json({

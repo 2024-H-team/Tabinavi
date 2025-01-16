@@ -24,14 +24,9 @@ export interface PlaceTypesRequest {
         type: string;
         count: number;
     }[];
+    dayStartTime?: string;
+    dayEndTime?: string;
 }
-
-/**
- * Fetch recommended place types from OpenAI.
- * The system prompt provides context for the assistant.
- * @param userMessage - The user's request or context about desired places.
- * @returns A string response that ideally contains recommended place types.
- */
 
 const SYSTEM_PROMPT = `You are a travel recommendation assistant.
 Your task is to suggest Google Maps place types based on user preferences and existing selections.
@@ -48,7 +43,7 @@ Rules:
   - Morning activities might include cafes or parks.
   - Afternoon activities could include museums or shopping malls.
   - Evening activities might include restaurants or night clubs.
-- Pay attention to the types the user has already selected and estimate the time spent at each location to inform the recommendation of subsequent types
+- Pay attention to the types and time of day the user has already selected and estimate the time spent at each location to inform the recommendation of subsequent types
 - Suggest 3-4 different types each time
 - For every 3 types that are suitable based on user preferences, insert 1 type that might not be directly suitable to encourage exploration of new and potentially interesting places
 - Format response as JSON array
@@ -62,26 +57,20 @@ User has selected:
 
 Suggested response: ["art_gallery", "park", "cafe", "library"]`;
 
-// getRecommendedPlaceTypes.ts
 function parseAIResponse(response: string): string[] {
     try {
-        // Clean the response string
         const cleanResponse = response
-            .replace(/```json\s*/, '') // Remove ```json
-            .replace(/```\s*$/, '') // Remove trailing ```
-            .trim(); // Remove whitespace
+            .replace(/```json\s*/, '')
+            .replace(/```\s*$/, '')
+            .trim();
 
         const parsed = JSON.parse(cleanResponse);
-
         if (!Array.isArray(parsed)) {
             throw new Error('Response is not an array');
         }
-
-        // Validate each item is a string
         if (!parsed.every((item) => typeof item === 'string')) {
             throw new Error('Array contains non-string values');
         }
-
         return parsed;
     } catch (error) {
         console.error('Parse error:', error);
@@ -91,21 +80,24 @@ function parseAIResponse(response: string): string[] {
 }
 
 function formatRequest(request: PlaceTypesRequest): string {
-    const { surveyAnswers, selectedPlaces } = request;
-
+    const { surveyAnswers, selectedPlaces, dayStartTime, dayEndTime } = request;
     let message = 'Based on the following preferences:\n';
 
-    // Add survey answers
     surveyAnswers.forEach(({ answer }) => {
         message += `- ${answer}\n`;
     });
 
-    // Add selected places if any
     if (selectedPlaces?.length) {
         message += '\nAlready selected places:\n';
         selectedPlaces.forEach(({ type, count }) => {
             message += `- ${type} (${count} times)\n`;
         });
+    }
+
+    if (dayStartTime || dayEndTime) {
+        message += '\nTime constraints:\n';
+        if (dayStartTime) message += `- Day start time: ${dayStartTime}\n`;
+        if (dayEndTime) message += `- Day end time: ${dayEndTime}\n`;
     }
 
     message += '\nPlease suggest appropriate Google Maps place types.';
@@ -130,8 +122,8 @@ export async function getRecommendedPlaceTypes(request: PlaceTypesRequest): Prom
         if (!responseMessage) {
             throw new Error('No response from OpenAI');
         }
-        const types = parseAIResponse(responseMessage);
 
+        const types = parseAIResponse(responseMessage);
         return {
             success: true,
             types,
