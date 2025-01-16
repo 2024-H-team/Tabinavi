@@ -80,14 +80,14 @@ export default function RegisterPage() {
                             <label>名前</label>
                             <input
                                 {...register('fullName', {
-                                    required: '氏名は必須です',
+                                    required: '名前は必須です',
                                 })}
                                 className={errors.fullName ? styles.error : ''}
                             />
                             {errors.fullName && <p className={styles.errorText}>{errors.fullName.message}</p>}
                         </div>
                         <div className={styles.formGroup}>
-                            <label>メール</label>
+                            <label>メールアドレス</label>
                             <input
                                 type="email"
                                 {...register('email', {
