@@ -23,6 +23,8 @@ import { useRouter } from 'next/navigation';
 import PackingItemList from '@/components/create-schedule/PackingItemList';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { truncateTitle, handleBack, handleSaveSchedule, handleDeleteSchedule } from '@/utils/scheduleUtils';
+import ManualDisplay from '@/components/create-schedule/ManualDisplay';
+import { IoAddCircleOutline } from 'react-icons/io5';
 
 export default function PreviewSpotsContainer() {
     const router = useRouter();
@@ -35,6 +37,38 @@ export default function PreviewSpotsContainer() {
     const [showPackingList, setShowPackingList] = useState(false);
 
     const [isSaving, setIsSaving] = useState(false);
+    const [showDeleteButton, setShowDeleteButton] = useState(false);
+    const [showManual, setShowManual] = useState(true);
+
+    useEffect(() => {
+        const hasShownManual = localStorage.getItem('previewManualDisplay');
+        if (hasShownManual) {
+            setShowManual(false);
+            return;
+        }
+
+        const handleInteraction = () => {
+            if (showManual) {
+                setShowManual(false);
+                localStorage.setItem('previewManualDisplay', 'shown');
+                window.removeEventListener('click', handleInteraction);
+            }
+        };
+
+        if (showManual) {
+            window.addEventListener('click', handleInteraction);
+        }
+
+        return () => {
+            window.removeEventListener('click', handleInteraction);
+        };
+    }, [showManual]);
+
+    useEffect(() => {
+        const profileEdit = sessionStorage.getItem('profileScheduleEdit');
+        const editSchedules = sessionStorage.getItem('editSchedules');
+        setShowDeleteButton(!!(profileEdit || editSchedules));
+    }, []);
 
     useEffect(() => {
         const editSchedules = sessionStorage.getItem('editSchedules');
@@ -42,6 +76,7 @@ export default function PreviewSpotsContainer() {
 
         if (editSchedules) {
             setSchedules(JSON.parse(editSchedules));
+            sessionStorage.setItem('schedules', JSON.stringify(JSON.parse(editSchedules)));
         } else if (regularSchedules) {
             setSchedules(JSON.parse(regularSchedules));
         } else {
@@ -174,13 +209,20 @@ export default function PreviewSpotsContainer() {
         await handleDeleteSchedule(schedules, router, sessionStorage);
     };
 
+    const handleAddSpotClick = () => {
+        router.push('/create-schedule/select-spot');
+    };
+
     return (
         <div className={styles.container}>
+            {showManual && <ManualDisplay />}
             <div className={styles.dateNav}>
                 <div className={styles.header}>
-                    <div className={styles.deleteBtn} onClick={handleDeleteScheduleClick}>
-                        <RiDeleteBin6Line className={styles.delete} color="red" size={20} />
-                    </div>
+                    {showDeleteButton && (
+                        <div className={styles.deleteBtn} onClick={handleDeleteScheduleClick}>
+                            <RiDeleteBin6Line className={styles.delete} color="red" size={20} />
+                        </div>
+                    )}
                     <IoIosArrowBack color="white" size={30} className={styles.back} onClick={handleBackClick} />
                     <HiOutlinePencil color="white" className={styles.edit} onClick={handleTitleClick} />
                     {isEditingTitle ? (
@@ -268,15 +310,21 @@ export default function PreviewSpotsContainer() {
             )}
 
             <div className={styles.btnBox}>
-                <button onClick={handleSave} className={styles.saveButton} disabled={isSaving}>
-                    {isSaving ? '保存中...' : 'スケジュールを確定する'}
-                </button>
-                <button
-                    className={`${styles.addButton} ${getAllPackingItems().length > 0 ? styles.active : ''}`}
-                    onClick={() => setShowPackingList(true)}
-                >
-                    <IoBagAdd color={getAllPackingItems().length > 0 ? 'blue' : 'gray'} size={30} />
-                </button>
+                <div className={styles.spotAddBtn} onClick={handleAddSpotClick}>
+                    <IoAddCircleOutline color="green" size={20} />
+                    予定を追加
+                </div>
+                <div className={styles.btnContainer}>
+                    <button onClick={handleSave} className={styles.saveButton} disabled={isSaving}>
+                        {isSaving ? '保存中...' : 'スケジュールを確定する'}
+                    </button>
+                    <button
+                        className={`${styles.addButton} ${getAllPackingItems().length > 0 ? styles.active : ''}`}
+                        onClick={() => setShowPackingList(true)}
+                    >
+                        <IoBagAdd color={getAllPackingItems().length > 0 ? 'blue' : 'gray'} size={30} />
+                    </button>
+                </div>
             </div>
         </div>
     );
