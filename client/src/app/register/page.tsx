@@ -66,19 +66,28 @@ export default function RegisterPage() {
                 ) : (
                     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
                         <div className={styles.formGroup}>
-                            <label>ユーザー名</label>
+                            <label>ログインID</label>
                             <input
                                 {...register('userName', {
-                                    required: 'ユーザー名は必須です',
+                                    required: 'ログインIDは必須です',
                                     minLength: 3,
                                 })}
                                 className={errors.userName ? styles.error : ''}
                             />
                             {errors.userName && <p className={styles.errorText}>{errors.userName.message}</p>}
                         </div>
-
                         <div className={styles.formGroup}>
-                            <label>メール</label>
+                            <label>名前</label>
+                            <input
+                                {...register('fullName', {
+                                    required: '名前は必須です',
+                                })}
+                                className={errors.fullName ? styles.error : ''}
+                            />
+                            {errors.fullName && <p className={styles.errorText}>{errors.fullName.message}</p>}
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>メールアドレス</label>
                             <input
                                 type="email"
                                 {...register('email', {
@@ -122,17 +131,6 @@ export default function RegisterPage() {
                             {errors.confirmPassword && (
                                 <p className={styles.errorText}>{errors.confirmPassword.message}</p>
                             )}
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label>氏名</label>
-                            <input
-                                {...register('fullName', {
-                                    required: '氏名は必須です',
-                                })}
-                                className={errors.fullName ? styles.error : ''}
-                            />
-                            {errors.fullName && <p className={styles.errorText}>{errors.fullName.message}</p>}
                         </div>
 
                         {error && <div className={styles.errorMessage}>{error}</div>}
