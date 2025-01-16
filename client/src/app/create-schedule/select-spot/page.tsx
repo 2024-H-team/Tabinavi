@@ -64,7 +64,7 @@ export default function CreateSchedule() {
             const hideTimer = setTimeout(() => {
                 setShowManual(false);
                 localStorage.setItem('mapManualMessage', 'shown');
-            }, 3000);
+            }, 3500);
 
             return () => {
                 clearTimeout(showTimer);
