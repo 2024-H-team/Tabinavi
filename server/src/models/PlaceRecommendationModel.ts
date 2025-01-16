@@ -20,11 +20,6 @@ export class RecommendedPlaceModel {
         this.pool = pool;
     }
 
-    /**
-     * Retrieves and processes user survey answers, handling priority questions by numbering the answers.
-     * @param userId - The ID of the user.
-     * @returns An array of SurveyAnswer objects.
-     */
     async getProcessedSurveyAnswers(userId: number): Promise<SurveyAnswer[]> {
         const query = `
             SELECT q.id AS question_id, q.type, ua.choice_id, ua.priority, c.text AS answer_text
@@ -47,13 +42,12 @@ export class RecommendedPlaceModel {
         return surveyAnswers;
     }
 
-    /**
-     * Fetches recommended place types based on survey answers and selected places.
-     * @param userId - The ID of the user.
-     * @param selectedPlaces - The currently selected place types.
-     * @returns The recommended place types from OpenAI.
-     */
-    async fetchRecommendedPlaceTypes(userId: number, selectedPlaces: SelectedPlace[]): Promise<PlaceTypesResponse> {
+    async fetchRecommendedPlaceTypes(
+        userId: number,
+        selectedPlaces: SelectedPlace[],
+        dayStartTime?: string,
+        dayEndTime?: string,
+    ): Promise<PlaceTypesResponse> {
         const surveyAnswers = await this.getProcessedSurveyAnswers(userId);
 
         const request: PlaceTypesRequest = {
@@ -62,6 +56,8 @@ export class RecommendedPlaceModel {
                 answer: sa.answer,
             })),
             selectedPlaces: selectedPlaces.length ? selectedPlaces : undefined,
+            dayStartTime,
+            dayEndTime,
         };
 
         const response = await getRecommendedPlaceTypes(request);
