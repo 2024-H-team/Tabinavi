@@ -43,7 +43,7 @@ Rules:
   - Morning activities might include cafes or parks.
   - Afternoon activities could include museums or shopping malls.
   - Evening activities might include restaurants or night clubs.
-- Pay attention to the types the user has already selected and estimate the time spent at each location to inform the recommendation of subsequent types
+- Pay attention to the types and time of day the user has already selected and estimate the time spent at each location to inform the recommendation of subsequent types
 - Suggest 3-4 different types each time
 - For every 3 types that are suitable based on user preferences, insert 1 type that might not be directly suitable to encourage exploration of new and potentially interesting places
 - Format response as JSON array
