@@ -113,7 +113,7 @@ export async function getRecommendedPlaceTypes(request: PlaceTypesRequest): Prom
         ];
 
         const completion = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o',
             messages,
             temperature: 0.7,
         });
