@@ -1,6 +1,7 @@
 .ContentWrap {
     min-height: calc(100% - 60px);
     padding: 24px;
+    padding-bottom: 80px;
     margin: auto;
     overflow: auto;
     &::-webkit-scrollbar {
@@ -28,5 +29,6 @@
         display: flex;
         justify-content: flex-start;
         margin: 24px 0 0 24px;
+        height: 24px;
     }
 }

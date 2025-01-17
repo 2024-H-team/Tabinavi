@@ -25,6 +25,7 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import { truncateTitle, handleBack, handleSaveSchedule, handleDeleteSchedule } from '@/utils/scheduleUtils';
 import ManualDisplay from '@/components/create-schedule/ManualDisplay';
 import { IoAddCircleOutline } from 'react-icons/io5';
+import { FaRegQuestionCircle } from 'react-icons/fa';
 
 export default function PreviewSpotsContainer() {
     const router = useRouter();
@@ -47,23 +48,8 @@ export default function PreviewSpotsContainer() {
             return;
         }
 
-        const handleInteraction = () => {
-            if (showManual) {
-                setShowManual(false);
-                localStorage.setItem('previewManualDisplay', 'shown');
-                window.removeEventListener('click', handleInteraction);
-            }
-        };
-
-        if (showManual) {
-            window.addEventListener('click', handleInteraction);
-        }
-
-        return () => {
-            window.removeEventListener('click', handleInteraction);
-        };
-    }, [showManual]);
-
+        setShowManual(true);
+    }, []);
     useEffect(() => {
         const profileEdit = sessionStorage.getItem('profileScheduleEdit');
         const editSchedules = sessionStorage.getItem('editSchedules');
@@ -214,8 +200,7 @@ export default function PreviewSpotsContainer() {
     };
 
     const getAllPackingItems = useCallback(() => {
-        const allItems = schedules.flatMap((schedule) => schedule.spots.flatMap((spot) => spot.packingList || []));
-        return [...new Set(allItems)];
+        return schedules.flatMap((schedule) => schedule.spots.flatMap((spot) => spot.packingList || []));
     }, [schedules]);
 
     const handleSave = async () => {
@@ -230,8 +215,16 @@ export default function PreviewSpotsContainer() {
         router.push('/create-schedule/select-spot');
     };
 
+    const handleQuestionClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowManual(true);
+    };
+    const handleCloseManual = () => {
+        setShowManual(false);
+        localStorage.setItem('previewManualDisplay', 'shown');
+    };
     return (
-        <div className={styles.container}>
+        <div className={styles.container} onClick={handleCloseManual}>
             {showManual && <ManualDisplay />}
             <div className={styles.dateNav}>
                 <div className={styles.header}>
@@ -327,6 +320,14 @@ export default function PreviewSpotsContainer() {
             )}
 
             <div className={styles.btnBox}>
+                <div className={styles.infoBtn}>
+                    <FaRegQuestionCircle
+                        size={25}
+                        color="#436eee"
+                        className={styles.questionBtn}
+                        onClick={handleQuestionClick}
+                    />
+                </div>
                 <div className={styles.spotAddBtn} onClick={handleAddSpotClick}>
                     <IoAddCircleOutline color="green" size={20} />
                     予定を追加

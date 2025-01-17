@@ -10,8 +10,8 @@ export const registerValidation = [
     body('password')
         .isLength({ min: 6 })
         .withMessage('パスワードは6文字以上である必要があります')
-        .matches(/\d/)
-        .withMessage('パスワードには数字を含める必要があります'),
+        .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)
+        .withMessage('パスワードは少なくとも1つの文字と1つの数字を含む必要があります'),
     body('fullName').trim().notEmpty().withMessage('氏名は必須項目です'),
 ];
 
