@@ -99,7 +99,10 @@ export class UserController {
             );
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { password, ...userWithoutPassword } = user;
+            const { password, ...userWithoutPassword } = {
+                ...user,
+                avatar: user.avatar || null,
+            };
 
             console.log('User logged in:', user.userName, getCurrentTime());
             return res.status(200).json({
