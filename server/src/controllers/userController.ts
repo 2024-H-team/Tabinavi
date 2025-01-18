@@ -164,7 +164,7 @@ export class UserController {
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...userWithoutPassword } = updatedUser;
-
+            console.log('User profile updated:', updatedUser.userName, getCurrentTime());
             return res.status(200).json({
                 success: true,
                 message: 'プロフィールが正常に更新されました',
