@@ -1,8 +1,18 @@
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { UserModel } from '../models/userModel';
+import { UserModel, UserUpdate } from '../models/userModel';
 import jwt from 'jsonwebtoken';
 import { getCurrentTime } from '~/utils/timeNow';
+import { processAndUploadImage } from '~/utils/imageUtils';
+
+interface AuthRequest extends Request {
+    user?: {
+        userId: number;
+        userName: string;
+        iat?: number;
+        exp?: number;
+    };
+}
 
 export const registerValidation = [
     body('userName').trim().isLength({ min: 3, max: 30 }).withMessage('ユーザー名は3〜30文字である必要があります'),
@@ -120,6 +130,62 @@ export class UserController {
                 success: false,
                 message: 'Internal server error',
             });
+        }
+    }
+
+    async updateProfile(req: AuthRequest, res: Response) {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ success: false, message: '認証が必要です' });
+            }
+            const userID = req.user.userId;
+
+            let avatar: string | undefined;
+            if (req.file) {
+                const fileName = `avatars/${userID}_${Date.now()}.webp`;
+                avatar = await processAndUploadImage(req.file.buffer, fileName);
+            }
+
+            const payload: UserUpdate = {
+                userID,
+                email: req.body.email,
+                fullName: req.body.fullName,
+                avatar,
+                currentPassword: req.body.currentPassword,
+                newPassword: req.body.newPassword,
+            };
+
+            await this.userModel.updateUser(payload);
+
+            const updatedUser = await this.userModel.getUserById(userID);
+            if (!updatedUser) {
+                throw new Error('User not found');
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { password, ...userWithoutPassword } = updatedUser;
+
+            return res.status(200).json({
+                success: true,
+                message: 'プロフィールが正常に更新されました',
+                data: userWithoutPassword,
+            });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                if (error.message === 'User not found') {
+                    return res.status(404).json({ success: false, message: 'ユーザーが見つかりません' });
+                }
+                if (error.message === 'Current password is incorrect') {
+                    return res.status(401).json({ success: false, message: '現在のパスワードが間違っています' });
+                }
+                if (error.message === 'Current password is required to set a new password') {
+                    return res
+                        .status(400)
+                        .json({ success: false, message: '新しいパスワードを設定するには現在のパスワードが必要です' });
+                }
+                console.error(error);
+                return res.status(500).json({ success: false, message: 'サーバー内部エラー' });
+            }
         }
     }
 }
