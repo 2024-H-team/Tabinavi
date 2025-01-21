@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { RecommendedPlaceModel, SelectedPlace } from '../models/PlaceRecommendationModel';
 import mysql from 'mysql2/promise';
 import { getCurrentTime } from '~/utils/timeNow';
-
+import { logWithIp } from '~/utils/logger';
 interface AuthRequest extends Request {
     user?: {
         userId: number;
@@ -40,7 +40,8 @@ export class RecommendedPlaceController {
                 dayEndTime,
             );
 
-            console.log('Recommended place types fetched:', userId, getCurrentTime());
+            // console.log('Recommended place types fetched:', userId, getCurrentTime());
+            logWithIp(req, 'Recommended place types fetched', getCurrentTime(), userId);
             if (recommendation.success) {
                 res.status(200).json({
                     success: true,

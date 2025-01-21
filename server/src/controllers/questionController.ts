@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { QuestionModel, UserAnswer } from '../models/questionModel';
 import mysql from 'mysql2/promise';
 import { getCurrentTime } from '~/utils/timeNow';
+import { logWithIp } from '~/utils/logger';
 
 interface AuthRequest extends Request {
     user?: {
@@ -54,7 +55,8 @@ export class QuestionController {
             }
 
             const { responseId, isUpdate } = await this.questionModel.submitUserAnswers(userId, answers);
-            console.log('Answers submitted:', userId, getCurrentTime());
+            // console.log('Answers submitted:', userId, getCurrentTime());
+            logWithIp(req, 'Answers submitted', getCurrentTime(), userId);
             res.status(201).json({
                 success: true,
                 message: 'Answers submitted successfully',

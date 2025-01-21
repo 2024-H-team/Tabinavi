@@ -5,10 +5,13 @@ import { verifyTokenMiddleware } from '../middlewares/verifyTokenMiddleware';
 import { asyncHandler } from '../middlewares/asyncHandler';
 import { UserModel } from '../models/userModel';
 import pool from '../config/database';
+import multer from 'multer';
 
 const router = express.Router();
 const userModel = new UserModel(pool);
 const userController = new UserController(userModel);
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 interface AuthRequest extends Request {
     user?: {
@@ -29,6 +32,13 @@ router.post(
     '/login',
     loginValidation,
     asyncHandler((req, res) => userController.login(req, res)),
+);
+
+router.put(
+    '/update-profile',
+    verifyTokenMiddleware,
+    upload.single('avatar'),
+    asyncHandler((req, res) => userController.updateProfile(req, res)),
 );
 
 router.get(

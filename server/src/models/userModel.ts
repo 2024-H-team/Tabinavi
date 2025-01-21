@@ -11,6 +11,16 @@ export interface User {
     create_at?: Date;
 }
 
+export interface UserUpdate {
+    userID: number;
+    userName?: string;
+    email?: string;
+    fullName?: string;
+    avatar?: string;
+    currentPassword?: string;
+    newPassword?: string;
+}
+
 export class UserModel {
     private pool: mysql.Pool;
 
@@ -102,5 +112,60 @@ export class UserModel {
         }
 
         return firstLogin;
+    }
+
+    async updateUser(user: UserUpdate): Promise<void> {
+        const [rows] = await this.pool.execute<mysql.RowDataPacket[]>('SELECT * FROM users WHERE userID = ?', [
+            user.userID,
+        ]);
+
+        if (rows.length === 0) {
+            throw new Error('User not found');
+        }
+
+        const existingUser = rows[0];
+
+        if (user.newPassword) {
+            if (!user.currentPassword) {
+                throw new Error('Current password is required to set a new password');
+            }
+            const isMatch = await bcrypt.compare(user.currentPassword, existingUser.password);
+            if (!isMatch) {
+                throw new Error('Current password is incorrect');
+            }
+        }
+
+        const updateFields: string[] = [];
+        const params: (string | number)[] = [];
+
+        if (user.email) {
+            updateFields.push('email = ?');
+            params.push(user.email);
+        }
+        if (user.fullName) {
+            updateFields.push('fullName = ?');
+            params.push(user.fullName);
+        }
+        if (user.avatar) {
+            updateFields.push('avatar = ?');
+            params.push(user.avatar);
+        }
+
+        if (user.newPassword) {
+            const hashed = await bcrypt.hash(user.newPassword, 10);
+            updateFields.push('password = ?');
+            params.push(hashed);
+        }
+
+        if (updateFields.length === 0) return;
+
+        const sql = `UPDATE users SET ${updateFields.join(', ')} WHERE userID = ?`;
+        params.push(user.userID);
+        await this.pool.execute(sql, params);
+    }
+
+    async getUserById(userId: number): Promise<User | null> {
+        const [rows] = await this.pool.execute<mysql.RowDataPacket[]>('SELECT * FROM users WHERE userID = ?', [userId]);
+        return rows.length > 0 ? (rows[0] as User) : null;
     }
 }

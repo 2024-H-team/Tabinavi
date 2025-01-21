@@ -23,7 +23,6 @@
             .log-entry {
                 font-size: 13px;
                 word-break: break-all;
-                word-wrap: break-word;
                 border-bottom: 1px solid #333;
                 padding: 5px;
             }
@@ -32,16 +31,43 @@
     <body>
         <div id="logs"></div>
         <script>
-            const socket = io('https://tabinaviapi.nguyenduchuynh.com/');
+            let apiKey = sessionStorage.getItem('LOG_KEY');
+            if (!apiKey) {
+                apiKey = prompt('(PROTECT_API_KEY):');
+                sessionStorage.setItem('LOG_KEY', apiKey);
+            }
+
             const logsDiv = document.getElementById('logs');
 
-            fetch('/api/logs')
-                .then((res) => res.json())
+            fetch('/api/logs', {
+                headers: {
+                    'x-api-key': apiKey,
+                },
+            })
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error('Invalid or missing API key!');
+                    }
+                    return res.json();
+                })
                 .then((logs) => {
                     logs.forEach((log) => {
                         addLogEntry(log);
                     });
+                })
+                .catch((err) => {
+                    addLogEntry('Error: ' + err.message);
                 });
+
+            const socket = io('https://tabinaviapi.nguyenduchuynh.com/', {
+                query: {
+                    apiKey: apiKey,
+                },
+            });
+
+            socket.on('connect_error', (err) => {
+                addLogEntry('Socket connect error: ' + err.message);
+            });
 
             socket.on('log', (log) => {
                 addLogEntry(log);
