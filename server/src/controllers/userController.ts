@@ -4,7 +4,7 @@ import { UserModel, UserUpdate } from '../models/userModel';
 import jwt from 'jsonwebtoken';
 import { getCurrentTime } from '~/utils/timeNow';
 import { processAndUploadImage } from '~/utils/imageUtils';
-
+import { logWithIp } from '~/utils/logger';
 interface AuthRequest extends Request {
     user?: {
         userId: number;
@@ -66,7 +66,8 @@ export class UserController {
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...userWithoutPassword } = newUser;
-            console.log('User registered:', newUser.userName, getCurrentTime());
+            // console.log('User registered:', newUser.userName, getCurrentTime());
+            logWithIp(req, 'User registered: ' + newUser.userName, getCurrentTime(), newUser.userID);
             return res.status(201).json({
                 success: true,
                 message: 'User registered successfully',
@@ -114,7 +115,8 @@ export class UserController {
                 avatar: user.avatar || null,
             };
 
-            console.log('User logged in:', user.userName, getCurrentTime());
+            // console.log('User logged in:', user.userName, getCurrentTime());
+            logWithIp(req, 'User logged in: ' + user.userName, getCurrentTime(), user.userID);
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',
@@ -164,7 +166,8 @@ export class UserController {
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...userWithoutPassword } = updatedUser;
-            console.log('User profile updated:', updatedUser.userName, getCurrentTime());
+            // console.log('User profile updated:', updatedUser.userName, getCurrentTime());
+            logWithIp(req, 'User profile updated: ' + updatedUser.userName, getCurrentTime(), updatedUser.userID);
             return res.status(200).json({
                 success: true,
                 message: 'プロフィールが正常に更新されました',
