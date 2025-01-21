@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getAllLogs } from '../models/logModel';
 
-export const getLogs = (req: Request, res: Response) => {
+export const getLogs = async (req: Request, res: Response): Promise<void> => {
     try {
         const logs = getAllLogs();
         res.json(logs);
