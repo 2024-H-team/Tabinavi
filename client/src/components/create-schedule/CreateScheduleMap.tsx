@@ -6,6 +6,7 @@ import { GoogleMap, Autocomplete } from '@react-google-maps/api';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import { useMapContext } from '@/components/MapProvider';
 import { smoothPanTo, createMarker, fetchPlaceDetailsFromLatLng, getPlaceDetails } from '@/utils/mapUtils';
+import { DaySchedule } from '@/app/create-schedule/page';
 
 interface CreateScheduleMapProps {
     onPlaceSelect: (places: PlaceDetails[]) => void;
@@ -29,7 +30,24 @@ const CreateScheduleMap: React.FC<CreateScheduleMapProps> = ({
     const selectedMarkersRef = useRef<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
     const highlightMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
 
-    const center = useMemo(() => ({ lat: 34.6937, lng: 135.5023 }), []);
+    const getInitialCenter = () => {
+        try {
+            const storedSchedules = sessionStorage.getItem('schedules');
+            if (storedSchedules) {
+                const schedules: DaySchedule[] = JSON.parse(storedSchedules);
+                if (Array.isArray(schedules) && schedules.length > 0 && schedules[0].spots?.length > 0) {
+                    const firstSpot = schedules[0].spots[0];
+                    if (firstSpot.location && firstSpot.location.lat && firstSpot.location.lng) {
+                        return { lat: firstSpot.location.lat, lng: firstSpot.location.lng };
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing schedules from sessionStorage:', error);
+        }
+        return { lat: 34.6937, lng: 135.5023 };
+    };
+    const center = useMemo(() => getInitialCenter(), []);
 
     const [recommendMarkers, setRecommendMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
 
