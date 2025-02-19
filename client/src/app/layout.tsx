@@ -2,7 +2,7 @@ import { Inter } from 'next/font/google';
 import 'normalize.css';
 import '@styles/GlobalStyles.scss';
 import { MapProvider } from '@/components/MapProvider';
-
+import '@styles/componentStyles/custom-timePicker-css.scss';
 import { Metadata } from 'next';
 
 export const generateMetadata = async (): Promise<Metadata> => {

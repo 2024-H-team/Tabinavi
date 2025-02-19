@@ -1,12 +1,15 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-import WheelPicker from '@/components/WheelPicker';
 import styles from '@styles/appStyles/schedule/InfoSetup.module.scss';
 import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import { BestRoute } from '@/types/TransferData';
-
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
 
@@ -29,6 +32,7 @@ export interface DaySchedule {
 }
 
 export default function InfoSetup() {
+    const router = useRouter();
     const [isOneDay, setIsOneDay] = useState(true);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -42,12 +46,12 @@ export default function InfoSetup() {
         },
     ]);
     const [title, setTitle] = useState('');
-    const router = useRouter();
 
     const getDateRange = (start: string, end: string): string[] => {
         const startDt = new Date(start);
         const endDt = new Date(end);
         const dateArray: string[] = [];
+
         for (let dt = new Date(startDt); dt <= endDt; dt.setDate(dt.getDate() + 1)) {
             const year = dt.getFullYear();
             const month = (dt.getMonth() + 1).toString().padStart(2, '0');
@@ -63,8 +67,8 @@ export default function InfoSetup() {
                 {
                     title,
                     date: startDate,
-                    startTime: `${hours[0]}:${minutes[0]}`,
-                    endTime: `${hours[0]}:${minutes[0]}`,
+                    startTime: '00:00',
+                    endTime: '00:00',
                     spots: [],
                     transports: [],
                 },
@@ -79,8 +83,8 @@ export default function InfoSetup() {
                 return {
                     title,
                     date,
-                    startTime: `${hours[0]}:${minutes[0]}`, // Đảm bảo startTime luôn hợp lệ
-                    endTime: index === dates.length - 1 ? `${hours[0]}:${minutes[0]}` : `${hours[23]}:${minutes[55]}`, // Đảm bảo endTime luôn hợp lệ
+                    startTime: '00:00',
+                    endTime: index === dates.length - 1 ? '00:00' : '23:55',
                     spots: [],
                     transports,
                 };
@@ -93,30 +97,22 @@ export default function InfoSetup() {
         setSchedules((prev) =>
             prev.map((schedule, i) => {
                 if (i !== index) return schedule;
-
-                const [hour, minute] = value.split(':');
-                const formattedHour = hours.includes(hour) ? hour : hours[0];
-                const formattedMinute = minutes.includes(minute) ? minute : minutes[0];
-                const formattedTime = `${formattedHour}:${formattedMinute}`;
-
-                return type === 'start'
-                    ? { ...schedule, startTime: formattedTime }
-                    : { ...schedule, endTime: formattedTime };
+                // Ghi đè giờ. value = "HH:mm"
+                return type === 'start' ? { ...schedule, startTime: value } : { ...schedule, endTime: value };
             }),
         );
     };
 
+    // Kiểm tra tính hợp lệ
     const validateSchedules = () => {
         if (!title.trim()) {
             alert('タイトルを入力してください。');
             return false;
         }
-
         if (!startDate) {
             alert('開始日を選択してください。');
             return false;
         }
-
         if (!isOneDay && !endDate) {
             alert('終了日を選択してください。');
             return false;
@@ -131,12 +127,12 @@ export default function InfoSetup() {
                 alert('出発時間と終了時間が同じです。');
                 return false;
             }
+            // So sánh chuỗi "HH:mm"
             if (schedule.startTime > schedule.endTime) {
                 alert('出発時間は終了時間より前である必要があります。');
                 return false;
             }
         }
-
         return true;
     };
 
@@ -158,6 +154,7 @@ export default function InfoSetup() {
                     <p>タイトル：</p>
                     <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
                 </div>
+
                 <div className={styles.toggleGroup}>
                     <span className={styles.toggleLabel}>日帰り</span>
                     <label className={styles.switch}>
@@ -165,6 +162,7 @@ export default function InfoSetup() {
                         <span className={styles.slider}></span>
                     </label>
                 </div>
+
                 <div className={styles.datePickerContainer}>
                     <div className={styles.datePickerGroup}>
                         <p className={styles.dateText} data-checked={isOneDay}></p>
@@ -182,71 +180,48 @@ export default function InfoSetup() {
                         </div>
                     )}
                 </div>
-                {((isOneDay && startDate) || (!isOneDay && startDate && endDate)) &&
-                    schedules.map((schedule, index) => (
-                        <div key={index} className={styles.daySchedule}>
-                            <p className={styles.date}>{schedule.date}</p>
-                            <div className={styles.timePickerGroup}>
-                                <div className={styles.pickers}>
-                                    出発時間
-                                    <div className={styles.pickersBlock}>
-                                        <WheelPicker
-                                            data={hours}
-                                            defaultSelection={hours.indexOf(schedule.startTime.split(':')[0])}
-                                            onChange={(value) =>
-                                                handleTimeChange(
-                                                    index,
-                                                    'start',
-                                                    `${value}:${schedule.startTime.split(':')[1]}`,
-                                                )
-                                            }
-                                        />
-                                        <p>-</p>
-                                        <WheelPicker
-                                            data={minutes}
-                                            defaultSelection={minutes.indexOf(schedule.startTime.split(':')[1])}
-                                            onChange={(value) =>
-                                                handleTimeChange(
-                                                    index,
-                                                    'start',
-                                                    `${schedule.startTime.split(':')[0]}:${value}`,
-                                                )
-                                            }
-                                        />
+
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
+                    {((isOneDay && startDate) || (!isOneDay && startDate && endDate)) &&
+                        schedules.map((schedule, index) => {
+                            const startObj = dayjs(`1970-01-01 ${schedule.startTime}`, 'YYYY-MM-DD HH:mm');
+                            const endObj = dayjs(`1970-01-01 ${schedule.endTime}`, 'YYYY-MM-DD HH:mm');
+
+                            return (
+                                <div key={index} className={styles.daySchedule}>
+                                    <p className={styles.date}>{schedule.date}</p>
+                                    <div className={styles.timePickerGroup}>
+                                        <div className={styles.pickers}>
+                                            <MobileTimePicker
+                                                label="出発時間"
+                                                ampm={false}
+                                                value={startObj}
+                                                onChange={(newVal) => {
+                                                    if (!newVal) return;
+                                                    const valStr = newVal.format('HH:mm');
+                                                    handleTimeChange(index, 'start', valStr);
+                                                }}
+                                            />
+                                        </div>
+                                        <span>～</span>
+                                        <div className={styles.pickers}>
+                                            <MobileTimePicker
+                                                label="終了時間"
+                                                ampm={false}
+                                                value={endObj}
+                                                onChange={(newVal) => {
+                                                    if (!newVal) return;
+                                                    const valStr = newVal.format('HH:mm');
+                                                    handleTimeChange(index, 'end', valStr);
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                                <span>～</span>
-                                <div className={styles.pickers}>
-                                    終了時間
-                                    <div className={styles.pickersBlock}>
-                                        <WheelPicker
-                                            data={hours}
-                                            defaultSelection={hours.indexOf(schedule.endTime.split(':')[0])}
-                                            onChange={(value) =>
-                                                handleTimeChange(
-                                                    index,
-                                                    'end',
-                                                    `${value}:${schedule.endTime.split(':')[1]}`,
-                                                )
-                                            }
-                                        />
-                                        <p>-</p>
-                                        <WheelPicker
-                                            data={minutes}
-                                            defaultSelection={minutes.indexOf(schedule.endTime.split(':')[1])}
-                                            onChange={(value) =>
-                                                handleTimeChange(
-                                                    index,
-                                                    'end',
-                                                    `${schedule.endTime.split(':')[0]}:${value}`,
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                            );
+                        })}
+                </LocalizationProvider>
+
                 <div className={styles.btnBox}>
                     <button onClick={handleSubmit} className={styles.submitButton}>
                         次に進む
