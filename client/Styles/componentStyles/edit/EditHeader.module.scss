@@ -4,7 +4,7 @@
     align-items: center;
     height: 120px;
     color: #f1f1f1;
-    padding-left: 22px;
+    padding-left: 10px;
     position: relative;
     h1 {
         font-size: 2.2rem;
@@ -14,6 +14,7 @@
         background-color: inherit;
         display: flex;
         align-items: center;
+        padding: 20px 10px 20px 20px;
     }
 }
 .questionBtn {

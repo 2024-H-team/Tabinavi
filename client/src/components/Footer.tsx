@@ -10,15 +10,15 @@ export default function Footer() {
         <footer className={styles.FooterWrap}>
             <Link className={styles.NavBtn} href={'/home'}>
                 <GoHome color="white" size="24px" />
-                <p>Home</p>
+                <p>ホーム</p>
             </Link>
             <Link className={styles.NavBtn} href={'/create-schedule'}>
                 <PiPlusSquareBold color="white" size="24px" />
-                <p>New schedule</p>
+                <p>スケジュール作成</p>
             </Link>
             <Link className={styles.NavBtn} href={'/profile'}>
                 <FaRegUser color="white" size="24px" />
-                <p>Profile</p>
+                <p>マイページ</p>
             </Link>
         </footer>
     );

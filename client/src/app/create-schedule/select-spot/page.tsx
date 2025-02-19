@@ -160,9 +160,15 @@ export default function CreateSchedule() {
     const handleLoadMore = (visibleSpots: PlaceDetails[]) => {
         setVisibleRecommendedSpots(visibleSpots);
     };
-
+    console.log(isContainerOpen);
     return (
-        <div className={Styles.page}>
+        <div
+            className={Styles.page}
+            onClick={(e) => {
+                console.log('Click on .page', e);
+                setIsContainerOpen(false);
+            }}
+        >
             <div className={Styles.mapContainer}>
                 <CreateScheduleMap
                     onPlaceSelect={setSelectedPlaces}
@@ -184,7 +190,13 @@ export default function CreateSchedule() {
                     />
                 </div>
             )}
-            <div className={Styles.menuBtn} onClick={toggleContainer}>
+            <div
+                className={Styles.menuBtn}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    toggleContainer();
+                }}
+            >
                 <MdMenuOpen color="white" size={30} />
                 <div className={`${Styles.manualBox} ${showManual ? Styles.show : ''}`}>
                     <div className={Styles.manualArrow}></div>

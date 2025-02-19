@@ -1,10 +1,11 @@
 'use client';
+import { useMemo } from 'react';
 import styles from '@styles/componentStyles/create-schedule/SelectedSpot.module.scss';
 import { PlaceDetails } from '@/types/PlaceDetails';
-import WheelPicker from '@/components/WheelPicker';
-
-const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
+import dayjs from 'dayjs';
 
 interface SelectedSpotProps {
     onDelete: () => void;
@@ -24,9 +25,15 @@ export default function SelectedSpot({
     const defaultHour = spot.stayTime?.hour || '00';
     const defaultMinute = spot.stayTime?.minute || '00';
 
+    const timeValue = useMemo(
+        () => dayjs(`1970-01-01 ${defaultHour}:${defaultMinute}`, 'YYYY-MM-DD HH:mm'),
+        [defaultHour, defaultMinute],
+    );
+
     const handleTimeChange = (newHour: string, newMinute: string) => {
         onStayTimeUpdate(spot.name, { hour: newHour, minute: newMinute });
     };
+
     const truncateText = (text: string, maxLength: number = 15) => {
         return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
     };
@@ -50,23 +57,19 @@ export default function SelectedSpot({
                 </div>
             </div>
             <div className={styles.timePickerGroup}>
-                <p>滞在時間</p>
-                <div className={styles.pickers}>
-                    <WheelPicker
-                        data={hours}
-                        defaultSelection={hours.indexOf(defaultHour)}
-                        onChange={(value) => {
-                            handleTimeChange(value, defaultMinute);
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
+                    <MobileTimePicker
+                        label="滞在時間"
+                        ampm={false}
+                        value={timeValue}
+                        onChange={(newVal) => {
+                            if (!newVal) return;
+                            const h = newVal.format('HH');
+                            const m = newVal.format('mm');
+                            handleTimeChange(h, m);
                         }}
                     />
-                    <WheelPicker
-                        data={minutes}
-                        defaultSelection={minutes.indexOf(defaultMinute)}
-                        onChange={(value) => {
-                            handleTimeChange(defaultHour, value);
-                        }}
-                    />
-                </div>
+                </LocalizationProvider>
             </div>
         </div>
     );

@@ -30,7 +30,7 @@ export default function EditHeader(props: Props) {
                 onClick={handleQuestionClick}
             />
             <button onClick={handleBack}>
-                <IoIosArrowBack size={18} color="white" />
+                <IoIosArrowBack size={32} color="white" />
             </button>
             <h1>{props.location}</h1>
         </header>

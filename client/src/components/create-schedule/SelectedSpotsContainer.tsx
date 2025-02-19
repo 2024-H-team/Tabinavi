@@ -88,45 +88,43 @@ export default function SelectedSpotsContainer({
             onDragStart={handleDragStart}
         >
             <SortableContext items={spots.map((spot) => spot.name)}>
-                <div className={`${styles.containerWrapper} ${isOpen ? styles.open : ''}`} onClick={onClose}>
-                    <div
-                        className={`${styles.Container} ${isOpen ? styles.open : ''}`}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className={styles.header}>
-                            {getDateRange()}
-                            <span className={styles.closeBtn} onClick={onClose}>
-                                ✕
-                            </span>
-                        </div>
-                        <div className={styles.datePageSelect}>
-                            <span onClick={handlePrevDate}>≪</span>
-                            <p className={styles.date}>
-                                {new Date(schedules[activeDateIndex]?.date).toLocaleDateString('ja-JP')}
-                            </p>
-                            <span onClick={handleNextDate}>≫</span>
-                        </div>
-                        <div className={styles.content}>
-                            {spots.map((spot, index) => (
-                                <SortableSpotWrapper
-                                    key={`${spot.name}-${index}`}
-                                    spot={spot}
-                                    onDelete={() => onDeleteSpot(index)}
-                                    onStayTimeUpdate={onStayTimeUpdate}
-                                    className={styles.selectedSpot}
-                                >
-                                    {({ dragHandleProps, isDragging }) => (
-                                        <SelectedSpot
-                                            spot={spot}
-                                            onDelete={() => onDeleteSpot(index)}
-                                            onStayTimeUpdate={onStayTimeUpdate}
-                                            dragHandleProps={dragHandleProps}
-                                            isDragging={isDragging}
-                                        />
-                                    )}
-                                </SortableSpotWrapper>
-                            ))}
-                        </div>
+                <div
+                    className={`${styles.Container} ${isOpen ? styles.open : ''}`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className={styles.header}>
+                        {getDateRange()}
+                        <span className={styles.closeBtn} onClick={onClose}>
+                            ✕
+                        </span>
+                    </div>
+                    <div className={styles.datePageSelect}>
+                        <span onClick={handlePrevDate}>≪</span>
+                        <p className={styles.date}>
+                            {new Date(schedules[activeDateIndex]?.date).toLocaleDateString('ja-JP')}
+                        </p>
+                        <span onClick={handleNextDate}>≫</span>
+                    </div>
+                    <div className={styles.content}>
+                        {spots.map((spot, index) => (
+                            <SortableSpotWrapper
+                                key={`${spot.name}-${index}`}
+                                spot={spot}
+                                onDelete={() => onDeleteSpot(index)}
+                                onStayTimeUpdate={onStayTimeUpdate}
+                                className={styles.selectedSpot}
+                            >
+                                {({ dragHandleProps, isDragging }) => (
+                                    <SelectedSpot
+                                        spot={spot}
+                                        onDelete={() => onDeleteSpot(index)}
+                                        onStayTimeUpdate={onStayTimeUpdate}
+                                        dragHandleProps={dragHandleProps}
+                                        isDragging={isDragging}
+                                    />
+                                )}
+                            </SortableSpotWrapper>
+                        ))}
                     </div>
                 </div>
             </SortableContext>

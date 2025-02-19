@@ -66,13 +66,13 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
     };
 
     return (
-        <div className={styles.EditWrap}>
+        <div className={styles.EditWrap} onClick={handleEditClick}>
             <div>
                 <h2>{title}</h2>
                 <div className={styles.PersonalEffectsWrap}>
                     {personalEffects.length > 0 ? (
                         personalEffects.map((effect, index) => (
-                            <div key={index} className={styles.PersonalEffects}>
+                            <div key={index} className={styles.PersonalEffects} onClick={(e) => e.stopPropagation()}>
                                 <p>
                                     {effect.Name}
                                     <button onClick={() => handleDelete(index)}>
@@ -95,14 +95,27 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
                             placeholder="持ち物を入力"
                             onChange={(e) => setNewItem(e.target.value)}
                             className={styles.AddItemInput}
+                            onClick={(e) => e.stopPropagation()}
                         />
-                        <button onClick={handleAdd} className={styles.AddButton}>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleAdd();
+                            }}
+                            className={styles.AddButton}
+                        >
                             追加
                         </button>
                     </div>
                 )}
             </div>
-            <button className={styles.EditBtn} onClick={handleEditClick}>
+            <button
+                className={styles.EditBtn}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditClick();
+                }}
+            >
                 {isAdding ? 'キャンセル' : <HiOutlinePencil color="#929292" />}
             </button>
         </div>
