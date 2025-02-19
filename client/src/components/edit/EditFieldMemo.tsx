@@ -64,13 +64,12 @@ export default function EditFieldMemo({ title, value, placeId }: EditFieldMemoPr
                     ref={inputRef}
                     rows={5}
                     cols={30}
-                    className={styles.EditMemo}
+                    className={`${styles.EditMemo} ${!isEditable ? styles.viewOnly : ''}`}
                     value={inputValue}
                     placeholder="お店の情報やURLを記入するのがおすすめ"
-                    readOnly={!isEditable}
+                    onFocus={() => setIsEditable(true)}
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    onClick={handleEnableEdit}
                 />
             </div>
             <button className={styles.EditBtn} onClick={handleEnableEdit}>

@@ -48,7 +48,7 @@ export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
     };
 
     return (
-        <div className={styles.EditWrap}>
+        <div className={styles.EditWrap} onClick={() => setShowPicker(true)}>
             <div className={styles.EditFieldWrap}>
                 <h2>{title}</h2>
                 {showPicker ? (
@@ -65,7 +65,14 @@ export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
                             onChange={(value) => handleTimeChange('minute', value)}
                         />
                         <span>分</span>
-                        <button onClick={() => setShowPicker(false)}>確定</button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowPicker(false);
+                            }}
+                        >
+                            確定
+                        </button>
                     </div>
                 ) : (
                     <div className={styles.EditField}>{`${hour}時間${minute}分`}</div>

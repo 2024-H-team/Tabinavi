@@ -79,15 +79,15 @@ export const TravelTimeCalculator: React.FC<TravelTimeCalculatorProps> = ({
             </select>
             {loading ? (
                 <p className={styles.duration}>計算中...</p>
-            ) : (
-                <p className={styles.duration}>
+            ) : selectedMode === 'TRANSIT' && transferData ? (
+                <div className={`${styles.duration} ${styles.transitDuration}`} onClick={handleDurationClick}>
                     {duration}
-                    {selectedMode === 'TRANSIT' && transferData && (
-                        <span onClick={handleDurationClick} className={styles.transferDetail}>
-                            <GrNext />
-                        </span>
-                    )}
-                </p>
+                    <span className={styles.transferDetail}>
+                        <GrNext />
+                    </span>
+                </div>
+            ) : (
+                <div className={styles.duration}>{duration}</div>
             )}
         </div>
     );
