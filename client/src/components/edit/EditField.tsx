@@ -1,14 +1,12 @@
 'use client';
+
 import { useState } from 'react';
 import styles from '@styles/componentStyles/edit/Content.module.scss';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import { DaySchedule } from '@/app/create-schedule/page';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
-import dayjs, { Dayjs } from 'dayjs';
-import 'dayjs/locale/ja';
+import { TimePicker } from 'rsuite';
+import 'rsuite/TimePicker/styles/index.css';
 
 interface EditFieldTimeProps {
     title: string;
@@ -21,7 +19,13 @@ export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
     const defaultHour = spot.stayTime?.hour || '00';
     const defaultMinute = spot.stayTime?.minute || '00';
 
-    const [time, setTime] = useState<Dayjs>(dayjs(`1970-01-01 ${defaultHour}:${defaultMinute}`, 'YYYY-MM-DD HH:mm'));
+    const defaultDate = new Date();
+    defaultDate.setHours(Number(defaultHour));
+    defaultDate.setMinutes(Number(defaultMinute));
+    defaultDate.setSeconds(0);
+    defaultDate.setMilliseconds(0);
+
+    const [time, setTime] = useState<Date>(defaultDate);
 
     const updateStorages = (newHour: string, newMinute: string) => {
         const editSpot = JSON.parse(sessionStorage.getItem('editSpot') || '{}');
@@ -42,58 +46,55 @@ export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
         }
     };
 
-    const handleTimeChange = (newVal: Dayjs | null) => {
-        if (!newVal) return;
-        setTime(newVal);
-        const h = newVal.format('HH');
-        const m = newVal.format('mm');
+    const handleTimeChange = (val: Date | null) => {
+        if (!val) return;
+        setTime(val);
+        const h = val.getHours().toString().padStart(2, '0');
+        const m = val.getMinutes().toString().padStart(2, '0');
         updateStorages(h, m);
     };
 
+    const displayHour = time.getHours().toString().padStart(2, '0');
+    const displayMinute = time.getMinutes().toString().padStart(2, '0');
+
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
-            <div className={styles.EditWrap} onClick={() => setShowPicker(true)}>
-                <div className={styles.EditFieldWrap}>
-                    <h2>{title}</h2>
-                    {showPicker ? (
-                        <div className={styles.timePickerContainer} onClick={(e) => e.stopPropagation()}>
-                            <MobileTimePicker
-                                ampm={false}
-                                value={time}
-                                onChange={handleTimeChange}
-                                sx={{
-                                    '& .MuiInputBase-root': {
-                                        fontSize: '1.2rem',
-                                        padding: '6px 10px',
-                                    },
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#436EEE',
-                                    },
-                                }}
-                            />
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowPicker(false);
-                                }}
-                            >
-                                確定
-                            </button>
-                        </div>
-                    ) : (
-                        <div className={styles.EditField}>{`${time.format('HH')}時間${time.format('mm')}分`}</div>
-                    )}
-                </div>
-                <button
-                    className={styles.EditBtn}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setShowPicker(true);
-                    }}
-                >
-                    <HiOutlinePencil color="#929292" />
-                </button>
+        <div className={styles.EditWrap} onClick={() => setShowPicker(true)}>
+            <div className={styles.EditFieldWrap}>
+                <p className={styles.title}>{title}</p>
+                {showPicker ? (
+                    <div className={styles.timePickerContainer} onClick={(e) => e.stopPropagation()}>
+                        <TimePicker
+                            format="HH:mm"
+                            value={time}
+                            onChange={handleTimeChange}
+                            style={{
+                                fontSize: '1.2rem',
+                                padding: '6px 10px',
+                            }}
+                        />
+                        <button
+                            className={styles.confirmBtn}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowPicker(false);
+                            }}
+                        >
+                            確定
+                        </button>
+                    </div>
+                ) : (
+                    <div className={styles.EditField}>{`${displayHour}時間${displayMinute}分`}</div>
+                )}
             </div>
-        </LocalizationProvider>
+            <button
+                className={styles.EditBtn}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setShowPicker(true);
+                }}
+            >
+                <HiOutlinePencil color="#929292" />
+            </button>
+        </div>
     );
 }

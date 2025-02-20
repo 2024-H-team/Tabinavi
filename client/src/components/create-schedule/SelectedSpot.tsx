@@ -1,11 +1,9 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import styles from '@styles/componentStyles/create-schedule/SelectedSpot.module.scss';
 import { PlaceDetails } from '@/types/PlaceDetails';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
-import dayjs from 'dayjs';
+import { TimePicker } from 'rsuite';
+import 'rsuite/TimePicker/styles/index.css';
 
 interface SelectedSpotProps {
     onDelete: () => void;
@@ -25,13 +23,24 @@ export default function SelectedSpot({
     const defaultHour = spot.stayTime?.hour || '00';
     const defaultMinute = spot.stayTime?.minute || '00';
 
-    const timeValue = useMemo(
-        () => dayjs(`1970-01-01 ${defaultHour}:${defaultMinute}`, 'YYYY-MM-DD HH:mm'),
-        [defaultHour, defaultMinute],
-    );
+    // Tạo 1 đối tượng Date dựa trên hour:minute
+    const defaultDate = useMemo(() => {
+        const d = new Date();
+        d.setHours(Number(defaultHour));
+        d.setMinutes(Number(defaultMinute));
+        d.setSeconds(0);
+        d.setMilliseconds(0);
+        return d;
+    }, [defaultHour, defaultMinute]);
 
-    const handleTimeChange = (newHour: string, newMinute: string) => {
-        onStayTimeUpdate(spot.name, { hour: newHour, minute: newMinute });
+    const [time, setTime] = useState<Date>(defaultDate);
+
+    const handleTimeChangeRSuite = (val: Date | null) => {
+        if (!val) return;
+        setTime(val);
+        const h = val.getHours().toString().padStart(2, '0');
+        const m = val.getMinutes().toString().padStart(2, '0');
+        onStayTimeUpdate(spot.name, { hour: h, minute: m });
     };
 
     const truncateText = (text: string, maxLength: number = 15) => {
@@ -50,26 +59,23 @@ export default function SelectedSpot({
                     =
                 </div>
                 <div>
-                    <h3 title={spot.name}>{truncateText(spot.name)}</h3>
+                    <p title={spot.name} className={styles.name}>
+                        {truncateText(spot.name)}
+                    </p>
                 </div>
                 <div className={styles.closeBtn} onClick={onDelete}>
                     ✕
                 </div>
             </div>
+
             <div className={styles.timePickerGroup}>
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
-                    <MobileTimePicker
-                        label="滞在時間"
-                        ampm={false}
-                        value={timeValue}
-                        onChange={(newVal) => {
-                            if (!newVal) return;
-                            const h = newVal.format('HH');
-                            const m = newVal.format('mm');
-                            handleTimeChange(h, m);
-                        }}
-                    />
-                </LocalizationProvider>
+                滞在時間：
+                <TimePicker
+                    format="HH:mm"
+                    value={time}
+                    onChange={handleTimeChangeRSuite}
+                    placement="autoVerticalStart"
+                />
             </div>
         </div>
     );

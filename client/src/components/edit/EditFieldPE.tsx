@@ -68,7 +68,7 @@ export default function EditFieldPE({ title, data }: EditFieldPEProps) {
     return (
         <div className={styles.EditWrap} onClick={handleEditClick}>
             <div>
-                <h2>{title}</h2>
+                <p className={styles.title}>{title}</p>
                 <div className={styles.PersonalEffectsWrap}>
                     {personalEffects.length > 0 ? (
                         personalEffects.map((effect, index) => (
