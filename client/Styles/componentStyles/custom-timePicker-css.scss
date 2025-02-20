@@ -71,6 +71,9 @@
         background-position: center !important;
         width: 15px !important;
         height: 15px !important;
+        pointer-events: none !important;
+        caret-color: transparent !important;
+        user-select: none !important;
     }
     .rs-input-group-addon {
         padding: 5px 10px !important;
