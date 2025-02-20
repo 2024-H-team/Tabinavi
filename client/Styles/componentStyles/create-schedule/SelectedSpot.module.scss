@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
     padding-left: 40px;
     border-radius: 10px;
     width: 100%;
@@ -23,6 +23,10 @@
         cursor: pointer;
         padding: 5px;
     }
+    .name {
+        font-size: 14px;
+        font-weight: 700;
+    }
     .closeBtn {
         position: absolute;
         top: 5px;
@@ -40,10 +44,11 @@
     }
     .timePickerGroup {
         display: flex;
+        flex-direction: column;
         justify-content: flex-start;
-        align-items: center;
+        align-items: flex-start;
         width: 120px;
-        gap: 10px;
+        gap: 3px;
         .pickers {
             display: flex;
             gap: 20px;

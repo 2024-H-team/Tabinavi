@@ -59,7 +59,7 @@ export default function EditFieldMemo({ title, value, placeId }: EditFieldMemoPr
     return (
         <div className={styles.EditWrap}>
             <div>
-                <h2>{title}</h2>
+                <p className={styles.title}>{title}</p>
                 <textarea
                     ref={inputRef}
                     rows={5}
