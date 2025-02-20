@@ -75,7 +75,6 @@ export default function SelectedSpot({
                     value={time}
                     onChange={handleTimeChangeRSuite}
                     placement="autoVerticalStart"
-                    readOnly={true}
                 />
             </div>
         </div>

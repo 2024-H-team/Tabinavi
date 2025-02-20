@@ -67,7 +67,6 @@ export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
                             format="HH:mm"
                             value={time}
                             onChange={handleTimeChange}
-                            readOnly={true}
                             style={{
                                 fontSize: '1.2rem',
                                 padding: '6px 10px',
