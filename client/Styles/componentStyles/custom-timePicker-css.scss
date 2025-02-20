@@ -70,6 +70,7 @@
 }
 .rs-picker-input-group {
     position: relative !important;
+    background-color: white !important;
     border: 1px solid #aaaaaa !important;
     pointer-events: none !important;
     user-select: none !important;
@@ -79,6 +80,13 @@
         pointer-events: none !important;
         caret-color: transparent !important;
         user-select: none !important;
+        background-color: white !important;
+        color: #000 !important;
+        &:disabled {
+            background-color: white !important;
+            color: #000 !important;
+            opacity: 1 !important;
+        }
     }
     .rs-input-group-addon {
         display: none !important;

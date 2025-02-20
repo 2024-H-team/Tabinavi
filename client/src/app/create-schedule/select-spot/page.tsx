@@ -160,12 +160,10 @@ export default function CreateSchedule() {
     const handleLoadMore = (visibleSpots: PlaceDetails[]) => {
         setVisibleRecommendedSpots(visibleSpots);
     };
-    console.log(isContainerOpen);
     return (
         <div
             className={Styles.page}
-            onClick={(e) => {
-                console.log('Click on .page', e);
+            onClick={() => {
                 setIsContainerOpen(false);
             }}
         >

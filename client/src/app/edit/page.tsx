@@ -49,7 +49,7 @@ export default function Edit() {
                             ここに押したらスポットの滞在時間、持ち物リストなどの情報が自動的に保存されます。
                         </div>
                     </div>
-                    <div className={styles.closeMess}>画面タッチして閉じる</div>
+                    <div className={styles.closeMess}>画面をタッチして閉じる</div>
                 </div>
             )}
             <EditHeader location={spot?.name || '未設定'} onShowManual={() => setShowManual(true)} />

@@ -66,7 +66,13 @@ export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
                     el.textContent = '分';
                 }
             });
-        }, 10);
+            const inputs = document.querySelectorAll(
+                '.rs-input, .rs-picker-input input',
+            ) as NodeListOf<HTMLInputElement>;
+            inputs.forEach((input) => {
+                input.disabled = true;
+            });
+        }, 50);
 
         return () => clearInterval(interval);
     }, [showPicker]);
@@ -80,7 +86,16 @@ export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
                         <TimePicker
                             format="HH:mm"
                             value={time}
-                            onChange={handleTimeChange}
+                            onChange={(value) => {
+                                handleTimeChange(value);
+
+                                setTimeout(() => {
+                                    (document.querySelector('.rs-picker-input input') as HTMLInputElement)?.blur();
+                                }, 100);
+                            }}
+                            hideMinutes={(minute) => minute % 5 !== 0}
+                            placement="autoVerticalStart"
+                            tabIndex={-1}
                             style={{
                                 fontSize: '1.2rem',
                                 padding: '6px 10px',

@@ -193,7 +193,7 @@ export default function InfoSetup() {
                                     <div className={styles.timePickerGroup}>
                                         <div className={styles.pickers}>
                                             <MobileTimePicker
-                                                label="出発時刻"
+                                                label="開始時刻"
                                                 ampm={false}
                                                 value={startObj}
                                                 onChange={(newVal) => {
