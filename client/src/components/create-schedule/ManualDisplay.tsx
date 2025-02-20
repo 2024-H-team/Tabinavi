@@ -19,7 +19,7 @@ export default function ManualDisplay() {
                 <div className={styles.manualArrow}></div>
                 <div className={styles.manualText}>電車の場合、ここに路線を見ることができます。</div>
             </div>
-            <div className={styles.closeMess}>画面タッチして閉じる</div>
+            <div className={styles.closeMess}>画面をタッチして閉じる</div>
         </div>
     );
 }

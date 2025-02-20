@@ -56,7 +56,13 @@ export default function SelectedSpot({
                     el.textContent = '分';
                 }
             });
-        }, 10);
+            const inputs = document.querySelectorAll(
+                '.rs-input, .rs-picker-input input',
+            ) as NodeListOf<HTMLInputElement>;
+            inputs.forEach((input) => {
+                input.disabled = true;
+            });
+        }, 50);
 
         return () => clearInterval(interval);
     }, []);
@@ -87,8 +93,16 @@ export default function SelectedSpot({
                 <TimePicker
                     format="HH:mm"
                     value={time}
-                    onChange={handleTimeChangeRSuite}
+                    hideMinutes={(minute) => minute % 5 !== 0}
+                    onChange={(value) => {
+                        handleTimeChangeRSuite(value);
+
+                        setTimeout(() => {
+                            (document.querySelector('.rs-picker-input input') as HTMLInputElement)?.blur();
+                        }, 100);
+                    }}
                     placement="autoVerticalStart"
+                    tabIndex={-1}
                 />
             </div>
         </div>
