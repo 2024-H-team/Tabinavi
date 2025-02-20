@@ -48,16 +48,8 @@
         height: 20px !important;
     }
 }
-.rs-picker-input-group {
+.rs-picker {
     position: relative !important;
-    border: 1px solid #aaaaaa !important;
-    input {
-        padding: 0px 5px !important;
-        margin: 0 !important;
-        pointer-events: none !important;
-        caret-color: transparent !important;
-        user-select: none !important;
-    }
     &::after {
         content: '' !important;
         position: absolute !important;
@@ -75,9 +67,21 @@
         caret-color: transparent !important;
         user-select: none !important;
     }
+}
+.rs-picker-input-group {
+    position: relative !important;
+    border: 1px solid #aaaaaa !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    input {
+        padding: 0px 5px !important;
+        margin: 0 !important;
+        pointer-events: none !important;
+        caret-color: transparent !important;
+        user-select: none !important;
+    }
     .rs-input-group-addon {
-        padding: 5px 10px !important;
-        padding-right: 10px !important;
+        display: none !important;
     }
 }
 .rs-anim-fade {
@@ -88,9 +92,6 @@
 }
 .rs-picker {
     padding: 0 !important;
-}
-.rs-input-group-addon {
-    display: none !important;
 }
 .rs-picker-toolbar {
     padding: 5px 10px !important;
