@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '@styles/componentStyles/edit/Content.module.scss';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { PlaceDetails } from '@/types/PlaceDetails';
@@ -56,6 +56,20 @@ export default function EditFieldTime({ title, spot }: EditFieldTimeProps) {
 
     const displayHour = time.getHours().toString().padStart(2, '0');
     const displayMinute = time.getMinutes().toString().padStart(2, '0');
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            document.querySelectorAll('.rs-calendar-time-dropdown-column-title').forEach((el) => {
+                if (el.textContent?.trim() === 'Hours') {
+                    el.textContent = '時';
+                } else if (el.textContent?.trim() === 'Minutes') {
+                    el.textContent = '分';
+                }
+            });
+        }, 10);
+
+        return () => clearInterval(interval);
+    }, [showPicker]);
 
     return (
         <div className={styles.EditWrap} onClick={() => setShowPicker(true)}>

@@ -54,9 +54,9 @@
     input {
         padding: 0px 5px !important;
         margin: 0 !important;
-        pointer-events: none;
-        caret-color: transparent;
-        user-select: none;
+        pointer-events: none !important;
+        caret-color: transparent !important;
+        user-select: none !important;
     }
     &::after {
         content: '' !important;

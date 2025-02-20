@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import styles from '@styles/componentStyles/create-schedule/SelectedSpot.module.scss';
 import { PlaceDetails } from '@/types/PlaceDetails';
 import { TimePicker } from 'rsuite';
@@ -46,6 +46,20 @@ export default function SelectedSpot({
     const truncateText = (text: string, maxLength: number = 15) => {
         return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
     };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            document.querySelectorAll('.rs-calendar-time-dropdown-column-title').forEach((el) => {
+                if (el.textContent?.trim() === 'Hours') {
+                    el.textContent = '時';
+                } else if (el.textContent?.trim() === 'Minutes') {
+                    el.textContent = '分';
+                }
+            });
+        }, 10);
+
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <div
