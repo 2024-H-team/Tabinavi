@@ -43,7 +43,7 @@ export default function SelectedSpot({
         onStayTimeUpdate(spot.name, { hour: h, minute: m });
     };
 
-    const truncateText = (text: string, maxLength: number = 15) => {
+    const truncateText = (text: string, maxLength: number = 12) => {
         return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
     };
 
