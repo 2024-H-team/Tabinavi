@@ -14,7 +14,7 @@ interface LoginFormData {
 }
 
 interface UserData {
-    id: number;
+    userID: number;
     userName: string;
     email?: string;
     created_at?: string;
@@ -40,15 +40,17 @@ export default function LoginPage() {
             const response = await apiClient.post('/auth/login', data);
             if (response.data.success) {
                 const { token, user } = response.data.data;
+
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', JSON.stringify(user));
+
                 const expirationDate = new Date();
                 expirationDate.setDate(expirationDate.getDate() + 7);
                 document.cookie = `token=${token}; path=/; expires=${expirationDate.toUTCString()}`;
+
                 const firstLoginData = localStorage.getItem('firstLoginData');
                 const firstLoginUsers: UserData[] = firstLoginData ? JSON.parse(firstLoginData) : [];
-
-                const existingUser = firstLoginUsers.find((u: UserData) => u.id === user.id);
+                const existingUser = firstLoginUsers.find((u: UserData) => u.userID === user.userID);
 
                 if (!existingUser) {
                     firstLoginUsers.push(user);
